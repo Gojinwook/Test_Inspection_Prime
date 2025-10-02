@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Inspect_Testing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Inspect_TestingDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algoritms\Inspect_Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algoritms\PinholeIsland.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algoritms\OpenShort.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algoritms\Alig2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algoritms\BuildIRB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algoritms\FWMFuncs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algoritms\TSQueueSM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Define.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algoritms\LowGray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algoritms\Our_Algorithms.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Halcon_Exchange.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CParams_Dialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algoritms\Inspect_Call.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algoritms\Lib\Open_Short_2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algoritms\Lib\Slice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algoritms\Lib\CParams.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algoritms\Lib\FWMFuncs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Inspect_Testing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Inspect_TestingDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Algoritms\Inspect_Common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Algoritms\PinholeIsland.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Algoritms\OpenShort.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Algoritms\FWMFuncs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Algoritms\Alig2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Algoritms\BuildIRB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Algoritms\LowGray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Algoritms\Our_Algorithms.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Halcon_Exchange.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CParams_Dialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Algoritms\Inspect_Call.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="InspectTesting.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\InspectTesting.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Algoritms\Lib\ALGORITHMSUB.dll" />
+    <None Include="Algoritms\Lib\ALGORITHMSUB_D.dll" />
+    <None Include="Algoritms\Lib\FWMDLL.dll" />
+    <None Include="Algoritms\Lib\Alg_Params.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\Inspect_Testing.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="Algoritms\Lib\ALGORITHMSUB.lib" />
+    <Library Include="Algoritms\Lib\ALGORITHMSUB_D.lib" />
+    <Library Include="Algoritms\Lib\FWMDLL.lib" />
+    <Library Include="Algoritms\Lib\Alg_Params.lib" />
+  </ItemGroup>
+</Project>

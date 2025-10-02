@@ -1,0 +1,1019 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="main">
+<interface/>
+<body>
+<c>*******************************************************</c>
+<c>*** Загрузка данных</c>
+<c>*******************************************************</c>
+<l>* read_image (Gi, 'G:/SAMSUNG/Test/p2112-004t3_2P0/Model/Gi.tif')</l>
+<l>* read_object (Regnoproc, 'G:/SAMSUNG/Test/p2112-004t3_2P0/Model/RegNoProc.hobj')</l>
+<l>* read_image (Gi, 'G:/SAMSUNG/NewData/p2309-001t1/Model_p2309-001t1_2P0/Model/Gi.tif')</l>
+<l>* read_image (Im, 'G:/SAMSUNG/NewData/p2309-001t1/Model_p2309-001t1_2P0/Model/Im.tif')</l>
+<l>* read_object (Regnoproc, 'G:/SAMSUNG/NewData/p2309-001t1/Model_p2309-001t1_2P0/Model/RegNoProc.hobj')</l>
+<c></c>
+<c></c>
+<l>*path_model := 'C:/WORK_CURR/SAMSUNG/Samsung-AOI/Vision/AOI/Run/Model/Model_p2309-001t1_2P0/Model/'</l>
+<l>path_model := 'C:/WORK_CURR/SAMSUNG/Samsung-AOI/Vision/AOI/Run/Model/Model_p2312-015d1_2P0_V1/Model/'</l>
+<l>path_teach := path_model + 'Teach/'</l>
+<c></c>
+<c></c>
+<l>* path_model := 'G:/SAMSUNG/Model_AOI/p2305-018t3/Model/'</l>
+<l>* path_teach := 'G:/SAMSUNG/Model_AOI/p2305-018t3/Model/Teach/'</l>
+<l>path_teach_tuples := path_teach + 'Tuples/'</l>
+<c></c>
+<c></c>
+<l>* path_model := 'C:/WORK_CURR/SAMSUNG/Samsung-AOI/Vision/AOI/Run/Model/p2305-018t2_2P0/Model/'</l>
+<l>* path_teach := path_model + 'Teach/'</l>
+<l>path_image := 'C:/TmpIm/'</l>
+<l>* path_image := 'G:/SAMSUNG/NewData/p2309-001t1/image/'</l>
+<c></c>
+<l>read_image (Gi_Im, path_model + 'Gi.tif')</l>
+<c></c>
+<l>read_object (Gi, path_model + 'Gi.hobj')</l>
+<l>read_object (Skel_FWMS, path_teach + 'SkeletonsLG.hobj')</l>
+<l>read_object (Skel_FWM, path_teach + 'SkeletonsFWM.hobj')</l>
+<l>read_image (WidthImageS, path_teach + 'WidthImageS.tif')</l>
+<c></c>
+<c></c>
+<l>* read_image (Gi, 'G:/SAMSUNG/Model_3/AOI/p2112-004t3_2P0/Model/Gi.tif')</l>
+<c></c>
+<l>stop()</l>
+<c>*******************************************************</c>
+<c>*** Параметры</c>
+<c>*******************************************************</c>
+<l>dev_update_off()</l>
+<l>Win := 20</l>
+<l>WinD2 := Win/2</l>
+<l>* SensLen := 50</l>
+<l>SensLen := 0</l>
+<c>*******************************************************</c>
+<c>*** Обучение</c>
+<c>*******************************************************</c>
+<l>Teach_Slice (Skel_FWMS, WidthImageS, Win, SensLen, path_teach_tuples, Pointer_Skel, Pointer_Sens, Rows_Sens, Cols_Sens, Pointer_Pos, CurrentOper, TotalPRC, MaxPRC)</l>
+<c></c>
+<l>* Teach_Slice (Skel_FWMS, WidthImageS, Win, SensLen, path_teach_tuples, _, _, _, _, _, CurrentOper, TotalPRC, MaxPRC)</l>
+<c></c>
+<l>stop()</l>
+<l>read_tuple(path_teach_tuples + 'Pointer_Skel.tup', Pointer_Skel)</l>
+<l>read_tuple(path_teach_tuples + 'Pointer_Sens.tup', Pointer_Sens)</l>
+<l>read_tuple(path_teach_tuples + 'Rows_Sens.tup', Rows_Sens)</l>
+<l>read_tuple(path_teach_tuples + 'Cols_Sens.tup', Cols_Sens)</l>
+<l>stop()</l>
+<c></c>
+<l>* read_object (Regnoproc, 'G:/SAMSUNG/Model_3/AOI/p2305-001d2_2P0_Test/Model/RegNoProc.hobj')</l>
+<l>* read_image (Gi, 'G:/SAMSUNG/Model_3/AOI/p2305-001d2_2P0_Test/Model/Gi.tif')</l>
+<c></c>
+<c></c>
+<l>* select_obj (Reg_SEL1_XLD, Reg_SEL1, 1)</l>
+<l>* get_contour_xld(Reg_SEL1, Rows, Cols)    </l>
+<l>* Pointer := 0</l>
+<l>* Pointer_Pos := 0</l>
+<l>* Pointer_Sens := []</l>
+<l>* Rows_Sens := []</l>
+<l>* Cols_Sens := []</l>
+<c></c>
+<l>* tuple_length(Rows, Len)</l>
+<l>* for Ind := WinD2 to Len - WinD2 - 1 by 1</l>
+<l>*     Ind0 := Ind - WinD2</l>
+<l>*     Ind1 := Ind + WinD2</l>
+<c>    </c>
+<l>*     tuple_atan2(Rows[Ind0] - Rows[Ind1], Cols[Ind0] - Cols[Ind1], Angle) </l>
+<l>*     tuple_deg(Angle, Angle_Deg)</l>
+<c>    </c>
+<l>*     tuple_cos(Angle + 1.5708, Cos)</l>
+<l>*     tuple_sin(Angle + 1.5708, Sin)</l>
+<l>*     P1X := Cols[Ind] + Cos * SensLenD2</l>
+<l>*     P1Y := Rows[Ind] + Sin * SensLenD2</l>
+<c></c>
+<l>*     tuple_cos(Angle + 4.71239, Cos)</l>
+<l>*     tuple_sin(Angle + 4.71239, Sin)</l>
+<l>*     P2X := Cols[Ind] + Cos * SensLenD2</l>
+<l>*     P2Y := Rows[Ind] + Sin * SensLenD2</l>
+<c>    </c>
+<l>*     gen_region_line(Reg_Sens, P1Y, P1X, P2Y, P2X)</l>
+<l>*     gen_contours_skeleton_xld(Reg_Sens, Reg_Sens_XLD, 1, 'filter')</l>
+<l>*     get_contour_xld(Reg_Sens_XLD, Rows_S, Cols_S)    </l>
+<c></c>
+<l>*     tuple_concat(Rows_Sens, Rows_S, Rows_Sens)</l>
+<l>*     tuple_concat(Cols_Sens, Cols_S, Cols_Sens)</l>
+<c>    </c>
+<l>*     tuple_length(Rows_S, Length)</l>
+<l>*     Pointer_Sens[Pointer] := Pointer_Pos</l>
+<l>*     Pointer := Pointer + 1</l>
+<l>*     Pointer_Pos := Pointer_Pos + Length</l>
+<c>    </c>
+<l>* endfor</l>
+<l>* Pointer_Sens[Pointer] := Pointer_Pos</l>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<l>stop()</l>
+<c></c>
+<c>*******************************************************</c>
+<c>*** Инспекция</c>
+<c>*******************************************************</c>
+<l>* read_image (Im, path_image + 'Im1_44.tif')</l>
+<l>read_image (Im, path_image + 'Im1_101.tif')</l>
+<c></c>
+<c></c>
+<l>Widt_Pos := 0</l>
+<l>Widt_S := []</l>
+<l>Depth_S := []</l>
+<l>Rows_Cent := []</l>
+<l>Cols_Cent := []</l>
+<l>tuple_length(Pointer_Skel, Count_Skel)</l>
+<l>Pos_Skel_S := 0</l>
+<l>for I_Skel := 0 to Count_Skel - 1 by 1</l>
+<l>    Pos_Skel_E := Pointer_Skel[I_Skel]</l>
+<c>    </c>
+<l>    *Pos_Skel_S := Pos_Skel_E - 50</l>
+<l>    *Pos_Skel_E := Pointer_Skel[I_Skel] - 12</l>
+<c>    </c>
+<l>    Depth_Pos := 1</l>
+<l>    for Point := Pos_Skel_S to Pos_Skel_E by 1</l>
+<c>        </c>
+<l>*         Point := 18900</l>
+<l>*         Point := 1440</l>
+<c>        </c>
+<l>        Point_S := Pointer_Sens[Point]</l>
+<l>        *Point_E := Point_S + 50</l>
+<l>        Point_E := Pointer_Sens[Point + 1] - 1</l>
+<c>        </c>
+<l>        tuple_select_range(Rows_Sens, Point_S, Point_E, Rows)</l>
+<l>        tuple_select_range(Cols_Sens, Point_S, Point_E, Cols)</l>
+<l>        get_grayval (Im, Rows, Cols, Gray)</l>
+<l>        tuple_length(Gray, Gray_Len)</l>
+<l>        SensLenD2 := Gray_Len / 2</l>
+<c></c>
+<l>        *Moving_Avg(Gray, 3, Gray)</l>
+<c>        </c>
+<c>        </c>
+<l>*         create_funct_1d_array(Gray, FGray)</l>
+<l>*         smooth_funct_1d_mean(FGray, 10, 1, GraySM)</l>
+<l>*         tuple_last_n(GraySM, 3, Gray)</l>
+<l>*         tuple_min(Gray, Min)</l>
+<c>       </c>
+<c>        </c>
+<c>        ** Находим минимальный ближе к центру - это дно Space</c>
+<l>        SN_Loc_Min (Gray, Loc_Min, Loc_Min_Val)</l>
+<c>        </c>
+<c>        *** Поиск точек перегиба Inflection points ***********************************************</c>
+<c></c>
+<c>        ** Интерполяция</c>
+<l>*         NI := 5</l>
+<l>*         Gray_NI := []</l>
+<l>*         Pos_NI := 0</l>
+<l>*         for I := 0 to Gray_Len - 2 by 1</l>
+<l>*             tuple_real(Gray[I], Gray0)</l>
+<l>*             tuple_real(Gray[I + 1], Gray1)</l>
+<l>*             D_Gary := (Gray1 - Gray0) / NI</l>
+<l>*             for It := 0 to NI - 1 by 1</l>
+<l>*                 Gray_NI[Pos_NI] := Gray0 + (D_Gary * It)</l>
+<l>*                 Pos_NI := Pos_NI + 1</l>
+<l>*             endfor</l>
+<l>*         endfor</l>
+<c>        </c>
+<c>        ** Сглаживание</c>
+<l>*         tuple_length(Gray_NI, Len_NI)</l>
+<l>        *Moving_Avg(Gray_NI, Len_NI / 20, Gray_NIS)</l>
+<c>        </c>
+<l>*         create_funct_1d_array(Gray_NI, FGray_NI)</l>
+<l>*         smooth_funct_1d_mean(FGray_NI, 15, 3, FGray_NIS)</l>
+<c>        </c>
+<l>*         derivate_funct_1d(FGray_NIS, 'second', Derivative2)</l>
+<l>*         derivate_funct_1d(FGray_NIS, 'first', Derivative1)</l>
+<l>*         smooth_funct_1d_mean(Derivative1, 10, 3, Derivative11)</l>
+<l>*         smooth_funct_1d_mean(Derivative2, 15, 2, Derivative21)</l>
+<l>*         Derivative21 := Derivative21 * 100 + 100</l>
+<c>        </c>
+<c>        </c>
+<c>        </c>
+<c>        </c>
+<c>        ***  *************************************************************************************</c>
+<c>        </c>
+<c>        </c>
+<c>        * Найти минимальный минимум. </c>
+<c>        * С допуском просматриваем все минимумы и выбираем, который ближе к центу</c>
+<l>        tuple_min(Loc_Min_Val, Min_Val)</l>
+<l>        Diff := 1000000</l>
+<l>        tuple_length(Loc_Min, Cnt)</l>
+<l>        for I := 0 to Cnt - 1 by 1</l>
+<l>            if (Loc_Min_Val[I] &lt;= Min_Val + 1)</l>
+<l>                if (Diff &gt; abs(SensLenD2 - Loc_Min[I]))</l>
+<l>                    Bott := Loc_Min[I]</l>
+<l>                    Diff := abs(SensLenD2 - Loc_Min[I])</l>
+<l>                endif</l>
+<l>            endif</l>
+<l>        endfor</l>
+<c>        </c>
+<c>        ** Глубина ----------------------------------------------------------</c>
+<l>        if (Depth_Pos == 1)</l>
+<l>            Depth_S[Depth_Pos - 1] := 0</l>
+<l>            Rows_Cent[Depth_Pos - 1] := Rows[Bott]</l>
+<l>            Cols_Cent[Depth_Pos - 1] := Cols[Bott]</l>
+<l>        endif</l>
+<c></c>
+<l>        Depth := Gray[Bott] </l>
+<l>        Depth_S[Depth_Pos] := Depth</l>
+<c>        </c>
+<l>        Rows_Cent[Depth_Pos] := Rows[Bott]</l>
+<l>        Cols_Cent[Depth_Pos] := Cols[Bott]</l>
+<c>        </c>
+<l>        Depth_Pos := Depth_Pos + 1</l>
+<c>        </c>
+<c>        </c>
+<c>        ** Ширина -----------------------------------------------------------</c>
+<l>*          create_funct_1d_array(Gray, FGray)</l>
+<l>*          smooth_funct_1d_mean(FGray, 10, 3, GraySM)</l>
+<l>*          tuple_last_n(GraySM, 3, Gray)</l>
+<l>*          tuple_min(Gray, Min)</l>
+<c>        </c>
+<l>*         thr :=  Depth  * 1.5</l>
+<l>*         thr :=  140</l>
+<l>*         thr :=  Min + 20</l>
+<c>        </c>
+<l>*         for I := Bott to 0 by -1</l>
+<l>*             if (Gray[I] &gt;= thr)</l>
+<l>*                 P1 := I</l>
+<l>*                 break</l>
+<l>*             endif</l>
+<l>*         endfor</l>
+<c>        </c>
+<l>*         for I := Bott to Len-1 by 1</l>
+<l>*             if (Gray[I] &gt;= thr)</l>
+<l>*                 P2 := I</l>
+<l>*                 break</l>
+<l>*             endif</l>
+<l>*         endfor</l>
+<c>        </c>
+<c>        </c>
+<c>        </c>
+<l>*         Fl := 0</l>
+<l>*         tuple_length(Gray, Len)</l>
+<l>*         for I := 0 to Len-1 by 1</l>
+<l>*             if (Gray[I] &gt;= thr and Fl == 0)</l>
+<l>*                 Fl := 1</l>
+<l>*             elseif (Gray[I] &lt;= thr and Fl == 1)</l>
+<l>*                 P1 := I</l>
+<l>*                 Fl := 2</l>
+<l>*             elseif (Gray[I] &gt; thr and Fl == 2)</l>
+<l>*                 P2 := I</l>
+<l>*                 break</l>
+<l>*             endif</l>
+<l>*         endfor</l>
+<c>    </c>
+<l>*         tuple_real(Gray[P1], T1)</l>
+<l>*         tuple_real(Gray[P1 + 1], T2)</l>
+<l>*         Pr := (T1 - thr) / (T1 - T2)</l>
+<l>*         P1A := P1 + Pr </l>
+<c>        </c>
+<c>        </c>
+<l>*         tuple_real(Gray[P2], T1)</l>
+<l>*         tuple_real(Gray[P2 - 1], T2)</l>
+<l>*         Pr := (T1 - thr) / (T1 - T2)</l>
+<l>*         P2A := P2 - Pr </l>
+<c>        </c>
+<c>        </c>
+<l>*         Widt := P2A - P1A </l>
+<l>*         Widt_S[Point] := Widt</l>
+<c>        ** ----------------------------------------------------------------            </c>
+<c>        </c>
+<l>*         gen_circle(Circle, Rows[Bott], Cols[Bott], 10.5)</l>
+<l>        tuple_length(Rows, Len)</l>
+<l>        gen_region_line(Line_Sens, Rows[0], Cols[0], Rows[Len-1], Cols[Len-1])</l>
+<l>        disp_obj(Line_Sens, 200000)</l>
+<c>        </c>
+<c>        </c>
+<c>        </c>
+<c>        </c>
+<l>*         Gray3 := Gray2</l>
+<l>*         Gray2 := Gray1</l>
+<l>*         Gray1 := Gray</l>
+<l>    endfor</l>
+<c>    </c>
+<c>    ** Добавлении заднего фронта. Для определения граничных дефектов</c>
+<l>    *Depth_Pos := Depth_Pos + 1</l>
+<l>    Depth_S[Depth_Pos] := 0</l>
+<c>    </c>
+<l>    Rows_Cent[Depth_Pos] := Rows[Bott]</l>
+<l>    Cols_Cent[Depth_Pos] := Cols[Bott]</l>
+<c>    </c>
+<c>    </c>
+<l>*     szw := 8</l>
+<l>*     FilterFloadMedn(Widt_S, szw, 50, 50, Def, Wfilt1, Wch1, Prc1)</l>
+<c></c>
+<l>    szw := 50</l>
+<l>    FilterFloadMedn(Depth_S, szw, 10, 10, Def, Wfilt, Wcmnh, Prc)</l>
+<c>    </c>
+<c></c>
+<l>*     read_tuple('C:/Temp/hv_Depth_S.tup', hv_Depth_S)</l>
+<l>*     read_tuple('C:/Temp/hv_Depth_Ppr_S.tup', hv_Depth_Ppr_S)</l>
+<c>    </c>
+<c>    * Определение дефектов</c>
+<c>    </c>
+<l>    tuple_length(Depth_S, Cnt)</l>
+<l>    for I := 0 to Cnt - 1 by 1</l>
+<c>        </c>
+<l>        if (Prc[I] &gt; 35)</l>
+<l>            Rows_S := Rows_Cent[I]</l>
+<l>            Cols_S := Cols_Cent[I]</l>
+<c></c>
+<l>            gen_circle(Circle, Rows_S, Cols_S, 10.5)</l>
+<l>            disp_obj(Circle, 200000)</l>
+<c>            </c>
+<l>        endif</l>
+<l>    endfor</l>
+<c>    </c>
+<c>    </c>
+<c>    </c>
+<l>    Pos_Skel_S := Pos_Skel_E + 1</l>
+<c>    </c>
+<l>endfor</l>
+<c></c>
+<c></c>
+<c>*******************************************************</c>
+<c>*** Инспекция</c>
+<c>*******************************************************</c>
+<l>dev_update_on()</l>
+<l>dev_update_off()</l>
+<c></c>
+<l>thr := 230</l>
+<c></c>
+<l>read_image (Im, path_image + 'Im1_29.tif')</l>
+<l>* read_image (Im, path_image + 'Im10_143.tif')</l>
+<c></c>
+<l>Auto_Threshold5 (Skel_FWMS, Im, thr, thrS, thrP)</l>
+<c></c>
+<c></c>
+<l>Widt_Pos := 0</l>
+<l>Widt_S := []</l>
+<l>Depth_S := []</l>
+<l>tuple_length(Pointer_Sens, Count_Sens)</l>
+<l>for Point := 0 to Count_Sens - 2 by 1</l>
+<c>    </c>
+<l>    *Point := 850</l>
+<l>    *Point := 1400</l>
+<l>    Point := 2679</l>
+<c>     </c>
+<c>     </c>
+<l>    Point_S := Pointer_Sens[Point]</l>
+<l>    Point_E := Pointer_Sens[Point + 1] - 1</l>
+<c>    </c>
+<l>    tuple_select_range(Rows_Sens, Point_S, Point_E, Rows)</l>
+<l>    tuple_select_range(Cols_Sens, Point_S, Point_E, Cols)</l>
+<l>    get_grayval (Im, Rows, Cols, Gray)</l>
+<c></c>
+<l>*     create_funct_1d_array(Gray, FGray)</l>
+<l>*     smooth_funct_1d_mean(FGray, 5, 3, Gray)</l>
+<l>*     local_min_max_funct_1d(Gray, 'plateaus_center', 'true', Min21, Max21)   </l>
+<c>    </c>
+<c>    *** Поиск пика</c>
+<c>    * Для каждого минимума найдем максимумы</c>
+<c>    * Это будет ПИК</c>
+<l>*     create_funct_1d_array(Gray, FGray)</l>
+<l>*     local_min_max_funct_1d(FGray, 'plateaus_center', 'true', MinG, MaxG)</l>
+<c>    </c>
+<c>    ** Находим минимальный ближе к центру - это дно Space</c>
+<l>    SN_Loc_Min (Gray, Loc_Min, Loc_Min_Val)</l>
+<c>    </c>
+<c>    * Найти минимальный минимум. </c>
+<c>    * С допуском просматриваем все минимумы и выбираем, который ближе к центу</c>
+<l>    tuple_min(Loc_Min_Val, Min_Val)</l>
+<l>    Diff := 1000000</l>
+<l>    tuple_length(Loc_Min, Cnt)</l>
+<l>    for I := 0 to Cnt - 1 by 1</l>
+<l>        if (Loc_Min_Val[I] &lt;= Min_Val + 10)</l>
+<l>            if (Diff &gt; abs(SensLenD2 - Loc_Min[I]))</l>
+<l>                Bott := Loc_Min[I]</l>
+<l>                Diff := abs(SensLenD2 - Loc_Min[I])</l>
+<l>            endif</l>
+<l>        endif</l>
+<l>    endfor</l>
+<c>    </c>
+<c>    ** Глубина ----------------------------------------------------------</c>
+<l>    Depth := Gray[Bott] </l>
+<l>    Depth_S[Point] := Depth</l>
+<c></c>
+<c>   </c>
+<c>    ** Найти Максимумы вокруг найденного дна  </c>
+<l>    SN_Loc_Max_Center (Gray, Bott, Loc_Max, Loc_Max_Val)</l>
+<c></c>
+<l>    Max_Val_L := 0</l>
+<l>    Max_Val_R := 0</l>
+<l>    tuple_length(Loc_Max, Cnt)</l>
+<l>    for I := 0 to Cnt - 1 by 1</l>
+<l>        if (Loc_Max[I] &lt; Bott and Loc_Max_Val[I] &gt; Max_Val_L)</l>
+<l>            Max_Val_L := Loc_Max_Val[I]</l>
+<l>        elseif (Loc_Max[I] &gt; Bott and Loc_Max_Val[I] &gt; Max_Val_R)</l>
+<l>            Max_Val_R := Loc_Max_Val[I]</l>
+<l>        endif</l>
+<l>    endfor</l>
+<c>    </c>
+<c>    </c>
+<c>    ** Найти порог ------------------------------------------------------</c>
+<l>*     create_funct_1d_array(Gray, FGray)</l>
+<l>*     smooth_funct_1d_mean(FGray, 1, 2, FGray_SM)</l>
+<l>*     local_min_max_funct_1d(FGray_SM, 'plateaus_center', 'true', Min21, Max21)</l>
+<c>    </c>
+<c>    </c>
+<l>*     tuple_max2(Max_Val_L,  Max_Val_R, Max_Val)</l>
+<l>*     thr := Max_Val - (Max_Val - Gray[Bott]) * 0.5</l>
+<c></c>
+<l>*     tuple_min2(Max_Val_L,  Max_Val_R, Min_Val)</l>
+<l>*     thr := Min_Val - (Min_Val - Gray[Bott]) * 0.3</l>
+<l>    thr :=  Depth  * 1.3</l>
+<c>   </c>
+<c>    </c>
+<c>    ** Ширина -----------------------------------------------------------</c>
+<l>    Fl := 0</l>
+<l>    tuple_length(Gray, Len)</l>
+<l>    for I := 0 to Len-1 by 1</l>
+<l>        if (Gray[I] &gt;= thr and Fl == 0)</l>
+<l>            Fl := 1</l>
+<l>        elseif (Gray[I] &lt;= thr and Fl == 1)</l>
+<l>            P1 := I</l>
+<l>            Fl := 2</l>
+<l>        elseif (Gray[I] &gt; thr and Fl == 2)</l>
+<l>            P2 := I</l>
+<l>            break</l>
+<l>        endif</l>
+<l>    endfor</l>
+<c></c>
+<l>    tuple_real(Gray[P1], T1)</l>
+<l>    tuple_real(Gray[P1 - 1], T2)</l>
+<l>    Pr := (T1 - thr) / (T1 - T2)</l>
+<l>    P1A := P1 - Pr </l>
+<c>    </c>
+<c>    </c>
+<l>    tuple_real(Gray[P2], T1)</l>
+<l>    tuple_real(Gray[P2 - 1], T2)</l>
+<l>    Pr := (T1 - thr) / (T1 - T2)</l>
+<l>    P2A := P2 - Pr </l>
+<c>    </c>
+<c>    </c>
+<l>    Widt := P2A - P1A </l>
+<l>    Widt_S[Point] := Widt</l>
+<c>    </c>
+<l>    tuple_length(Rows, Len)</l>
+<l>    gen_region_line(Line_Sens, Rows[0], Cols[0], Rows[Len-1], Cols[Len-1])</l>
+<c>    </c>
+<c>    * Измеряем расстояние между пиками и глубину</c>
+<c>    * Находим Порог по середине пика</c>
+<c>    </c>
+<c>    </c>
+<l>*     Fl := 0</l>
+<l>*     Max_Val := 0</l>
+<l>*     tuple_length(Loc_Max, Cnt)</l>
+<l>*     for I := 0 to Cnt - 1 by 1</l>
+<l>*         if (Loc_Max[I] &gt;= Bott)</l>
+<l>*             Fl := 1</l>
+<l>*             Max_Val := 0</l>
+<l>*         endif</l>
+<c>        </c>
+<l>*         if (Fl == 0 and Loc_Max_Val[I] &gt; Max_Val)</l>
+<l>*             Boot_L := I</l>
+<l>*             Max_Val := Loc_Max_Val[I]</l>
+<l>*         elseif (Fl == 1 and Loc_Max_Val[I] &gt; Max_Val)</l>
+<l>*             Boot_R := I</l>
+<l>*             Max_Val := Loc_Max_Val[I]</l>
+<l>*             break</l>
+<l>*         endif</l>
+<l>*     endfor</l>
+<c>    </c>
+<c>    </c>
+<l>*     for I := 0 to Cnt - 1 by 1</l>
+<l>*         if (Loc_Max[I] &lt; Bott)</l>
+<l>*             Boot_L := I</l>
+<l>*         elseif (Loc_Max[I] &gt; Bott)</l>
+<l>*             Boot_R := I</l>
+<l>*             break</l>
+<l>*         endif</l>
+<l>*     endfor</l>
+<c>    </c>
+<c>    </c>
+<c>    </c>
+<c>    *** ---</c>
+<c>    </c>
+<c>    </c>
+<c>    </c>
+<c>    </c>
+<l>*     create_funct_1d_array(Gray, FGray)</l>
+<l>*     smooth_funct_1d_mean(FGray, 1, 2, FGrayS)</l>
+<c>    </c>
+<l>*     Fl := 1</l>
+<l>*     tuple_length(Gray, Len)</l>
+<l>*     for I := 0 to Len - 1 by 1</l>
+<c>            </c>
+<l>*         if (Gray[I] &lt;= thr and Gray[I] &gt; Gray[I + 1] and Fl == 1)</l>
+<l>*             P1 := I</l>
+<l>*             Fl := 2</l>
+<l>*         elseif (Gray[I] &gt;= thr and Fl == 2)</l>
+<l>*             P2 := I</l>
+<l>*             break</l>
+<l>*         endif</l>
+<l>*     endfor</l>
+<c></c>
+<l>*     tuple_real(Gray[P1], T1)</l>
+<l>*     tuple_real(Gray[P1 - 1], T2)</l>
+<l>*     Pr := (T1 - thr) / (T1 - T2)</l>
+<l>*     P1A := P1 - Pr </l>
+<c>    </c>
+<c>    </c>
+<l>*     tuple_real(Gray[P2], T1)</l>
+<l>*     tuple_real(Gray[P2 - 1], T2)</l>
+<l>*     Pr := (T1 - thr) / (T1 - T2)</l>
+<l>*     P2A := P2 - Pr </l>
+<c>    </c>
+<c>    </c>
+<l>*     Widt[Widt_Pos] := P2A - P1A </l>
+<l>*     Widt_Pos := Widt_Pos + 1</l>
+<c>    </c>
+<c></c>
+<c>    </c>
+<c>    </c>
+<l>endfor</l>
+<c></c>
+<l>szw := 50</l>
+<l>FilterFloadMedn(Widt_S, szw, 50, 50, Def, Wfilt1, Wch1, Prc1)</l>
+<l>FilterFloadMedn(Depth_S, szw, 50, 50, Def, Wfilt, Wch, Prc)</l>
+<c></c>
+<c></c>
+<c></c>
+<l>Gray1 := []</l>
+<l>Gray2 := []</l>
+<c></c>
+<c></c>
+<l>Tuple_In := Widt</l>
+<l>Move_Avg := 10</l>
+<c></c>
+<c></c>
+<c>* Скользящее среднее</c>
+<l>tuple_length (Tuple_In, t_len)</l>
+<l>move_avg_h := Move_Avg</l>
+<l>sum_mov := Tuple_In[0] * move_avg_h</l>
+<l>tuple_gen_const (t_len, 0, Tuple_Avg)</l>
+<l>for k := 0 to t_len + move_avg_h/2 - 1 by 1</l>
+<l>    if (k &gt;= move_avg_h / 2)</l>
+<l>        Tuple_Avg[k - move_avg_h / 2] := sum_mov / move_avg_h</l>
+<l>    endif</l>
+<c>    </c>
+<l>    if (k &gt;= move_avg_h)</l>
+<l>        sum_mov := sum_mov - Tuple_In[k - move_avg_h]</l>
+<l>    else</l>
+<l>        sum_mov := sum_mov - Tuple_In[0]</l>
+<l>    endif</l>
+<c>    </c>
+<l>    if (k &lt; t_len)</l>
+<l>        sum_mov := sum_mov + Tuple_In[k]</l>
+<l>    else</l>
+<l>        sum_mov := sum_mov + Tuple_In[t_len - 1]</l>
+<l>    endif</l>
+<l>endfor</l>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c>*******************************************************</c>
+<c>*** End</c>
+<c>*******************************************************</c>
+<c></c>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+<procedure name="dev_update_off">
+<interface/>
+<body>
+<c>* This procedure sets different update settings to 'off'.</c>
+<c>* This is useful to get the best performance and reduce overhead.</c>
+<c>* </c>
+<l>dev_update_pc ('off')</l>
+<l>dev_update_var ('off')</l>
+<l>dev_update_window ('off')</l>
+<l>return ()</l>
+</body>
+<docu id="dev_update_off">
+<abstract lang="en_US">This procedure sets dev_update_pc, dev_update_var and dev_update_window to 'off'.</abstract>
+<alternatives>
+<item>dev_update_pc</item>
+<item>dev_update_var</item>
+<item>dev_update_window</item>
+</alternatives>
+<chapters lang="de_DE">
+<item>Develop</item>
+</chapters>
+<chapters lang="en_US">
+<item>Develop</item>
+</chapters>
+<example lang="en_US">dev_update_off ()
+* do something
+dev_update_on ()</example>
+<keywords lang="de_DE">
+<item>Aktualisierungsmodus setzen</item>
+</keywords>
+<keywords lang="en_US">
+<item>set update mode</item>
+</keywords>
+<library lang="de_DE">MVTec Standard Procedures</library>
+<library lang="en_US">MVTec Standard Procedures</library>
+<see_also>
+<item>dev_update_on</item>
+</see_also>
+<short lang="de_DE">Switch dev_update_pc, dev_update_var and dev_update_window to 'off'.</short>
+<short lang="en_US">Switch dev_update_pc, dev_update_var and dev_update_window to 'off'.</short>
+<parameters/>
+</docu>
+</procedure>
+<procedure name="dev_update_on">
+<interface/>
+<body>
+<c>* This procedure sets different update settings to 'on'.</c>
+<c>* </c>
+<l>dev_update_pc ('on')</l>
+<l>dev_update_var ('on')</l>
+<l>dev_update_window ('on')</l>
+<l>return ()</l>
+</body>
+<docu id="dev_update_on">
+<abstract lang="en_US">This procedure sets dev_update_pc, dev_update_var and dev_update_window to 'on'.</abstract>
+<alternatives>
+<item>dev_update_pc</item>
+<item>dev_update_var</item>
+<item>dev_update_window</item>
+</alternatives>
+<chapters lang="de_DE">
+<item>Develop</item>
+</chapters>
+<chapters lang="en_US">
+<item>Develop</item>
+</chapters>
+<example lang="en_US">dev_update_off ()
+* do something
+dev_update_on ()</example>
+<keywords lang="de_DE">
+<item>Aktualisierungsmodus setzen</item>
+</keywords>
+<keywords lang="en_US">
+<item>set update mode</item>
+</keywords>
+<library lang="de_DE">MVTec Standard Procedures</library>
+<library lang="en_US">MVTec Standard Procedures</library>
+<see_also>
+<item>dev_update_off</item>
+</see_also>
+<short lang="de_DE">Switch dev_update_pc, dev_update_var and dev_update_window to 'on'.</short>
+<short lang="en_US">Switch dev_update_pc, dev_update_var and dev_update_window to 'on'.</short>
+<parameters/>
+</docu>
+</procedure>
+<procedure name="Auto_Threshold5">
+<interface>
+<io>
+<par name="SkeletonsFWMS" base_type="iconic" dimension="0"/>
+<par name="Im" base_type="iconic" dimension="0"/>
+</io>
+<oc>
+<par name="thr" base_type="ctrl" dimension="0"/>
+<par name="thrS" base_type="ctrl" dimension="0"/>
+<par name="thrP" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>union1 (SkeletonsFWMS, SkeletonFWMS)</l>
+<l>dilation_circle (SkeletonFWMS, SkeletonFWMSd, 9.5)</l>
+<l>reduce_domain (Im, SkeletonFWMSd, Imp)</l>
+<c></c>
+<l>gray_histo_abs (SkeletonFWMSd, Imp, 1, AbsoluteHisto1)</l>
+<c></c>
+<l>create_funct_1d_array (AbsoluteHisto1, FAbsoluteHisto1)</l>
+<l>smooth_funct_1d_mean (FAbsoluteHisto1, 15, 5, FAbsoluteHistosm1)</l>
+<l>local_min_max_funct_1d (FAbsoluteHistosm1, 'strict_min_max', 'true', Min21, Max21)</l>
+<c></c>
+<l>* Middle := 140</l>
+<l>Middle := int(Min21[0])</l>
+<c></c>
+<l>if (Middle == 0)</l>
+<l>    thr := 0</l>
+<l>    thrS := 0</l>
+<l>    thrP := 0</l>
+<l>    return ()</l>
+<l>endif</l>
+<c></c>
+<l>tuple_first_n (AbsoluteHisto1, Middle, Space_T)</l>
+<l>create_funct_1d_array (Space_T, FSpace_T)</l>
+<l>smooth_funct_1d_mean (FSpace_T, 9, 3, FSpace_T)</l>
+<l>local_min_max_funct_1d (FSpace_T, 'plateaus_center', 'true', MinS, MaxS)</l>
+<c></c>
+<l>Max_Index (MaxS, FSpace_T, Idx)</l>
+<l>thrS := MaxS[Idx]</l>
+<c></c>
+<c></c>
+<c></c>
+<l>tuple_last_n (AbsoluteHisto1, Middle, Patern_T)</l>
+<l>create_funct_1d_array (Patern_T, FPatern_T)</l>
+<l>smooth_funct_1d_mean (FPatern_T, 9, 3, FPatern_T)</l>
+<l>local_min_max_funct_1d (FPatern_T, 'plateaus_center', 'true', MinP, MaxP)</l>
+<c></c>
+<l>Max_Index (MaxP, FPatern_T, Idx)</l>
+<l>thrP := MaxP[Idx] + Middle</l>
+<c></c>
+<l>tuple_mean ([thrS, thrP], thr)</l>
+<c></c>
+<c></c>
+<l>return ()</l>
+</body>
+<docu id="Auto_Threshold5">
+<parameters>
+<parameter id="Im"/>
+<parameter id="SkeletonsFWMS"/>
+<parameter id="thr"/>
+<parameter id="thrP"/>
+<parameter id="thrS"/>
+</parameters>
+</docu>
+</procedure>
+<procedure name="Max_Index">
+<interface>
+<ic>
+<par name="Max21" base_type="ctrl" dimension="0"/>
+<par name="FAbsoluteHistosm1" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="Max_Index" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>Max_Pos := 0</l>
+<l>Max_Val := 0</l>
+<l>Max_Index := 0</l>
+<l>tuple_length (Max21, Length)</l>
+<l>for Index := 0 to Length - 1 by 1</l>
+<c></c>
+<l>    Extr_Pos := Max21[Index]</l>
+<l>    tuple_int (Extr_Pos, Extr_Pos)</l>
+<l>    Extr_Val := FAbsoluteHistosm1[Extr_Pos]</l>
+<l>    if (Extr_Val &gt; Max_Val)</l>
+<l>        Max_Val := Extr_Val</l>
+<l>        Max_Pos := Extr_Pos</l>
+<l>        Max_Index := Index</l>
+<l>    endif</l>
+<l>endfor</l>
+<l>return ()</l>
+</body>
+<docu id="Max_Index">
+<parameters>
+<parameter id="FAbsoluteHistosm1"/>
+<parameter id="Max21"/>
+<parameter id="Max_Index"/>
+</parameters>
+</docu>
+</procedure>
+<procedure name="SN_Loc_Min">
+<interface>
+<ic>
+<par name="Gray" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="Loc_Min" base_type="ctrl" dimension="0"/>
+<par name="Loc_Min_Val" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>    Loc_Min := []</l>
+<l>    Loc_Min_Val := []</l>
+<l>    Fl := 1</l>
+<l>    tuple_length(Gray, Gray_Len)</l>
+<l>    for I := 1 to Gray_Len - 1 by 1</l>
+<l>        I0 := I - 1</l>
+<l>        if (Gray[I0] &gt; Gray[I])</l>
+<l>            Fl := 1   </l>
+<l>        endif</l>
+<c></c>
+<l>        if ((Gray[I0] &lt; Gray[I] and Fl == 1) or (I == Gray_Len - 1 and Fl == 1))</l>
+<l>            tuple_concat(Loc_Min, I0, Loc_Min)</l>
+<l>            tuple_concat(Loc_Min_Val, Gray[I0], Loc_Min_Val)</l>
+<l>            Fl := 0   </l>
+<l>        endif</l>
+<l>    endfor</l>
+<l>return ()</l>
+</body>
+<docu id="SN_Loc_Min">
+<parameters>
+<parameter id="Gray"/>
+<parameter id="Loc_Min"/>
+<parameter id="Loc_Min_Val"/>
+</parameters>
+</docu>
+</procedure>
+<procedure name="SN_Loc_Max_Center">
+<interface>
+<ic>
+<par name="Gray" base_type="ctrl" dimension="0"/>
+<par name="Center" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="Loc_Max" base_type="ctrl" dimension="0"/>
+<par name="Loc_Max_Val" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>    Loc_Max := []</l>
+<l>    Loc_Max_Val := []</l>
+<l>    Fl := 1</l>
+<l>    Pos_Fl := 0</l>
+<l>    tuple_length(Gray, Gray_Len)</l>
+<l>    for I := 1 to Gray_Len - 1 by 1</l>
+<l>        I0 := I - 1</l>
+<l>        if (Gray[I0] &lt; Gray[I])</l>
+<l>            Fl := 1   </l>
+<l>            Pos_Fl := I</l>
+<l>        endif</l>
+<c></c>
+<l>        if ((Gray[I0] &gt; Gray[I] and Fl == 1) or (I == Gray_Len - 1 and Fl == 1))</l>
+<l>            if (Center - I0 &gt; 0)</l>
+<l>                Pos_I :=  I0               </l>
+<l>            else</l>
+<l>                Pos_I :=  Pos_Fl               </l>
+<l>            endif</l>
+<l>            tuple_concat(Loc_Max, Pos_I, Loc_Max)</l>
+<l>            tuple_concat(Loc_Max_Val, Gray[Pos_I], Loc_Max_Val)</l>
+<l>            Fl := 0   </l>
+<l>        endif</l>
+<l>    endfor</l>
+<l>return ()</l>
+</body>
+<docu id="SN_Loc_Max_Center">
+<parameters>
+<parameter id="Center"/>
+<parameter id="Gray"/>
+<parameter id="Loc_Max"/>
+<parameter id="Loc_Max_Val"/>
+</parameters>
+</docu>
+</procedure>
+<procedure name="Teach_Slice">
+<interface>
+<io>
+<par name="Skel_FWMS" base_type="iconic" dimension="0"/>
+<par name="WidthImageS" base_type="iconic" dimension="0"/>
+</io>
+<ic>
+<par name="Win" base_type="ctrl" dimension="0"/>
+<par name="SensLen" base_type="ctrl" dimension="0"/>
+<par name="path_teach_tuples" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="Pointer_Skel" base_type="ctrl" dimension="0"/>
+<par name="Pointer_Sens" base_type="ctrl" dimension="0"/>
+<par name="Rows_Sens" base_type="ctrl" dimension="0"/>
+<par name="Cols_Sens" base_type="ctrl" dimension="0"/>
+<par name="Pointer_Pos" base_type="ctrl" dimension="0"/>
+<par name="CurrentOper" base_type="ctrl" dimension="0"/>
+<par name="TotalPRC" base_type="ctrl" dimension="0"/>
+<par name="MaxPRC" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>gen_contours_skeleton_xld(Skel_FWMS, Reg_SEL1_XLD, 1, 'filter')</l>
+<c></c>
+<l>Pointer_Skel := []</l>
+<l>Pointer_Sens := []</l>
+<l>Rows_Sens := []</l>
+<l>Cols_Sens := []</l>
+<l>Width_Sens := []</l>
+<l>Pointer_Pos := 0</l>
+<c></c>
+<l>WinD2 := Win/2</l>
+<l>SensLenD2 := SensLen / 2</l>
+<c></c>
+<l>*tuple_concat(Pointer_Skel, 0, Pointer_Skel)</l>
+<l>count_obj(Reg_SEL1_XLD, Count)</l>
+<c></c>
+<l>TotalPRC := 0</l>
+<l>MaxPRC := 0</l>
+<l>CurrentOper:='Low Gray - Formation of sensors'</l>
+<l>for Index := 1 to Count by 1</l>
+<l>    select_obj (Reg_SEL1_XLD, Reg_SEL1, Index)</l>
+<l>    get_contour_xld(Reg_SEL1, Rows, Cols)    </l>
+<c></c>
+<l>    tuple_length(Rows, Len)</l>
+<l>    MaxPRC := MaxPRC + Len</l>
+<l>endfor</l>
+<c></c>
+<l>for Index := 1 to Count by 1</l>
+<c>    </c>
+<l>    select_obj (Reg_SEL1_XLD, Reg_SEL1, Index)</l>
+<l>    get_contour_xld(Reg_SEL1, Rows, Cols)    </l>
+<c>    </c>
+<c></c>
+<l>    tuple_length(Rows, Len)</l>
+<l>*     for Ind := WinD2 to Len - WinD2 - 2 by 1</l>
+<l>    for Ind := 0 to Len - 1 by 1</l>
+<c></c>
+<l>*         if (SensLen == 0)</l>
+<l>*             get_grayval (WidthImageS, Rows[Ind], Cols[Ind], GrayW)</l>
+<l>*             SensLen := GrayW * 2</l>
+<l>*             SensLenD2 := SensLen / 2</l>
+<l>*         endif</l>
+<l>        get_grayval (WidthImageS, Rows[Ind], Cols[Ind], GrayW)</l>
+<l>        SensLen := GrayW * 2</l>
+<l>        SensLenD2 := SensLen / 2</l>
+<c></c>
+<c>            </c>
+<l>        if (Ind &lt; WinD2)</l>
+<l>            Ind0 := 0</l>
+<l>            Ind1 := Ind + Win</l>
+<l>        elseif (Ind &gt; Len - 1 - WinD2)</l>
+<l>            Ind0 := Len - 1 - Win </l>
+<l>            Ind1 := Len - 1</l>
+<l>        else</l>
+<l>            Ind0 := Ind - WinD2</l>
+<l>            Ind1 := Ind + WinD2</l>
+<l>        endif</l>
+<c>        </c>
+<c>        </c>
+<l>        tuple_atan2(Rows[Ind0] - Rows[Ind1], Cols[Ind0] - Cols[Ind1], Angle) </l>
+<l>        tuple_deg(Angle, Angle_Deg)</l>
+<c>        </c>
+<l>        tuple_cos(Angle + 1.5708, Cos)</l>
+<l>        tuple_sin(Angle + 1.5708, Sin)</l>
+<l>        P1X := Cols[Ind] + Cos * SensLenD2</l>
+<l>        P1Y := Rows[Ind] + Sin * SensLenD2</l>
+<c>    </c>
+<l>        tuple_cos(Angle + 4.71239, Cos)</l>
+<l>        tuple_sin(Angle + 4.71239, Sin)</l>
+<l>        P2X := Cols[Ind] + Cos * SensLenD2</l>
+<l>        P2Y := Rows[Ind] + Sin * SensLenD2</l>
+<c>        </c>
+<l>        gen_region_line(Reg_Sens, P1Y, P1X, P2Y, P2X)</l>
+<l>        gen_contours_skeleton_xld(Reg_Sens, Reg_Sens_XLD, 1, 'filter')</l>
+<l>        get_contour_xld(Reg_Sens_XLD, Rows_S, Cols_S)    </l>
+<c>    </c>
+<l>        tuple_concat(Rows_Sens, Rows_S, Rows_Sens)</l>
+<l>        tuple_concat(Cols_Sens, Cols_S, Cols_Sens)</l>
+<l>        tuple_concat(Pointer_Sens, Pointer_Pos, Pointer_Sens)</l>
+<c></c>
+<l>        tuple_length(Rows_S, Length)</l>
+<l>        Pointer_Pos := Pointer_Pos + Length</l>
+<c>        </c>
+<l>        TotalPRC := TotalPRC + 1</l>
+<c></c>
+<l>    endfor</l>
+<c>    </c>
+<l>    tuple_length(Pointer_Sens, Len_Sens)</l>
+<l>    tuple_concat(Pointer_Skel, Len_Sens - 1, Pointer_Skel)</l>
+<c>    </c>
+<c>    </c>
+<l> endfor</l>
+<l>tuple_concat(Pointer_Sens, Pointer_Pos, Pointer_Sens)</l>
+<c></c>
+<l>CurrentOper:='Low Gray - Saving objects'</l>
+<c></c>
+<l>tuple_int(Rows_Sens, Rows_Sens)</l>
+<l>tuple_int(Cols_Sens, Cols_Sens)</l>
+<l>write_tuple(Pointer_Skel, path_teach_tuples + 'Pointer_Skel.tup')</l>
+<l>write_tuple(Pointer_Sens, path_teach_tuples + 'Pointer_Sens.tup')</l>
+<l>write_tuple(Rows_Sens, path_teach_tuples + 'Rows_Sens.tup')</l>
+<l>write_tuple(Cols_Sens, path_teach_tuples + 'Cols_Sens.tup')</l>
+<c></c>
+<l>return ()</l>
+</body>
+<docu id="Teach_Slice">
+<parameters>
+<parameter id="Cols_Sens"/>
+<parameter id="CurrentOper"/>
+<parameter id="MaxPRC"/>
+<parameter id="Pointer_Pos"/>
+<parameter id="Pointer_Sens"/>
+<parameter id="Pointer_Skel"/>
+<parameter id="Rows_Sens"/>
+<parameter id="SensLen"/>
+<parameter id="Skel_FWMS"/>
+<parameter id="TotalPRC"/>
+<parameter id="WidthImageS"/>
+<parameter id="Win"/>
+<parameter id="path_teach_tuples"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>

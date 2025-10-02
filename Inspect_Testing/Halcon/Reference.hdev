@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="main">
+<interface/>
+<body>
+<l>dev_update_off()</l>
+<l>path_model := 'C:/WORK_CURR/SAMSUNG/Samsung-AOI/Vision/AOI/Run/Model/Model_p2312-015d1_2P0_V5/Model/'</l>
+<l>path_teach := path_model + 'Teach/'</l>
+<l>path_image := 'C:/TmpIm/'</l>
+<c></c>
+<c></c>
+<l>read_image (Gi, path_model + 'Gi.tif')</l>
+<l>read_image (Gi, path_model + 'Gi.tif')</l>
+<l>read_image (Im, path_image + 'Im1_96.tif')</l>
+<c></c>
+<l>get_image_size(Gi, Width, Height)</l>
+<l>threshold(Gi, Gi_Reg, 150, 255)</l>
+<c></c>
+<c></c>
+<c>* -------------------------------------------------------------------------------------------</c>
+<c>* Автоматический расчет threshold</c>
+<l>Adj_Erosion := 5</l>
+<l>Adj_Dilation := 15</l>
+<c></c>
+<c></c>
+<l>*read_image (Gi_Adj, 'C:/WORK_CURR/SAMSUNG/Samsung-AOI/Vision/AOI/Run/Model/Model_p2312-015d1_2P0_V1/Model/' + 'Gi_Adj.tif')</l>
+<l>read_image (Gi_Adj, 'C:/WORK_CURR/SAMSUNG/Samsung-AOI/Vision/AOI/Run/Model/Model_p1804-005m3_2P0/Model/' + 'Gi_Adj.tif')</l>
+<l>threshold(Gi_Adj, Gi_Adj_Reg, 150, 255)</l>
+<l>get_domain(Gi_Adj, Domain)</l>
+<c></c>
+<l>read_object(RegNoProc, 'C:/WORK_CURR/SAMSUNG/Samsung-AOI/Vision/AOI/Run/Model/Model_p1804-005m3_2P0/Model/' + 'RegNoProc.hobj')</l>
+<l>difference(Domain, RegNoProc, RegProc)</l>
+<c></c>
+<l>*read_image (Im1, path_image + 'Im44_116.tif')</l>
+<l>read_image (Im1, path_image + 'Im1_1.tif')</l>
+<c></c>
+<l>* read_image (Im, path_image + 'Im1_1.tif')</l>
+<l>threshold(Im1, Gi_Adj_Reg, 130, 255)</l>
+<c></c>
+<l>* erosion_circle(Gi_Adj_Reg, Gi_Adj_Reg_Dil, 2)</l>
+<c></c>
+<l>count_seconds(t1)</l>
+<l>* t:=t2-t1</l>
+<c></c>
+<c></c>
+<l>Area_A := []</l>
+<l>Pos_A := 0</l>
+<c></c>
+<l>Min_Err := 1000000000</l>
+<l>Min_Th := 0</l>
+<l>for Th := 0 to 255 by 1</l>
+<c>    </c>
+<l>    threshold(Im1, Im1_Reg, Th, 255)</l>
+<l>    difference(Im1_Reg, RegNoProc, Im1_Reg)</l>
+<c></c>
+<l>    symm_difference(Gi_Adj_Reg, Im1_Reg, RegionDiff)</l>
+<l>*    difference(Im1_Reg, Gi_Adj_Reg, RegionDiff)</l>
+<l>*    difference(Gi_Adj_Reg, Im1_Reg, RegionDiff)</l>
+<c>    </c>
+<l>    area_center(RegionDiff, Area, Row1, Column)</l>
+<l>    Area_A[Pos_A] := Area</l>
+<l>    Pos_A := Pos_A + 1</l>
+<c></c>
+<l>*     difference(Im1_Reg, Gi_Adj_Reg, RegionDiff1)</l>
+<l>*     difference(Gi_Adj_Reg, Im1_Reg, RegionDiff2)</l>
+<l>*     area_center(RegionDiff1, Area1, Row1, Column1)</l>
+<l>*     area_center(RegionDiff2, Area2, Row1, Column1)</l>
+<c>  </c>
+<l>    if (Min_Err &gt; Area)</l>
+<l>        Min_Err := Area</l>
+<l>        Min_Th := Th</l>
+<l>    endif</l>
+<c>    </c>
+<l>endfor</l>
+<c></c>
+<l>count_seconds(t2)</l>
+<l>t:=t2-t1</l>
+<c></c>
+<l>threshold(Im1, Im1_Reg, 150, 255)</l>
+<l>threshold(Im1, Im1_Reg, Min_Th, 255)</l>
+<c></c>
+<c></c>
+<l>erosion_circle(Gi_Adj_Reg, Gi_Adj_Reg_Dil, 5.5)</l>
+<l>dilation_circle(Gi_Adj_Reg_Dil, Gi_Adj_Reg_Dil1, 5.5)</l>
+<c></c>
+<c></c>
+<l>stop()</l>
+<c>* -------------------------------------------------------------------------------------------</c>
+<c></c>
+<c></c>
+<l>Adj_Erosion := 5</l>
+<l>Adj_Dilation := 15</l>
+<c></c>
+<c>* Adjust</c>
+<l>Adjust_Gi (Gi_Reg, Im, Gi_Adj, Width, Height, Adj_Erosion, Adj_Dilation)</l>
+<c></c>
+<l>region_to_bin(Gi_Adj, Gi_D, 255, 0, Width, Height)</l>
+<c></c>
+<c></c>
+<l>write_image(Gi_D, 'tiff', 0, path_model + 'Gi_D.tif')</l>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<l>read_image (Im0, path_image + 'Im1_107.tif')</l>
+<l>read_image (Im1, path_image + 'Im1_96.tif')</l>
+<l>read_image (Im2, path_image + 'Im1_97.tif')</l>
+<l>read_image (Im3, path_image + 'Im1_98.tif')</l>
+<l>read_image (Im4, path_image + 'Im1_99.tif')</l>
+<l>read_image (Im5, path_image + 'Im1_102.tif')</l>
+<l>read_image (Im6, path_image + 'Im1_103.tif')</l>
+<l>read_image (Im7, path_image + 'Im1_104.tif')</l>
+<l>read_image (Im8, path_image + 'Im1_105.tif')</l>
+<l>read_image (Im9, path_image + 'Im1_106.tif')</l>
+<l>stop()</l>
+<c></c>
+<c></c>
+<c></c>
+<l>gen_image_const(Im_Ref, 'byte', Width, Height)</l>
+<l>tuple_gen_sequence(0, Width - 1, 1, Cols)</l>
+<l>DivVal := 10</l>
+<c></c>
+<l>Set_Ref_Image (Im0, Im_Ref, Height, Width, Cols, DivVal)</l>
+<l>Set_Ref_Image (Im1, Im_Ref, Height, Width, Cols, DivVal)</l>
+<l>Set_Ref_Image (Im2, Im_Ref, Height, Width, Cols, DivVal)</l>
+<l>Set_Ref_Image (Im3, Im_Ref, Height, Width, Cols, DivVal)</l>
+<l>Set_Ref_Image (Im4, Im_Ref, Height, Width, Cols, DivVal)</l>
+<l>Set_Ref_Image (Im5, Im_Ref, Height, Width, Cols, DivVal)</l>
+<l>Set_Ref_Image (Im6, Im_Ref, Height, Width, Cols, DivVal)</l>
+<l>Set_Ref_Image (Im7, Im_Ref, Height, Width, Cols, DivVal)</l>
+<l>Set_Ref_Image (Im8, Im_Ref, Height, Width, Cols, DivVal)</l>
+<l>Set_Ref_Image (Im9, Im_Ref, Height, Width, Cols, DivVal)</l>
+<c></c>
+<l>stop()</l>
+<c></c>
+<l>read_image (Im_E0, path_image + 'Im1_101.tif')</l>
+<c></c>
+<l>gen_image_const(Im_RefE, 'byte', Width, Height)</l>
+<l>for Row := 0 to Height - 1 by 1</l>
+<c>    </c>
+<l>*     Row := 836</l>
+<l>*     Row := 102</l>
+<l>    tuple_gen_const(Width, Row, Rows)</l>
+<c>   </c>
+<l>    get_grayval(Im_E0, Rows, Cols, Gray)</l>
+<c>    </c>
+<l>    get_grayval(Im_Ref, Rows, Cols, GrayRef)</l>
+<l>    GrayRef0 := GrayRef - Gray</l>
+<l>    tuple_abs(GrayRef0, GrayRef0)</l>
+<c>    </c>
+<l>    set_grayval(Im_RefE, Rows, Cols, GrayRef0)</l>
+<l>endfor</l>
+<c></c>
+<l>threshold(Im_RefE, Region, 50, 255)</l>
+<c></c>
+<l>stop()</l>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+<procedure name="Set_Ref_Image">
+<interface>
+<io>
+<par name="Im0" base_type="iconic" dimension="0"/>
+<par name="Im_Ref" base_type="iconic" dimension="0"/>
+</io>
+<ic>
+<par name="Height" base_type="ctrl" dimension="0"/>
+<par name="Width" base_type="ctrl" dimension="0"/>
+<par name="Cols" base_type="ctrl" dimension="0"/>
+<par name="DivVal" base_type="ctrl" dimension="0"/>
+</ic>
+</interface>
+<body>
+<l>for Row := 0 to Height - 1 by 1</l>
+<l>    tuple_gen_const(Width, Row, Rows)</l>
+<c>   </c>
+<l>    get_grayval(Im0, Rows, Cols, Gray)</l>
+<l>    GrayDiv := Gray / DivVal</l>
+<c>    </c>
+<l>    get_grayval(Im_Ref, Rows, Cols, GrayRef)</l>
+<l>    GrayRef := GrayRef + GrayDiv</l>
+<l>    set_grayval(Im_Ref, Rows, Cols, GrayRef)</l>
+<l>endfor</l>
+<l>return ()</l>
+</body>
+<docu id="Set_Ref_Image">
+<parameters>
+<parameter id="Cols"/>
+<parameter id="DivVal"/>
+<parameter id="Height"/>
+<parameter id="Im0"/>
+<parameter id="Im_Ref"/>
+<parameter id="Width"/>
+</parameters>
+</docu>
+</procedure>
+<procedure name="dev_update_off">
+<interface/>
+<body>
+<c>* This procedure sets different update settings to 'off'.</c>
+<c>* This is useful to get the best performance and reduce overhead.</c>
+<c></c>
+<l>dev_update_pc ('off')</l>
+<l>dev_update_var ('off')</l>
+<l>dev_update_window ('off')</l>
+<l>return ()</l>
+</body>
+<docu id="dev_update_off">
+<abstract lang="en_US">This procedure sets dev_update_pc, dev_update_var and dev_update_window to 'off'.</abstract>
+<alternatives>
+<item>dev_update_pc</item>
+<item>dev_update_var</item>
+<item>dev_update_window</item>
+</alternatives>
+<chapters lang="de_DE">
+<item>Develop</item>
+</chapters>
+<chapters lang="en_US">
+<item>Develop</item>
+</chapters>
+<example lang="en_US">dev_update_off ()
+* do something
+dev_update_on ()</example>
+<keywords lang="de_DE">
+<item>Aktualisierungsmodus setzen</item>
+</keywords>
+<keywords lang="en_US">
+<item>set update mode</item>
+</keywords>
+<library lang="de_DE">MVTec Standard Procedures</library>
+<library lang="en_US">MVTec Standard Procedures</library>
+<see_also>
+<item>dev_update_on</item>
+</see_also>
+<short lang="de_DE">Switch dev_update_pc, dev_update_var and dev_update_window to 'off'.</short>
+<short lang="en_US">Switch dev_update_pc, dev_update_var and dev_update_window to 'off'.</short>
+<parameters/>
+</docu>
+</procedure>
+<procedure name="Gi_Adjust">
+<interface>
+<io>
+<par name="Gi_Reg" base_type="iconic" dimension="0"/>
+<par name="Im" base_type="iconic" dimension="0"/>
+</io>
+<oo>
+<par name="Gi_Adj" base_type="iconic" dimension="0"/>
+</oo>
+<ic>
+<par name="Width" base_type="ctrl" dimension="0"/>
+<par name="Height" base_type="ctrl" dimension="0"/>
+</ic>
+</interface>
+<body>
+<l>Min_Err := 1000000000</l>
+<l>for I := 1 to 20 by 1</l>
+<c>    </c>
+<l>    if (I &lt; 5)</l>
+<l>        erosion_circle(Gi_Reg, Gi_Reg_Dil, I)</l>
+<l>    else</l>
+<l>        dilation_circle(Gi_Reg, Gi_Reg_Dil, I)</l>
+<l>    endif</l>
+<c>    </c>
+<l>    region_to_bin(Gi_Reg_Dil, Gi_D, 255, 0, Width, Height)</l>
+<c>    </c>
+<l>    Err := 0</l>
+<l>    for Row := 0 to Height - 1 by 1</l>
+<l>        tuple_gen_const(Width, Row, Rows)</l>
+<c>      </c>
+<l>        get_grayval(Im, Rows, Cols, Gray)</l>
+<l>        get_grayval(Gi_D, Rows, Cols, Gray_D)</l>
+<l>        Gray_Test := Gray_D - Gray</l>
+<l>        tuple_abs(Gray_Test, Gray_Test)</l>
+<l>        tuple_sum(Gray_Test, Gray_Test)</l>
+<l>        Err := Err + Gray_Test</l>
+<l>    endfor</l>
+<c>    </c>
+<l>    if (Min_Err &gt; Err)</l>
+<l>        Min_Err := Err</l>
+<l>        Gi_Adj := Gi_Reg_Dil</l>
+<l>    endif</l>
+<c>    </c>
+<l>endfor</l>
+<l>region_to_bin(Gi_Adj, Gi_D, 255, 0, Width, Height)</l>
+<l>return ()</l>
+</body>
+<docu id="Gi_Adjust">
+<parameters>
+<parameter id="Gi_Adj"/>
+<parameter id="Gi_Reg"/>
+<parameter id="Height"/>
+<parameter id="Im"/>
+<parameter id="Width"/>
+</parameters>
+</docu>
+</procedure>
+<procedure name="Adjust_Gi">
+<interface>
+<io>
+<par name="Gi_Reg" base_type="iconic" dimension="0"/>
+<par name="Im" base_type="iconic" dimension="0"/>
+</io>
+<oo>
+<par name="Gi_Adj" base_type="iconic" dimension="0"/>
+</oo>
+<ic>
+<par name="Width" base_type="ctrl" dimension="0"/>
+<par name="Height" base_type="ctrl" dimension="0"/>
+<par name="Adj_Erosion" base_type="ctrl" dimension="0"/>
+<par name="Adj_Dilation" base_type="ctrl" dimension="0"/>
+</ic>
+</interface>
+<body>
+<l>tuple_gen_sequence(0, Width - 1, 1, Cols)</l>
+<c></c>
+<l>Min_Err := 1000000000</l>
+<l>Adj_Count := Adj_Erosion + Adj_Dilation</l>
+<l>for I := 1 to Adj_Count by 1</l>
+<c>    </c>
+<l>    if (I &lt; Adj_Erosion)</l>
+<l>        erosion_circle(Gi_Reg, Gi_Reg_Dil, I)</l>
+<l>    else</l>
+<l>        dilation_circle(Gi_Reg, Gi_Reg_Dil, I)</l>
+<l>    endif</l>
+<c>    </c>
+<l>    region_to_bin(Gi_Reg_Dil, Gi_D, 255, 0, Width, Height)</l>
+<c>    </c>
+<l>    Err := 0</l>
+<l>    for Row := 0 to Height - 1 by 1</l>
+<l>        tuple_gen_const(Width, Row, Rows)</l>
+<c>      </c>
+<l>        get_grayval(Im, Rows, Cols, Gray)</l>
+<l>        get_grayval(Gi_D, Rows, Cols, Gray_D)</l>
+<l>        Gray_Test := Gray_D - Gray</l>
+<l>        tuple_abs(Gray_Test, Gray_Test)</l>
+<l>        tuple_sum(Gray_Test, Gray_Test)</l>
+<l>        Err := Err + Gray_Test</l>
+<l>    endfor</l>
+<c>    </c>
+<l>    if (Min_Err &gt; Err)</l>
+<l>        Min_Err := Err</l>
+<l>        Gi_Adj := Gi_Reg_Dil</l>
+<l>    endif</l>
+<c>    </c>
+<l>endfor</l>
+<l>return ()</l>
+</body>
+<docu id="Adjust_Gi">
+<parameters>
+<parameter id="Adj_Dilation"/>
+<parameter id="Adj_Erosion"/>
+<parameter id="Gi_Adj"/>
+<parameter id="Gi_Reg"/>
+<parameter id="Height"/>
+<parameter id="Im"/>
+<parameter id="Width"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>

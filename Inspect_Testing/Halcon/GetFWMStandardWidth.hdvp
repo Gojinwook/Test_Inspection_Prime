@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="GetFWMStandardWidth">
+<interface>
+<io>
+<par name="SkeletonFWMi" base_type="iconic" dimension="0"/>
+<par name="WidthImageP" base_type="iconic" dimension="0"/>
+</io>
+<oc>
+<par name="stdWFWM" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<c>*** GetFWMStandardWidth </c>
+<c>* 250228</c>
+<c></c>
+<l>get_region_points(SkeletonFWMi,RowsFWM, ColumnsFWM)</l>
+<l>get_grayval(WidthImageP, RowsFWM, ColumnsFWM, GWFWM)</l>
+<l>tuple_median (GWFWM, stdWFWM)</l>
+<l>return ()</l>
+</body>
+<docu id="GetFWMStandardWidth">
+<parameters>
+<parameter id="SkeletonFWMi"/>
+<parameter id="WidthImageP"/>
+<parameter id="stdWFWM"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>

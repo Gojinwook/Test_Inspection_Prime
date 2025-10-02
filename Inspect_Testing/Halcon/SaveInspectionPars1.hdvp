@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="SaveInspectionPars1">
+<interface>
+<ic>
+<par name="pathfile" base_type="ctrl" dimension="0"/>
+<par name="thr" base_type="ctrl" dimension="0"/>
+<par name="fumax" base_type="ctrl" dimension="0"/>
+<par name="aislmax" base_type="ctrl" dimension="0"/>
+<par name="PHrmin" base_type="ctrl" dimension="0"/>
+<par name="PHamin" base_type="ctrl" dimension="0"/>
+<par name="Islrmin" base_type="ctrl" dimension="0"/>
+<par name="Islamin" base_type="ctrl" dimension="0"/>
+<par name="aphmax" base_type="ctrl" dimension="0"/>
+<par name="dilS" base_type="ctrl" dimension="0"/>
+<par name="dilFWM" base_type="ctrl" dimension="0"/>
+<par name="expsize" base_type="ctrl" dimension="0"/>
+<par name="dil" base_type="ctrl" dimension="0"/>
+<par name="EPexp" base_type="ctrl" dimension="0"/>
+<par name="lMB" base_type="ctrl" dimension="0"/>
+<par name="prcMB" base_type="ctrl" dimension="0"/>
+<par name="absMB" base_type="ctrl" dimension="0"/>
+<par name="minMB" base_type="ctrl" dimension="0"/>
+<par name="lSP" base_type="ctrl" dimension="0"/>
+<par name="prcSP" base_type="ctrl" dimension="0"/>
+<par name="absSP" base_type="ctrl" dimension="0"/>
+<par name="minSP" base_type="ctrl" dimension="0"/>
+<par name="sz1" base_type="ctrl" dimension="0"/>
+<par name="lMBS" base_type="ctrl" dimension="0"/>
+<par name="sz2" base_type="ctrl" dimension="0"/>
+<par name="ang" base_type="ctrl" dimension="0"/>
+<par name="prcMBS" base_type="ctrl" dimension="0"/>
+<par name="absMBS" base_type="ctrl" dimension="0"/>
+<par name="minMBS" base_type="ctrl" dimension="0"/>
+<par name="minWSpace" base_type="ctrl" dimension="0"/>
+<par name="dclcmax" base_type="ctrl" dimension="0"/>
+<par name="LG_SensLen" base_type="ctrl" dimension="0"/>
+<par name="LG_m_szw" base_type="ctrl" dimension="0"/>
+<par name="LG_m_prcLG" base_type="ctrl" dimension="0"/>
+<par name="mmat_shift" base_type="ctrl" dimension="0"/>
+<par name="mmat_fsz" base_type="ctrl" dimension="0"/>
+<par name="PHash" base_type="ctrl" dimension="0"/>
+</ic>
+</interface>
+<body>
+<c>* *************************************</c>
+<c>* **** Inspection serialization   *****</c>
+<c>* *************************************</c>
+<c></c>
+<l>InspectParsOut:=[thr, fumax, aislmax, PHrmin, PHamin, Islrmin, Islamin, aphmax, dilS, dilFWM, expsize, dil, EPexp,\
+lMB,prcMB,absMB,minMB,lSP,prcSP,absSP,minSP, sz1,lMBS,sz2,ang,prcMBS,absMBS,minMBS,minWSpace,dclcmax,\
+LG_SensLen,LG_m_szw,LG_m_prcLG,mmat_shift,mmat_fsz, PHash]</l>
+<l>serialize_tuple(InspectParsOut, SerializedItemHandle)</l>
+<l>* fileser := pathfile+'/Teach/TeachPars.ser'</l>
+<l>open_file(pathfile, 'output_binary', FileHandle)</l>
+<l>fwrite_serialized_item(FileHandle, SerializedItemHandle)</l>
+<l>close_file(FileHandle)</l>
+<c> </c>
+<c>* **********************************</c>
+<l>return ()</l>
+</body>
+<docu id="SaveInspectionPars1">
+<parameters>
+<parameter id="EPexp"/>
+<parameter id="Islamin"/>
+<parameter id="Islrmin"/>
+<parameter id="LG_SensLen"/>
+<parameter id="LG_m_prcLG"/>
+<parameter id="LG_m_szw"/>
+<parameter id="PHamin"/>
+<parameter id="PHash"/>
+<parameter id="PHrmin"/>
+<parameter id="absMB"/>
+<parameter id="absMBS"/>
+<parameter id="absSP"/>
+<parameter id="aislmax"/>
+<parameter id="ang"/>
+<parameter id="aphmax"/>
+<parameter id="dclcmax"/>
+<parameter id="dil"/>
+<parameter id="dilFWM"/>
+<parameter id="dilS"/>
+<parameter id="expsize"/>
+<parameter id="fumax"/>
+<parameter id="lMB"/>
+<parameter id="lMBS"/>
+<parameter id="lSP"/>
+<parameter id="minMB"/>
+<parameter id="minMBS"/>
+<parameter id="minSP"/>
+<parameter id="minWSpace"/>
+<parameter id="mmat_fsz"/>
+<parameter id="mmat_shift"/>
+<parameter id="pathfile"/>
+<parameter id="prcMB"/>
+<parameter id="prcMBS"/>
+<parameter id="prcSP"/>
+<parameter id="sz1"/>
+<parameter id="sz2"/>
+<parameter id="thr"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>

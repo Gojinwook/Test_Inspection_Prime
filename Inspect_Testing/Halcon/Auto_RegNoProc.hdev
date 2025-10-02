@@ -1,0 +1,892 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="main">
+<interface/>
+<body>
+<c>*******************************************************</c>
+<c>*** Загрузка данных</c>
+<c>*******************************************************</c>
+<l>* read_image (Gi, 'G:/SAMSUNG/Test/p2112-004t3_2P0/Model/Gi.tif')</l>
+<l>* read_object (Regnoproc, 'G:/SAMSUNG/Test/p2112-004t3_2P0/Model/RegNoProc.hobj')</l>
+<l>* read_image (Gi, 'G:/SAMSUNG/NewData/p2309-001t1/Model_p2309-001t1_2P0/Model/Gi.tif')</l>
+<l>* read_image (Im, 'G:/SAMSUNG/NewData/p2309-001t1/Model_p2309-001t1_2P0/Model/Im.tif')</l>
+<l>* read_object (Regnoproc, 'G:/SAMSUNG/NewData/p2309-001t1/Model_p2309-001t1_2P0/Model/RegNoProc.hobj')</l>
+<c></c>
+<c></c>
+<l>*path_model := 'C:/WORK_CURR/SAMSUNG/Samsung-AOI/Vision/AOI/Run/Model/Model_p2309-001t1_2P0/Model/'</l>
+<l>*path_model := 'C:/WORK_CURR/SAMSUNG/Samsung-AOI/Vision/AOI/Run/Model/Model_p2312-015d1_2P0_V1/Model/'</l>
+<l>* path_model := 'G:/SAMSUNG/Image/p2212-026d4/p2212-026d4/p2212-026d4/L1/Model/p2212-026d4_LayerL1-SHORT0.0-0200/Model/'</l>
+<l>* path_model := 'G:/SAMSUNG/Image/250217_underkill/Patern/Model/p2411-004d101_LayerL1-SHORT2.0-0200/Model/'</l>
+<l>path_model := 'G:/SAMSUNG/Image/2025_05_24/20250524_InspectErr_2/20250524_Model/Model/p2406-001m1_LayerL2-SHORT3.2-0200/Model/'</l>
+<l>* path_model := 'C:/WORK_CURR/SAMSUNG/Samsung-AOI/Vision/AOI/Run/Model/p2212-028m1_LayerL1-SHORT2.0-0200/Model/'</l>
+<l>path_teach := path_model + 'Teach/'</l>
+<l>path_teach_tuples := path_teach + 'Tuples/'</l>
+<c></c>
+<c></c>
+<l>path_image := 'G:/SAMSUNG/Image/Model-20240924T042944Z-001/Underkill Image/'</l>
+<l>path_image := 'C:/TmpIm/'</l>
+<c></c>
+<l>read_image (Gi_Im, path_model + 'Gi.tif')</l>
+<l>read_object (Gi, path_model + 'Gi.hobj')</l>
+<l>read_object (Skel_FWMS, path_teach + 'SkeletonsLG.hobj')</l>
+<l>read_object (Skel_FWM, path_teach + 'SkeletonsFWM.hobj')</l>
+<l>read_object (Skel_Gi, path_teach + 'SkeletonGs.hobj')</l>
+<l>read_image (WidthImageS, path_teach + 'WidthImageS.tif')</l>
+<l>read_image (WidthImageP, path_teach + 'WidthImageP.tif')</l>
+<l>read_object (RegNoProc, path_model + 'RegNoProc.hobj')</l>
+<c></c>
+<l>stop()</l>
+<l>Midle_Line_Type := 0</l>
+<l>Frame_Width := 50</l>
+<l>Midle_Line_Width := 100</l>
+<l>Dilation_Coil := 50</l>
+<l>Erosion_Coil := 30</l>
+<l>stop()</l>
+<l>get_image_size(Gi_Im, Im_W, Im_H)</l>
+<l>get_domain(Gi_Im, Gi_Domain)</l>
+<c></c>
+<c>* --- Удаление рамки</c>
+<l>gen_rectangle1(Frame_I, Frame_Width, Frame_Width, Im_H - Frame_Width, Im_W - Frame_Width)</l>
+<l>difference(Gi_Domain, Frame_I, Frame)</l>
+<l>* dilation_rectangle1(Gi_Domain, RegionDilation1, Frame_Width, Frame_Width)</l>
+<c></c>
+<c>* --- Удаление средней линии</c>
+<l>if (Midle_Line_Type == 0)</l>
+<l>    M_Pos := Im_W / 2</l>
+<l>    gen_rectangle1(Midle_Line, 0, M_Pos - Midle_Line_Width / 2, Im_H, M_Pos + Midle_Line_Width / 2)</l>
+<l>else</l>
+<l>    M_Pos := Im_H / 2</l>
+<l>    gen_rectangle1(Midle_Line, M_Pos - Midle_Line_Width / 2, 0, M_Pos + Midle_Line_Width / 2, Im_W)</l>
+<l>endif</l>
+<l>union2(Midle_Line, Frame, Frame_Line)</l>
+<c></c>
+<c>* --- Удаление лишних объектов</c>
+<l>threshold(Gi_Im, Gi_Reg, 128, 255)</l>
+<l>difference(Gi_Reg, Frame_Line, Gi_Reg)</l>
+<l>connection(Gi_Reg, Gi_Reg)</l>
+<l>count_obj(Gi_Reg, NumObj)</l>
+<c></c>
+<c>* --- Поиск 2-х максимальных площадей объектов - Coils</c>
+<l>Arr_Obj := []</l>
+<l>for I := 1 to NumObj by 1</l>
+<l>    select_obj(Gi_Reg, ObjSel, I)</l>
+<l>    dev_display(ObjSel)</l>
+<l>    area_center(ObjSel, Area, Row, Col)</l>
+<l>    Arr_Obj[|Arr_Obj|] := Area</l>
+<l>endfor</l>
+<l>tuple_sort_index(Arr_Obj, Indices)</l>
+<l>Coil_1 := Indices[|Indices|-1] + 1</l>
+<l>Coil_2 := Indices[|Indices|-2] + 1</l>
+<c></c>
+<c>* --- Расширение Coils, затем сужение</c>
+<l>select_obj(Gi_Reg, ObjSel, Coil_1)</l>
+<l>dilation_circle(ObjSel, ObjSel_Dil, Dilation_Coil)</l>
+<l>erosion_circle(ObjSel_Dil, Obj_Coil_1, Erosion_Coil)</l>
+<c></c>
+<l>select_obj(Gi_Reg, ObjSel, Coil_2)</l>
+<l>dilation_circle(ObjSel, ObjSel_Dil, Dilation_Coil)</l>
+<l>erosion_circle(ObjSel_Dil, Obj_Coil_2, Erosion_Coil)</l>
+<c></c>
+<c>* --- Собираем RegNoProc</c>
+<l>difference(Obj_Coil_1, Frame_Line, Obj_Coil_1)</l>
+<l>difference(Obj_Coil_2, Frame_Line, Obj_Coil_2)</l>
+<l>union2(Obj_Coil_1, Obj_Coil_2, Obj_Coil)</l>
+<l>difference(Gi_Domain, Obj_Coil, RegNoProc)</l>
+<c></c>
+<l>dev_display(Gi_Im)</l>
+<l>dev_display(RegNoProc)</l>
+<c></c>
+<c></c>
+<l>stop()</l>
+<c></c>
+<l>Regnoproc1 := Regnoproc</l>
+<c></c>
+<l>stop()</l>
+<l>read_image (Gi, 'C:/WORK_CURR/SAMSUNG/Samsung-AOI/Vision/AOI/Run/Model/p2406-001m1_LayerL2-SHORT3.2-0200/Model/Gi.tif')</l>
+<l>read_object (Regnoproc, 'C:/WORK_CURR/SAMSUNG/Samsung-AOI/Vision/AOI/Run/Model/p2406-001m1_LayerL2-SHORT3.2-0200/Model/RegNoProc.hobj')</l>
+<l>read_object (Regnoproc, 'C:/WORK_CURR/SAMSUNG/Samsung-AOI/Vision/AOI/Run/Model/p2406-001m1_LayerL2-SHORT3.2-0200/Model/Teach/RegNoProc.hobj')</l>
+<c></c>
+<c></c>
+<l>get_domain(Gi, Domain)</l>
+<l>difference(Domain, Regnoproc, RegionDifference)</l>
+<l>connection(RegionDifference, ConnectedRegions)</l>
+<l>count_obj(ConnectedRegions, Number)</l>
+<c></c>
+<c></c>
+<l>stop()</l>
+<c></c>
+<c></c>
+<l>path_model := 'G:/SAMSUNG/Image/p2405-015d2_LayerL1-SHORT3.2-0200_Overkill/Model/p2405-015d2_LayerL1-SHORT3.2-0200/Model/'</l>
+<l>read_image (Gi_Im, path_model + 'Gi.tif')</l>
+<l>get_image_size(Gi_Im, Im_W, Im_H)</l>
+<l>get_domain(Gi_Im, Gi_Domain)</l>
+<c></c>
+<c>* --- Удаление рамки</c>
+<l>gen_rectangle1(Frame_I, Frame_Width, Frame_Width, Im_H - Frame_Width, Im_W - Frame_Width)</l>
+<l>difference(Gi_Domain, Frame_I, Frame)</l>
+<l>* dilation_rectangle1(Gi_Domain, RegionDilation1, Frame_Width, Frame_Width)</l>
+<c></c>
+<c>* --- Удаление средней линии</c>
+<l>if (Midle_Line_Type == 0)</l>
+<l>    M_Pos := Im_W / 2</l>
+<l>    gen_rectangle1(Midle_Line, 0, M_Pos - Midle_Line_Width / 2, Im_H, M_Pos + Midle_Line_Width / 2)</l>
+<l>else</l>
+<l>    M_Pos := Im_H / 2</l>
+<l>    gen_rectangle1(Midle_Line, M_Pos - Midle_Line_Width / 2, 0, M_Pos + Midle_Line_Width / 2, Im_W)</l>
+<l>endif</l>
+<l>union2(Midle_Line, Frame, Frame_Line)</l>
+<c></c>
+<c>* --- Удаление лишних объектов</c>
+<l>threshold(Gi_Im, Gi_Reg, 128, 255)</l>
+<l>difference(Gi_Reg, Frame_Line, Gi_Reg)</l>
+<l>connection(Gi_Reg, Gi_Reg)</l>
+<l>count_obj(Gi_Reg, NumObj)</l>
+<c></c>
+<c>* --- Поиск 2-х максимальных площадей объектов - Coils</c>
+<l>Arr_Obj := []</l>
+<l>for I := 1 to NumObj by 1</l>
+<l>    select_obj(Gi_Reg, ObjSel, I)</l>
+<l>    dev_display(ObjSel)</l>
+<l>    area_center(ObjSel, Area, Row, Col)</l>
+<l>    Arr_Obj[|Arr_Obj|] := Area</l>
+<l>endfor</l>
+<l>tuple_sort_index(Arr_Obj, Indices)</l>
+<l>Coil_1 := Indices[|Indices|-1] + 1</l>
+<l>Coil_2 := Indices[|Indices|-2] + 1</l>
+<c></c>
+<c>* --- Расширение Coils, затем сужение</c>
+<l>select_obj(Gi_Reg, ObjSel, Coil_1)</l>
+<l>dilation_circle(ObjSel, ObjSel_Dil, Dilation_Coil)</l>
+<l>erosion_circle(ObjSel_Dil, Obj_Coil_1, Erosion_Coil)</l>
+<c></c>
+<l>select_obj(Gi_Reg, ObjSel, Coil_2)</l>
+<l>dilation_circle(ObjSel, ObjSel_Dil, Dilation_Coil)</l>
+<l>erosion_circle(ObjSel_Dil, Obj_Coil_2, Erosion_Coil)</l>
+<c></c>
+<c>* --- Собираем RegNoProc</c>
+<l>difference(Obj_Coil_1, Frame_Line, Obj_Coil_1)</l>
+<l>difference(Obj_Coil_2, Frame_Line, Obj_Coil_2)</l>
+<l>union2(Obj_Coil_1, Obj_Coil_2, Obj_Coil)</l>
+<l>difference(Gi_Domain, Obj_Coil, RegNoProc)</l>
+<c></c>
+<c></c>
+<l>stop()</l>
+<c></c>
+<c></c>
+<c></c>
+<l>read_image (Gi, 'G:/SAMSUNG/Image/model_compare/01_Model/p2411-042d101_LayerL1-T-SHORT2.0-0200_Synapse/Model/Gi.tif')</l>
+<l>read_object (Regnoproc1, 'G:/SAMSUNG/Image/model_compare/01_Model/p2411-042d101_LayerL1-T-SHORT2.0-0200_Stemco/Model/RegNoProc.hobj')</l>
+<l>read_object (Regnoproc2, 'G:/SAMSUNG/Image/model_compare/01_Model/p2411-042d101_LayerL1-T-SHORT2.0-0200_Synapse/Model/RegNoProc.hobj')</l>
+<l>stop()</l>
+<l>stop()</l>
+<l>stop()</l>
+<l>read_image (Gi, 'G:/SAMSUNG/Image/EQ_08_VISIONSW_3_DOWN_ERROR (3)/01_Model/p2409-007t101_LayerL1-T-SHORT1.0-0250/Model/Gi.tif')</l>
+<l>read_object (Regnoproc1, 'G:/SAMSUNG/Image/EQ_08_VISIONSW_3_DOWN_ERROR (3)/01_Model/p2409-007t101_LayerL1-T-SHORT1.0-0250/Model/RegNoProc.hobj')</l>
+<l>read_object (Regnoproc, 'G:/SAMSUNG/Image/EQ_08_VISIONSW_3_DOWN_ERROR (3)/01_Model/p2409-007t101_LayerL1-T-SHORT1.0-0250/Model/Teach/RegNoProc.hobj')</l>
+<c></c>
+<c></c>
+<c></c>
+<l>stop()</l>
+<l>stop()</l>
+<c></c>
+<c>*******************************************************</c>
+<c>*** End</c>
+<c>*******************************************************</c>
+<c></c>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+<procedure name="dev_update_off">
+<interface/>
+<body>
+<c>* This procedure sets different update settings to 'off'.</c>
+<c>* This is useful to get the best performance and reduce overhead.</c>
+<c>* </c>
+<l>dev_update_pc ('off')</l>
+<l>dev_update_var ('off')</l>
+<l>dev_update_window ('off')</l>
+<l>return ()</l>
+</body>
+<docu id="dev_update_off">
+<abstract lang="en_US">This procedure sets dev_update_pc, dev_update_var and dev_update_window to 'off'.</abstract>
+<alternatives>
+<item>dev_update_pc</item>
+<item>dev_update_var</item>
+<item>dev_update_window</item>
+</alternatives>
+<chapters lang="de_DE">
+<item>Develop</item>
+</chapters>
+<chapters lang="en_US">
+<item>Develop</item>
+</chapters>
+<example lang="en_US">dev_update_off ()
+* do something
+dev_update_on ()</example>
+<keywords lang="de_DE">
+<item>Aktualisierungsmodus setzen</item>
+</keywords>
+<keywords lang="en_US">
+<item>set update mode</item>
+</keywords>
+<library lang="de_DE">MVTec Standard Procedures</library>
+<library lang="en_US">MVTec Standard Procedures</library>
+<see_also>
+<item>dev_update_on</item>
+</see_also>
+<short lang="de_DE">Switch dev_update_pc, dev_update_var and dev_update_window to 'off'.</short>
+<short lang="en_US">Switch dev_update_pc, dev_update_var and dev_update_window to 'off'.</short>
+<parameters/>
+</docu>
+</procedure>
+<procedure name="dev_update_on">
+<interface/>
+<body>
+<c>* This procedure sets different update settings to 'on'.</c>
+<c>* </c>
+<l>dev_update_pc ('on')</l>
+<l>dev_update_var ('on')</l>
+<l>dev_update_window ('on')</l>
+<l>return ()</l>
+</body>
+<docu id="dev_update_on">
+<abstract lang="en_US">This procedure sets dev_update_pc, dev_update_var and dev_update_window to 'on'.</abstract>
+<alternatives>
+<item>dev_update_pc</item>
+<item>dev_update_var</item>
+<item>dev_update_window</item>
+</alternatives>
+<chapters lang="de_DE">
+<item>Develop</item>
+</chapters>
+<chapters lang="en_US">
+<item>Develop</item>
+</chapters>
+<example lang="en_US">dev_update_off ()
+* do something
+dev_update_on ()</example>
+<keywords lang="de_DE">
+<item>Aktualisierungsmodus setzen</item>
+</keywords>
+<keywords lang="en_US">
+<item>set update mode</item>
+</keywords>
+<library lang="de_DE">MVTec Standard Procedures</library>
+<library lang="en_US">MVTec Standard Procedures</library>
+<see_also>
+<item>dev_update_off</item>
+</see_also>
+<short lang="de_DE">Switch dev_update_pc, dev_update_var and dev_update_window to 'on'.</short>
+<short lang="en_US">Switch dev_update_pc, dev_update_var and dev_update_window to 'on'.</short>
+<parameters/>
+</docu>
+</procedure>
+<procedure name="Auto_Threshold5">
+<interface>
+<io>
+<par name="SkeletonsFWMS" base_type="iconic" dimension="0"/>
+<par name="Im" base_type="iconic" dimension="0"/>
+</io>
+<oc>
+<par name="thr" base_type="ctrl" dimension="0"/>
+<par name="thrS" base_type="ctrl" dimension="0"/>
+<par name="thrP" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>union1 (SkeletonsFWMS, SkeletonFWMS)</l>
+<l>dilation_circle (SkeletonFWMS, SkeletonFWMSd, 9.5)</l>
+<l>reduce_domain (Im, SkeletonFWMSd, Imp)</l>
+<c></c>
+<l>gray_histo_abs (SkeletonFWMSd, Imp, 1, AbsoluteHisto1)</l>
+<c></c>
+<l>create_funct_1d_array (AbsoluteHisto1, FAbsoluteHisto1)</l>
+<l>smooth_funct_1d_mean (FAbsoluteHisto1, 15, 5, FAbsoluteHistosm1)</l>
+<l>local_min_max_funct_1d (FAbsoluteHistosm1, 'strict_min_max', 'true', Min21, Max21)</l>
+<c></c>
+<l>* Middle := 140</l>
+<l>Middle := int(Min21[0])</l>
+<c></c>
+<l>if (Middle == 0)</l>
+<l>    thr := 0</l>
+<l>    thrS := 0</l>
+<l>    thrP := 0</l>
+<l>    return ()</l>
+<l>endif</l>
+<c></c>
+<l>tuple_first_n (AbsoluteHisto1, Middle, Space_T)</l>
+<l>create_funct_1d_array (Space_T, FSpace_T)</l>
+<l>smooth_funct_1d_mean (FSpace_T, 9, 3, FSpace_T)</l>
+<l>local_min_max_funct_1d (FSpace_T, 'plateaus_center', 'true', MinS, MaxS)</l>
+<c></c>
+<l>Max_Index (MaxS, FSpace_T, Idx)</l>
+<l>thrS := MaxS[Idx]</l>
+<c></c>
+<c></c>
+<c></c>
+<l>tuple_last_n (AbsoluteHisto1, Middle, Patern_T)</l>
+<l>create_funct_1d_array (Patern_T, FPatern_T)</l>
+<l>smooth_funct_1d_mean (FPatern_T, 9, 3, FPatern_T)</l>
+<l>local_min_max_funct_1d (FPatern_T, 'plateaus_center', 'true', MinP, MaxP)</l>
+<c></c>
+<l>Max_Index (MaxP, FPatern_T, Idx)</l>
+<l>thrP := MaxP[Idx] + Middle</l>
+<c></c>
+<l>tuple_mean ([thrS, thrP], thr)</l>
+<c></c>
+<c></c>
+<l>return ()</l>
+</body>
+<docu id="Auto_Threshold5">
+<parameters>
+<parameter id="Im"/>
+<parameter id="SkeletonsFWMS"/>
+<parameter id="thr"/>
+<parameter id="thrP"/>
+<parameter id="thrS"/>
+</parameters>
+</docu>
+</procedure>
+<procedure name="Max_Index">
+<interface>
+<ic>
+<par name="Max21" base_type="ctrl" dimension="0"/>
+<par name="FAbsoluteHistosm1" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="Max_Index" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>Max_Pos := 0</l>
+<l>Max_Val := 0</l>
+<l>Max_Index := 0</l>
+<l>tuple_length (Max21, Length)</l>
+<l>for Index := 0 to Length - 1 by 1</l>
+<c></c>
+<l>    Extr_Pos := Max21[Index]</l>
+<l>    tuple_int (Extr_Pos, Extr_Pos)</l>
+<l>    Extr_Val := FAbsoluteHistosm1[Extr_Pos]</l>
+<l>    if (Extr_Val &gt; Max_Val)</l>
+<l>        Max_Val := Extr_Val</l>
+<l>        Max_Pos := Extr_Pos</l>
+<l>        Max_Index := Index</l>
+<l>    endif</l>
+<l>endfor</l>
+<l>return ()</l>
+</body>
+<docu id="Max_Index">
+<parameters>
+<parameter id="FAbsoluteHistosm1"/>
+<parameter id="Max21"/>
+<parameter id="Max_Index"/>
+</parameters>
+</docu>
+</procedure>
+<procedure name="SN_Loc_Min">
+<interface>
+<ic>
+<par name="Gray" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="Loc_Min" base_type="ctrl" dimension="0"/>
+<par name="Loc_Min_Val" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>    Loc_Min := []</l>
+<l>    Loc_Min_Val := []</l>
+<l>    Fl := 1</l>
+<l>    tuple_length(Gray, Gray_Len)</l>
+<l>    for I := 1 to Gray_Len - 1 by 1</l>
+<l>        I0 := I - 1</l>
+<l>        if (Gray[I0] &gt; Gray[I])</l>
+<l>            Fl := 1   </l>
+<l>        endif</l>
+<c></c>
+<l>        if ((Gray[I0] &lt; Gray[I] and Fl == 1) or (I == Gray_Len - 1 and Fl == 1))</l>
+<l>            tuple_concat(Loc_Min, I0, Loc_Min)</l>
+<l>            tuple_concat(Loc_Min_Val, Gray[I0], Loc_Min_Val)</l>
+<l>            Fl := 0   </l>
+<l>        endif</l>
+<l>    endfor</l>
+<l>return ()</l>
+</body>
+<docu id="SN_Loc_Min">
+<parameters>
+<parameter id="Gray"/>
+<parameter id="Loc_Min"/>
+<parameter id="Loc_Min_Val"/>
+</parameters>
+</docu>
+</procedure>
+<procedure name="SN_Loc_Max_Center">
+<interface>
+<ic>
+<par name="Gray" base_type="ctrl" dimension="0"/>
+<par name="Center" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="Loc_Max" base_type="ctrl" dimension="0"/>
+<par name="Loc_Max_Val" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>    Loc_Max := []</l>
+<l>    Loc_Max_Val := []</l>
+<l>    Fl := 1</l>
+<l>    Pos_Fl := 0</l>
+<l>    tuple_length(Gray, Gray_Len)</l>
+<l>    for I := 1 to Gray_Len - 1 by 1</l>
+<l>        I0 := I - 1</l>
+<l>        if (Gray[I0] &lt; Gray[I])</l>
+<l>            Fl := 1   </l>
+<l>            Pos_Fl := I</l>
+<l>        endif</l>
+<c></c>
+<l>        if ((Gray[I0] &gt; Gray[I] and Fl == 1) or (I == Gray_Len - 1 and Fl == 1))</l>
+<l>            if (Center - I0 &gt; 0)</l>
+<l>                Pos_I :=  I0               </l>
+<l>            else</l>
+<l>                Pos_I :=  Pos_Fl               </l>
+<l>            endif</l>
+<l>            tuple_concat(Loc_Max, Pos_I, Loc_Max)</l>
+<l>            tuple_concat(Loc_Max_Val, Gray[Pos_I], Loc_Max_Val)</l>
+<l>            Fl := 0   </l>
+<l>        endif</l>
+<l>    endfor</l>
+<l>return ()</l>
+</body>
+<docu id="SN_Loc_Max_Center">
+<parameters>
+<parameter id="Center"/>
+<parameter id="Gray"/>
+<parameter id="Loc_Max"/>
+<parameter id="Loc_Max_Val"/>
+</parameters>
+</docu>
+</procedure>
+<procedure name="Teach_Slice">
+<interface>
+<io>
+<par name="Skel_FWMS" base_type="iconic" dimension="0"/>
+<par name="WidthImageS" base_type="iconic" dimension="0"/>
+</io>
+<ic>
+<par name="Win" base_type="ctrl" dimension="0"/>
+<par name="SensLen" base_type="ctrl" dimension="0"/>
+<par name="path_teach_tuples" base_type="ctrl" dimension="0"/>
+<par name="Type" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="Pointer_Skel" base_type="ctrl" dimension="0"/>
+<par name="Pointer_Sens" base_type="ctrl" dimension="0"/>
+<par name="Rows_Sens" base_type="ctrl" dimension="0"/>
+<par name="Cols_Sens" base_type="ctrl" dimension="0"/>
+<par name="Pointer_Pos" base_type="ctrl" dimension="0"/>
+<par name="CurrentOper" base_type="ctrl" dimension="0"/>
+<par name="TotalPRC" base_type="ctrl" dimension="0"/>
+<par name="MaxPRC" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>gen_contours_skeleton_xld(Skel_FWMS, Reg_SEL1_XLD, 1, 'filter')</l>
+<l>smooth_contours_xld (Reg_SEL1_XLD, Reg_SEL1_XLD, 15)</l>
+<c></c>
+<l>Pointer_Skel := []</l>
+<l>Pointer_Sens := []</l>
+<l>Rows_Sens := []</l>
+<l>Cols_Sens := []</l>
+<l>Width_Sens := []</l>
+<l>Pointer_Pos := 0</l>
+<c></c>
+<l>WinD2 := Win/2</l>
+<l>SensLenD2 := SensLen / 2</l>
+<c></c>
+<l>*tuple_concat(Pointer_Skel, 0, Pointer_Skel)</l>
+<l>count_obj(Reg_SEL1_XLD, Count)</l>
+<c></c>
+<l>TotalPRC := 0</l>
+<l>MaxPRC := 0</l>
+<l>CurrentOper:='Low Gray - Formation of sensors'</l>
+<l>for Index := 1 to Count by 1</l>
+<l>    select_obj (Reg_SEL1_XLD, Reg_SEL1, Index)</l>
+<l>    get_contour_xld(Reg_SEL1, Rows, Cols)    </l>
+<c></c>
+<l>    tuple_length(Rows, Len)</l>
+<l>    MaxPRC := MaxPRC + Len</l>
+<l>endfor</l>
+<c></c>
+<l>for Index := 1 to Count by 1</l>
+<c>    </c>
+<l>    select_obj (Reg_SEL1_XLD, Reg_SEL1, Index)</l>
+<l>    get_contour_xld(Reg_SEL1, Rows, Cols)    </l>
+<c>    </c>
+<c></c>
+<l>    tuple_length(Rows, Len)</l>
+<l>    if (Len &lt; 1000)</l>
+<l>        continue</l>
+<l>    endif</l>
+<l>*     for Ind := WinD2 to Len - WinD2 - 2 by 1</l>
+<l>    for Ind := 0 to Len - 1 by 1</l>
+<c></c>
+<l>*         if (SensLen == 0)</l>
+<l>*             get_grayval (WidthImageS, Rows[Ind], Cols[Ind], GrayW)</l>
+<l>*             SensLen := GrayW * 2</l>
+<l>*             SensLenD2 := SensLen / 2</l>
+<l>*         endif</l>
+<l>        get_grayval (WidthImageS, Rows[Ind], Cols[Ind], GrayW)</l>
+<l>        *SensLen := GrayW * 2</l>
+<l>        SensLen := GrayW * 2</l>
+<l>        SensLenD2 := SensLen / 2</l>
+<c></c>
+<c>            </c>
+<l>        if (Ind &lt; WinD2)</l>
+<l>            Ind0 := 0</l>
+<l>            Ind1 := Ind + Win</l>
+<l>        elseif (Ind &gt; Len - 1 - WinD2)</l>
+<l>            Ind0 := Len - 1 - Win </l>
+<l>            Ind1 := Len - 1</l>
+<l>        else</l>
+<l>            Ind0 := Ind - WinD2</l>
+<l>            Ind1 := Ind + WinD2</l>
+<l>        endif</l>
+<c>        </c>
+<c>        </c>
+<l>        tuple_atan2(Rows[Ind0] - Rows[Ind1], Cols[Ind0] - Cols[Ind1], Angle) </l>
+<l>        tuple_deg(Angle, Angle_Deg)</l>
+<c>        </c>
+<l>        tuple_cos(Angle + 1.5708, Cos)</l>
+<l>        tuple_sin(Angle + 1.5708, Sin)</l>
+<l>        P1X := Cols[Ind] + Cos * SensLenD2</l>
+<l>        P1Y := Rows[Ind] + Sin * SensLenD2</l>
+<c>    </c>
+<l>        tuple_cos(Angle + 4.71239, Cos)</l>
+<l>        tuple_sin(Angle + 4.71239, Sin)</l>
+<l>        P2X := Cols[Ind] + Cos * SensLenD2</l>
+<l>        P2Y := Rows[Ind] + Sin * SensLenD2</l>
+<c>        </c>
+<c>        * --------------------------------------------------------</c>
+<l>        dX := (P1X - P2X) / SensLen</l>
+<l>        dY := (P1Y - P2Y) / SensLen</l>
+<l>        Rows_S1 := []</l>
+<l>        Cols_S1 := []</l>
+<l>        Row1 := P1Y</l>
+<l>        Col1 := P1X</l>
+<l>        for Idx := 0 to SensLen - 1 by 1</l>
+<c>            </c>
+<l>            Rows_S1[Idx] := Row1</l>
+<l>            Cols_S1[Idx] := Col1</l>
+<c>            </c>
+<l>            Row1 := Row1 - dY</l>
+<l>            Col1 := Col1 - dX</l>
+<l>        endfor</l>
+<c>        </c>
+<c>        </c>
+<l>*          gen_region_points(Region, Rows_S1, Cols_S1)</l>
+<l>*          disp_obj(Region, 200000)</l>
+<c>        * --------------------------------------------------------</c>
+<c>        </c>
+<l>*         gen_region_line(Reg_Sens, P1Y, P1X, P2Y, P2X)</l>
+<l>*         get_region_contour(Reg_Sens, Rows_S1, Cols_S1)</l>
+<c>        </c>
+<l>*         disp_obj(Reg_Sens, 200000)</l>
+<l>*         gen_contours_skeleton_xld(Reg_Sens, Reg_Sens_XLD, 1, 'filter')</l>
+<l>*         get_contour_xld(Reg_Sens_XLD, Rows_S, Cols_S)    </l>
+<c>    </c>
+<l>        tuple_concat(Rows_Sens, Rows_S1, Rows_Sens)</l>
+<l>        tuple_concat(Cols_Sens, Cols_S1, Cols_Sens)</l>
+<l>        tuple_concat(Pointer_Sens, Pointer_Pos, Pointer_Sens)</l>
+<c></c>
+<l>        tuple_length(Rows_S1, Length)</l>
+<l>        Pointer_Pos := Pointer_Pos + Length</l>
+<c>        </c>
+<l>        TotalPRC := TotalPRC + 1</l>
+<c></c>
+<l>    endfor</l>
+<c>    </c>
+<l>    tuple_length(Pointer_Sens, Len_Sens)</l>
+<l>    tuple_concat(Pointer_Skel, Len_Sens - 1, Pointer_Skel)</l>
+<c>    </c>
+<c>    </c>
+<l> endfor</l>
+<l>tuple_concat(Pointer_Sens, Pointer_Pos, Pointer_Sens)</l>
+<c></c>
+<l>CurrentOper:='Low Gray - Saving objects'</l>
+<c></c>
+<l>tuple_int(Rows_Sens, Rows_Sens)</l>
+<l>tuple_int(Cols_Sens, Cols_Sens)</l>
+<l>if (Type == 'S')</l>
+<l>    write_tuple(Pointer_Skel, path_teach_tuples + 'Pointer_Skel.tup')</l>
+<l>    write_tuple(Pointer_Sens, path_teach_tuples + 'Pointer_Sens.tup')</l>
+<l>    write_tuple(Rows_Sens, path_teach_tuples + 'Rows_Sens.tup')</l>
+<l>    write_tuple(Cols_Sens, path_teach_tuples + 'Cols_Sens.tup')</l>
+<l>else</l>
+<l>    write_tuple(Pointer_Skel, path_teach_tuples + 'Pointer_Skel_P.tup')</l>
+<l>    write_tuple(Pointer_Sens, path_teach_tuples + 'Pointer_Sens_P.tup')</l>
+<l>    write_tuple(Rows_Sens, path_teach_tuples + 'Rows_Sens_P.tup')</l>
+<l>    write_tuple(Cols_Sens, path_teach_tuples + 'Cols_Sens_P.tup')</l>
+<l>endif</l>
+<c></c>
+<l>return ()</l>
+</body>
+<docu id="Teach_Slice">
+<parameters>
+<parameter id="Cols_Sens"/>
+<parameter id="CurrentOper"/>
+<parameter id="MaxPRC"/>
+<parameter id="Pointer_Pos"/>
+<parameter id="Pointer_Sens"/>
+<parameter id="Pointer_Skel"/>
+<parameter id="Rows_Sens"/>
+<parameter id="SensLen"/>
+<parameter id="Skel_FWMS"/>
+<parameter id="TotalPRC"/>
+<parameter id="Type"/>
+<parameter id="WidthImageS"/>
+<parameter id="Win"/>
+<parameter id="path_teach_tuples"/>
+</parameters>
+</docu>
+</procedure>
+<procedure name="Test_Matrix">
+<interface/>
+<body>
+<l>count_seconds(s1)</l>
+<c></c>
+<c></c>
+<l>Mx_Size := 20 </l>
+<l>create_matrix(Mx_Size, 100, 255, Matrix_Gray)</l>
+<l>Mx_Pos := 0</l>
+<l>Mx_Cnt := 0</l>
+<c></c>
+<l>Depth_Pos := 0</l>
+<l>Gray_Len := 50</l>
+<c></c>
+<l>for I := 0 to 20000 - 1 by 1</l>
+<c>    </c>
+<l>    tuple_gen_sequence(0, Gray_Len - 1, 1, Gray)</l>
+<l>    tuple_gen_sequence(0, Gray_Len - 1, 1, Col_Seq)</l>
+<l>    tuple_gen_const (Gray_Len, Mx_Pos, Row_Seq)</l>
+<l>    set_value_matrix(Matrix_Gray, Row_Seq, Col_Seq, Gray)</l>
+<l>    Mx_Pos := Mx_Pos + 1</l>
+<l>    if (Mx_Pos &gt;= Mx_Size - 1)</l>
+<l>        Mx_Pos := 0</l>
+<l>    endif</l>
+<c></c>
+<c>    </c>
+<l>    if (Mx_Cnt &lt; Mx_Size - 1)</l>
+<l>        Mx_Cnt := Mx_Cnt + 1</l>
+<l>        Mx_Pos_Last := 0</l>
+<l>    else</l>
+<l>        min_matrix(Matrix_Gray, 'columns', Matrix_Gray_Min)</l>
+<l>        tuple_gen_const(Gray_Len, 0, Row_Seq)</l>
+<l>        get_value_matrix(Matrix_Gray_Min, Row_Seq, Col_Seq, Gray_Last)</l>
+<c>        </c>
+<l>        tuple_max(Gray_Last, Depth)</l>
+<l>        Depth_S[Depth_Pos] := Depth</l>
+<l>        Depth_Pos := Depth_Pos + 1            </l>
+<c>        </c>
+<l>    endif</l>
+<c>    </c>
+<c>    </c>
+<c>    </c>
+<l>endfor</l>
+<c></c>
+<c></c>
+<c>        </c>
+<l>count_seconds(s2)</l>
+<l>s := s2 - s1        </l>
+<c>        </c>
+<l>return ()</l>
+</body>
+<docu id="Test_Matrix">
+<parameters/>
+</docu>
+</procedure>
+<procedure name="Region_Threshold_SubPix_W2">
+<interface>
+<io>
+<par name="Im" base_type="iconic" dimension="0"/>
+<par name="RegSel" base_type="iconic" dimension="0"/>
+</io>
+<ic>
+<par name="Im_H" base_type="ctrl" dimension="0"/>
+<par name="Im_W" base_type="ctrl" dimension="0"/>
+<par name="Thr" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="RowsSub" base_type="ctrl" dimension="0"/>
+<par name="ColsSub" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>RowsSub := []</l>
+<l>ColsSub := []</l>
+<l>Pos_Sub := 0</l>
+<c></c>
+<c></c>
+<l>get_region_contour (RegSel, Rows, Cols)</l>
+<l>tuple_length (Rows, Cont_Len)</l>
+<c></c>
+<c>* Тест на дырку</c>
+<l>for Pos := 0 to Cont_Len - 1 by 1</l>
+<l>    get_grayval (Im, Rows[Pos], Cols[Pos], Gray0)</l>
+<c></c>
+<l>    if (Gray0 &lt; Thr)</l>
+<l>        Hole := 1</l>
+<l>        break</l>
+<l>    elseif (Gray0 &gt;= Thr)</l>
+<l>        Hole := 0</l>
+<l>        break</l>
+<l>    endif</l>
+<c></c>
+<l>endfor</l>
+<c></c>
+<c></c>
+<l>for Pos := 0 to Cont_Len - 1 by 1</l>
+<l>    get_grayval (Im, Rows[Pos], Cols[Pos], Gray0)</l>
+<c></c>
+<l>    Pos_Next := Pos + 1</l>
+<l>    if (Pos_Next &gt; Cont_Len - 1)</l>
+<l>        Pos_Next := 0</l>
+<l>    endif</l>
+<l>    Pos_Prev := Pos - 1</l>
+<l>    if (Pos_Prev &lt; 0)</l>
+<l>        Pos_Prev := Cont_Len - 1</l>
+<l>    endif</l>
+<l>    Row_Prev := Rows[Pos_Prev]</l>
+<l>    Col_Prev := Cols[Pos_Prev]</l>
+<l>    Row_Next := Rows[Pos_Next]</l>
+<l>    Col_Next := Cols[Pos_Next]</l>
+<l>    Row_Curr := Rows[Pos]</l>
+<l>    Col_Curr := Cols[Pos]</l>
+<c></c>
+<l>    dev_set_color ('red')</l>
+<l>    gen_cross_contour_xld (Cross, Row_Curr, Col_Curr, 1, 0)</l>
+<c></c>
+<c></c>
+<l>    if (Row_Curr &gt;= Im_H - 1 or Col_Curr &gt;= Im_W - 1 or Row_Curr == 0 or Col_Curr == 0)</l>
+<l>        continue</l>
+<l>    endif</l>
+<c></c>
+<c>    * Направление</c>
+<l>    if (Row_Curr &gt; Row_Prev or Row_Curr &lt; Row_Next)</l>
+<l>        Down := 1</l>
+<l>    else</l>
+<l>        Down := 0</l>
+<l>    endif</l>
+<c></c>
+<l>    if (Col_Curr &lt; Col_Prev or Col_Curr &gt; Col_Next)</l>
+<l>        Left := 1</l>
+<l>    else</l>
+<l>        Left := 0</l>
+<l>    endif</l>
+<c></c>
+<c>    * -- Cols -------------------------------------------</c>
+<l>    get_grayval (Im, Row_Curr, Col_Curr + 1, Gray1)</l>
+<l>    get_grayval (Im, Row_Curr, Col_Curr - 1, Gray2)</l>
+<l>    X0 := -1</l>
+<l>    X1 := 0</l>
+<l>    X2 := 0</l>
+<l>    Xr1 := -1</l>
+<c></c>
+<c>    * Идем вниз. Сравниваем с полем справа</c>
+<l>    if (Down and ((Hole == 1 and Gray1 &gt; Thr) or (Hole == 0 and Gray1 &lt; Thr)))</l>
+<l>        X0 := Thr</l>
+<l>        X1 := Gray0</l>
+<l>        X2 := Gray1</l>
+<l>        Y1 := Cols[Pos]</l>
+<l>        Y2 := Cols[Pos] + 1</l>
+<c>        * Идем вверх. Сравниваем с полем слева</c>
+<l>    elseif (not Down and ((Hole == 1 and Gray2 &gt; Thr) or (Hole == 0 and Gray2 &lt; Thr)))</l>
+<l>        X0 := Thr</l>
+<l>        X1 := Gray2</l>
+<l>        X2 := Gray0</l>
+<l>        Y1 := Cols[Pos] - 1</l>
+<l>        Y2 := Cols[Pos]</l>
+<l>    endif</l>
+<c></c>
+<l>    if (X0 &gt;= 0 and X2 != X1)</l>
+<l>        Xr1 := real(Y1) + real(X0 - X1) * real(Y2 - Y1) / real(X2 - X1)</l>
+<l>        Yr1 := Rows[Pos]</l>
+<c></c>
+<l>        dev_set_color ('green')</l>
+<l>        gen_cross_contour_xld (Cross, Yr1, Xr1, 0.5, 0)</l>
+<l>    endif</l>
+<c></c>
+<c>    * --- Rows -------------------------------------------</c>
+<l>    get_grayval (Im, Row_Curr + 1, Col_Curr, Gray1)</l>
+<l>    get_grayval (Im, Row_Curr - 1, Col_Curr, Gray2)</l>
+<l>    X0 := -1</l>
+<l>    Yr2 := -1</l>
+<c></c>
+<c>    * Идем влево. Сравниваем с полем снизу</c>
+<l>    if (Left and ((Hole == 1 and Gray1 &gt; Thr) or (Hole == 0 and Gray1 &lt; Thr)))</l>
+<l>        X0 := Thr</l>
+<l>        X1 := Gray0</l>
+<l>        X2 := Gray1</l>
+<l>        Y1 := Rows[Pos]</l>
+<l>        Y2 := Rows[Pos] + 1</l>
+<c>        * Идем вправо. Сравниваем с полем сверху</c>
+<l>    elseif (not Left and ((Hole == 1 and Gray2 &gt; Thr) or (Hole == 0 and Gray2 &lt; Thr)))</l>
+<l>        X0 := Thr</l>
+<l>        X1 := Gray2</l>
+<l>        X2 := Gray0</l>
+<l>        Y1 := Rows[Pos] - 1</l>
+<l>        Y2 := Rows[Pos]</l>
+<l>    endif</l>
+<c></c>
+<l>    if (X0 &gt;= 0 and X2 != X1)</l>
+<l>        Yr2 := real(Y1) + real(X0 - X1) * real(Y2 - Y1) / real(X2 - X1)</l>
+<l>        Xr2 := Cols[Pos]</l>
+<c></c>
+<l>        dev_set_color ('green')</l>
+<l>        gen_cross_contour_xld (Cross, Yr2, Xr2, 0.5, 0)</l>
+<l>    endif</l>
+<c></c>
+<l>    if (Xr1 &gt;= 0 and Yr2 &gt;= 0)</l>
+<l>        Yr_Avg := (Yr2 + Yr1) / 2</l>
+<l>        Xr_Avg := (Xr2 + Xr1) / 2</l>
+<c></c>
+<l>        RowsSub[Pos_Sub] := Yr_Avg</l>
+<l>        ColsSub[Pos_Sub] := Xr_Avg</l>
+<l>        Pos_Sub := Pos_Sub + 1</l>
+<c></c>
+<l>        dev_set_color ('red')</l>
+<l>        gen_cross_contour_xld (Cross, Yr_Avg, Xr_Avg, 0.5, 0)</l>
+<c></c>
+<l>    elseif (Xr1 &gt;= 0)</l>
+<l>        RowsSub[Pos_Sub] := Yr1</l>
+<l>        ColsSub[Pos_Sub] := Xr1</l>
+<l>        Pos_Sub := Pos_Sub + 1</l>
+<c></c>
+<l>        dev_set_color ('red')</l>
+<l>        gen_cross_contour_xld (Cross, Yr1, Xr1, 0.5, 0)</l>
+<l>    elseif (Yr2 &gt;= 0)</l>
+<l>        RowsSub[Pos_Sub] := Yr2</l>
+<l>        ColsSub[Pos_Sub] := Xr2</l>
+<l>        Pos_Sub := Pos_Sub + 1</l>
+<c></c>
+<l>        dev_set_color ('red')</l>
+<l>        gen_cross_contour_xld (Cross, Yr2, Xr2, 0.5, 0)</l>
+<l>    endif</l>
+<c></c>
+<l>endfor</l>
+<l>return ()</l>
+</body>
+<docu id="Region_Threshold_SubPix_W2">
+<parameters>
+<parameter id="ColsSub"/>
+<parameter id="Im"/>
+<parameter id="Im_H"/>
+<parameter id="Im_W"/>
+<parameter id="RegSel"/>
+<parameter id="RowsSub"/>
+<parameter id="Thr"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="Adjust_Gi">
+<interface>
+<io>
+<par name="Gi_Reg" base_type="iconic" dimension="0"/>
+<par name="Im" base_type="iconic" dimension="0"/>
+</io>
+<oo>
+<par name="Gi_Adj" base_type="iconic" dimension="0"/>
+</oo>
+<ic>
+<par name="Width" base_type="ctrl" dimension="0"/>
+<par name="Height" base_type="ctrl" dimension="0"/>
+<par name="Adj_Erosion" base_type="ctrl" dimension="0"/>
+<par name="Adj_Dilation" base_type="ctrl" dimension="0"/>
+</ic>
+</interface>
+<body>
+<l>tuple_gen_sequence(0, Width - 1, 1, Cols)</l>
+<c></c>
+<l>Min_Err := 1000000000</l>
+<l>Adj_Count := Adj_Erosion + Adj_Dilation</l>
+<l>for I := 1 to Adj_Count by 1</l>
+<c>    </c>
+<l>    if (I &lt; Adj_Erosion)</l>
+<l>        erosion_circle(Gi_Reg, Gi_Reg_Dil, I)</l>
+<l>    else</l>
+<l>        dilation_circle(Gi_Reg, Gi_Reg_Dil, I)</l>
+<l>    endif</l>
+<c>    </c>
+<l>    region_to_bin(Gi_Reg_Dil, Gi_D, 255, 0, Width, Height)</l>
+<c>    </c>
+<l>    Err := 0</l>
+<l>    for Row := 0 to Height - 1 by 1</l>
+<l>        tuple_gen_const(Width, Row, Rows)</l>
+<c>      </c>
+<l>        get_grayval(Im, Rows, Cols, Gray)</l>
+<l>        get_grayval(Gi_D, Rows, Cols, Gray_D)</l>
+<l>        Gray_Test := Gray_D - Gray</l>
+<l>        tuple_abs(Gray_Test, Gray_Test)</l>
+<l>        tuple_sum(Gray_Test, Gray_Test)</l>
+<l>        Err := Err + Gray_Test</l>
+<l>    endfor</l>
+<c>    </c>
+<l>    if (Min_Err &gt; Err)</l>
+<l>        Min_Err := Err</l>
+<l>        Gi_Adj := Gi_Reg_Dil</l>
+<l>    endif</l>
+<c>    </c>
+<l>endfor</l>
+<l>return ()</l>
+</body>
+<docu id="Adjust_Gi">
+<parameters>
+<parameter id="Adj_Dilation"/>
+<parameter id="Adj_Erosion"/>
+<parameter id="Gi_Adj"/>
+<parameter id="Gi_Reg"/>
+<parameter id="Height"/>
+<parameter id="Im"/>
+<parameter id="Width"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>

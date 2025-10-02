@@ -1,0 +1,68 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.33529.398
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Inspect_Testing", "Inspect_Testing\Inspect_Testing.vcxproj", "{63C94B1F-1F34-4F3D-9A02-6042112B6D0A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CDF812D8-D1F7-467F-A0FC-68DD23133661} = {CDF812D8-D1F7-467F-A0FC-68DD23133661}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FWM_DLL", "..\DLL\MFC\Inspection\FWM_DLL\FWM_DLL.vcxproj", "{5AA06A09-6405-4927-8E24-BB3F98F9D01A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Alg_Params", "..\DLL\MFC\Inspection\Alg_Params\Alg_Params.vcxproj", "{CDF812D8-D1F7-467F-A0FC-68DD23133661}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug_DLL|x64 = Debug_DLL|x64
+		Debug_DLL|x86 = Debug_DLL|x86
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{63C94B1F-1F34-4F3D-9A02-6042112B6D0A}.Debug_DLL|x64.ActiveCfg = Debug_DLL|x64
+		{63C94B1F-1F34-4F3D-9A02-6042112B6D0A}.Debug_DLL|x64.Build.0 = Debug_DLL|x64
+		{63C94B1F-1F34-4F3D-9A02-6042112B6D0A}.Debug_DLL|x86.ActiveCfg = Debug_DLL|Win32
+		{63C94B1F-1F34-4F3D-9A02-6042112B6D0A}.Debug_DLL|x86.Build.0 = Debug_DLL|Win32
+		{63C94B1F-1F34-4F3D-9A02-6042112B6D0A}.Debug|x64.ActiveCfg = Debug|x64
+		{63C94B1F-1F34-4F3D-9A02-6042112B6D0A}.Debug|x64.Build.0 = Debug|x64
+		{63C94B1F-1F34-4F3D-9A02-6042112B6D0A}.Debug|x86.ActiveCfg = Debug|Win32
+		{63C94B1F-1F34-4F3D-9A02-6042112B6D0A}.Debug|x86.Build.0 = Debug|Win32
+		{63C94B1F-1F34-4F3D-9A02-6042112B6D0A}.Release|x64.ActiveCfg = Release|x64
+		{63C94B1F-1F34-4F3D-9A02-6042112B6D0A}.Release|x64.Build.0 = Release|x64
+		{63C94B1F-1F34-4F3D-9A02-6042112B6D0A}.Release|x86.ActiveCfg = Release|Win32
+		{63C94B1F-1F34-4F3D-9A02-6042112B6D0A}.Release|x86.Build.0 = Release|Win32
+		{5AA06A09-6405-4927-8E24-BB3F98F9D01A}.Debug_DLL|x64.ActiveCfg = Debug|x64
+		{5AA06A09-6405-4927-8E24-BB3F98F9D01A}.Debug_DLL|x64.Build.0 = Debug|x64
+		{5AA06A09-6405-4927-8E24-BB3F98F9D01A}.Debug_DLL|x86.ActiveCfg = Debug|Win32
+		{5AA06A09-6405-4927-8E24-BB3F98F9D01A}.Debug_DLL|x86.Build.0 = Debug|Win32
+		{5AA06A09-6405-4927-8E24-BB3F98F9D01A}.Debug|x64.ActiveCfg = Debug|x64
+		{5AA06A09-6405-4927-8E24-BB3F98F9D01A}.Debug|x64.Build.0 = Debug|x64
+		{5AA06A09-6405-4927-8E24-BB3F98F9D01A}.Debug|x86.ActiveCfg = Debug|Win32
+		{5AA06A09-6405-4927-8E24-BB3F98F9D01A}.Debug|x86.Build.0 = Debug|Win32
+		{5AA06A09-6405-4927-8E24-BB3F98F9D01A}.Release|x64.ActiveCfg = Release|x64
+		{5AA06A09-6405-4927-8E24-BB3F98F9D01A}.Release|x64.Build.0 = Release|x64
+		{5AA06A09-6405-4927-8E24-BB3F98F9D01A}.Release|x86.ActiveCfg = Release|Win32
+		{5AA06A09-6405-4927-8E24-BB3F98F9D01A}.Release|x86.Build.0 = Release|Win32
+		{CDF812D8-D1F7-467F-A0FC-68DD23133661}.Debug_DLL|x64.ActiveCfg = Debug|x64
+		{CDF812D8-D1F7-467F-A0FC-68DD23133661}.Debug_DLL|x64.Build.0 = Debug|x64
+		{CDF812D8-D1F7-467F-A0FC-68DD23133661}.Debug_DLL|x86.ActiveCfg = Debug|Win32
+		{CDF812D8-D1F7-467F-A0FC-68DD23133661}.Debug_DLL|x86.Build.0 = Debug|Win32
+		{CDF812D8-D1F7-467F-A0FC-68DD23133661}.Debug|x64.ActiveCfg = Debug|x64
+		{CDF812D8-D1F7-467F-A0FC-68DD23133661}.Debug|x64.Build.0 = Debug|x64
+		{CDF812D8-D1F7-467F-A0FC-68DD23133661}.Debug|x86.ActiveCfg = Debug|Win32
+		{CDF812D8-D1F7-467F-A0FC-68DD23133661}.Debug|x86.Build.0 = Debug|Win32
+		{CDF812D8-D1F7-467F-A0FC-68DD23133661}.Release|x64.ActiveCfg = Release|x64
+		{CDF812D8-D1F7-467F-A0FC-68DD23133661}.Release|x64.Build.0 = Release|x64
+		{CDF812D8-D1F7-467F-A0FC-68DD23133661}.Release|x86.ActiveCfg = Release|Win32
+		{CDF812D8-D1F7-467F-A0FC-68DD23133661}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {18E1BD41-9E38-4916-84F4-EFE91738F8C9}
+	EndGlobalSection
+EndGlobal

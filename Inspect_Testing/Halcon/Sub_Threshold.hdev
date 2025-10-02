@@ -1,0 +1,696 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="main">
+<interface/>
+<body>
+<l>dev_update_off()</l>
+<l>dev_update_on()</l>
+<l>path_model := 'G:/SAMSUNG/Image/240704_2um-auto2/Model/'</l>
+<l>path_teach := path_model + 'Teach/'</l>
+<l>path_image := 'C:/TmpIm/'</l>
+<c></c>
+<c></c>
+<l>Thr := 150</l>
+<c></c>
+<l>*read_image (Im, path_image + 'Im5_7.tif')</l>
+<l>read_image (Im, path_image + 'Im1_1.tif')</l>
+<l>get_image_size(Im, Im_W, Im_H)</l>
+<l>* gen_rectangle1 (ROI_0, 541.583, 125.505, 558.155, 132.722)</l>
+<l>* reduce_domain(Im, ROI_0, Im)</l>
+<c></c>
+<l>threshold(Im, Im_Reg, Thr, 255)</l>
+<l>threshold(Im, Im_RegN, 0, Thr)</l>
+<l>connection(Im_Reg, Im_Reg)</l>
+<l>connection(Im_RegN, Im_RegN)</l>
+<c></c>
+<c></c>
+<c>* Удалим самый большой регион</c>
+<l>* count_obj(Im_RegN, Reg_Count)</l>
+<l>* Max_Area := 0</l>
+<l>* Max_Idx := 0</l>
+<l>* for Idx := 1 to Reg_Count by 1</l>
+<l>*     select_obj(Im_RegN, RegSel, Idx)</l>
+<l>*     area_center(RegSel, Area, Row, Col)</l>
+<l>*     if (Area &gt; Max_Area)</l>
+<l>*         Max_Area := Area</l>
+<l>*         Max_Idx := Idx</l>
+<l>*     endif</l>
+<l>* endfor</l>
+<l>* select_obj(Im_RegN, RegSel, Max_Idx)</l>
+<l>* obj_diff(Im_RegN, RegSel, Im_RegN)</l>
+<c></c>
+<l>stop()</l>
+<l>dev_set_color('red')</l>
+<l>threshold_sub_pix(Im, Im_Reg_Sub, Thr)</l>
+<l>count_obj(Im_Reg_Sub, Reg_Count)</l>
+<l>for Idx := 1 to Reg_Count by 1</l>
+<l>*     Idx := 34</l>
+<l>    select_obj(Im_Reg_Sub, RegSel_Sub, Idx)</l>
+<l>    get_contour_xld(RegSel_Sub, RowSub, ColSub)</l>
+<l>    tuple_length(RowSub, Cont_Len_Sub)</l>
+<l>    for Pos := 0 to Cont_Len_Sub - 1 by 1</l>
+<l>        gen_cross_contour_xld(Cross, RowSub[Pos], ColSub[Pos], 0.8, 0)</l>
+<l>        dev_display(Cross)</l>
+<l>    endfor</l>
+<c>    </c>
+<c>    </c>
+<l>    stop()</l>
+<l>endfor</l>
+<c></c>
+<l>stop()</l>
+<c>* Расчет субпикселя</c>
+<l>dev_set_color('green')</l>
+<c></c>
+<l>count_seconds(t2)</l>
+<l>gen_empty_obj(Im_Reg_Sub_My)</l>
+<c></c>
+<l>count_obj(Im_Reg, Reg_Count)</l>
+<l>for Idx := 1 to Reg_Count by 1</l>
+<c>    </c>
+<l>    RowsSub := []</l>
+<l>    ColsSub := []</l>
+<l>    Pos_Sub := 0</l>
+<c>    </c>
+<l>    select_obj(Im_Reg, RegSel, Idx)</l>
+<l>    get_region_contour(RegSel, Rows, Cols)</l>
+<l>    tuple_length(Rows, Cont_Len)</l>
+<l>    for Pos := 0 to Cont_Len - 1 by 1</l>
+<l>        get_grayval(Im, Rows[Pos], Cols[Pos], Gray0)</l>
+<c></c>
+<l>        Pos_Next := Pos + 1</l>
+<l>        if (Pos_Next &gt; Cont_Len - 1)</l>
+<l>            Pos_Next := 0</l>
+<l>        endif</l>
+<l>        Pos_Prev := Pos - 1</l>
+<l>        if (Pos_Prev &lt; 0)</l>
+<l>            Pos_Prev := Cont_Len - 1</l>
+<l>        endif</l>
+<l>        Row_Prev := Rows[Pos_Prev]</l>
+<l>        Col_Prev := Cols[Pos_Prev]</l>
+<l>        Row_Next := Rows[Pos_Next]</l>
+<l>        Col_Next := Cols[Pos_Next]</l>
+<l>        Row_Curr := Rows[Pos]</l>
+<l>        Col_Curr := Cols[Pos]</l>
+<l>        if (Row_Curr &gt;= Im_H - 1 or Col_Curr &gt;= Im_W - 1 or Row_Curr == 0 or Col_Curr == 0)</l>
+<l>            continue</l>
+<l>        endif</l>
+<c>        </c>
+<c>        * Направление</c>
+<l>        if (Row_Curr &gt; Row_Prev or Row_Curr &lt; Row_Next)</l>
+<l>            Down := 1</l>
+<l>        else</l>
+<l>            Down := 0</l>
+<l>        endif</l>
+<c></c>
+<l>        if (Col_Curr &lt; Col_Prev or Col_Curr &gt; Col_Next)</l>
+<l>            Left := 1</l>
+<l>        else</l>
+<l>            Left := 0</l>
+<l>        endif</l>
+<c>        </c>
+<c>        *-- Cols -------------------------------------------</c>
+<l>        get_grayval(Im, Row_Curr, Col_Curr + 1, Gray1)</l>
+<l>        get_grayval(Im, Row_Curr, Col_Curr - 1, Gray2)</l>
+<l>        X0 := -1</l>
+<l>        Xr1 := -1</l>
+<c>        </c>
+<c>        * Идем вниз. Сравниваем с полем справа</c>
+<l>        if (Down and Gray1 &lt; Thr)</l>
+<l>            X0 := Thr</l>
+<l>            X1 := Gray0</l>
+<l>            X2 := Gray1</l>
+<l>            Y1 := Cols[Pos]</l>
+<l>            Y2 := Cols[Pos] + 1</l>
+<c>        * Идем вверх. Сравниваем с полем слева</c>
+<l>        elseif (not Down and Gray2 &lt; Thr)</l>
+<l>            X0 := Thr</l>
+<l>            X1 := Gray2</l>
+<l>            X2 := Gray0</l>
+<l>            Y1 := Cols[Pos] - 1</l>
+<l>            Y2 := Cols[Pos]</l>
+<l>        endif</l>
+<c>        </c>
+<l>        if (X0 &gt;= 0 and X2 != X1)</l>
+<l>            Xr1 := real(Y1) + real(X0 - X1) * real(Y2 - Y1) / real(X2 - X1)</l>
+<l>            Yr1 := Rows[Pos]</l>
+<c>            </c>
+<l>            dev_set_color('green')</l>
+<l>            gen_cross_contour_xld(Cross, Yr1, Xr1, 0.5, 0)</l>
+<l>        endif</l>
+<c>        </c>
+<c>        *--- Rows -------------------------------------------</c>
+<l>        get_grayval(Im, Row_Curr + 1, Col_Curr, Gray1)</l>
+<l>        get_grayval(Im, Row_Curr - 1, Col_Curr, Gray2)</l>
+<l>        X0 := -1</l>
+<l>        Yr2 := -1</l>
+<c>        </c>
+<c>        * Идем влево. Сравниваем с полем снизу</c>
+<l>        if (Left and Gray1 &lt; Thr)</l>
+<l>            X0 := Thr</l>
+<l>            X1 := Gray0</l>
+<l>            X2 := Gray1</l>
+<l>            Y1 := Rows[Pos]</l>
+<l>            Y2 := Rows[Pos] + 1</l>
+<c>        * Идем вправо. Сравниваем с полем сверху</c>
+<l>        elseif (not Left and Gray2 &lt; Thr)</l>
+<l>            X0 := Thr</l>
+<l>            X1 := Gray2</l>
+<l>            X2 := Gray0</l>
+<l>            Y1 := Rows[Pos] - 1</l>
+<l>            Y2 := Rows[Pos]</l>
+<l>        endif</l>
+<c></c>
+<l>        if (X0 &gt;= 0 and X2 != X1)</l>
+<l>            Yr2 := real(Y1) + real(X0 - X1) * real(Y2 - Y1) / real(X2 - X1)</l>
+<l>            Xr2 := Cols[Pos]</l>
+<c></c>
+<l>            dev_set_color('red')</l>
+<l>            gen_cross_contour_xld(Cross, Yr2, Xr2, 0.5, 0)</l>
+<l>        endif        </l>
+<c>        </c>
+<c>        </c>
+<c>        </c>
+<l>        if (Xr1 &gt;= 0 and Yr2 &gt;= 0)</l>
+<l>            if (Xr1 &gt; Xr2)</l>
+<l>                if (Yr1 &gt; Yr2)</l>
+<l>                    RowsSub[Pos_Sub] := Yr2</l>
+<l>                    ColsSub[Pos_Sub] := Xr2</l>
+<l>                    Pos_Sub := Pos_Sub + 1</l>
+<c>                    </c>
+<l>                    RowsSub[Pos_Sub] := Yr1</l>
+<l>                    ColsSub[Pos_Sub] := Xr1</l>
+<l>                    Pos_Sub := Pos_Sub + 1</l>
+<l>                else</l>
+<l>                    RowsSub[Pos_Sub] := Yr1</l>
+<l>                    ColsSub[Pos_Sub] := Xr1</l>
+<l>                    Pos_Sub := Pos_Sub + 1</l>
+<c>                    </c>
+<l>                    RowsSub[Pos_Sub] := Yr2</l>
+<l>                    ColsSub[Pos_Sub] := Xr2</l>
+<l>                    Pos_Sub := Pos_Sub + 1</l>
+<l>                endif</l>
+<l>            else</l>
+<l>                if (Yr1 &lt; Yr2)</l>
+<l>                    RowsSub[Pos_Sub] := Yr2</l>
+<l>                    ColsSub[Pos_Sub] := Xr2</l>
+<l>                    Pos_Sub := Pos_Sub + 1</l>
+<c>                    </c>
+<l>                    RowsSub[Pos_Sub] := Yr1</l>
+<l>                    ColsSub[Pos_Sub] := Xr1</l>
+<l>                    Pos_Sub := Pos_Sub + 1</l>
+<l>                else</l>
+<l>                    RowsSub[Pos_Sub] := Yr1</l>
+<l>                    ColsSub[Pos_Sub] := Xr1</l>
+<l>                    Pos_Sub := Pos_Sub + 1</l>
+<c>                    </c>
+<l>                    RowsSub[Pos_Sub] := Yr2</l>
+<l>                    ColsSub[Pos_Sub] := Xr2</l>
+<l>                    Pos_Sub := Pos_Sub + 1</l>
+<l>                endif</l>
+<l>            endif</l>
+<l>        elseif (Xr1 &gt;= 0)</l>
+<l>            RowsSub[Pos_Sub] := Yr1</l>
+<l>            ColsSub[Pos_Sub] := Xr1</l>
+<l>            Pos_Sub := Pos_Sub + 1</l>
+<l>        elseif (Yr2 &gt;= 0)</l>
+<l>            RowsSub[Pos_Sub] := Yr2</l>
+<l>            ColsSub[Pos_Sub] := Xr2</l>
+<l>            Pos_Sub := Pos_Sub + 1</l>
+<l>        endif</l>
+<c>        </c>
+<l>    endfor</l>
+<c>        </c>
+<l>    gen_contour_polygon_xld(Reg_Sub, RowsSub, ColsSub)</l>
+<c>  </c>
+<l>    union2_closed_contours_xld(Im_Reg_Sub_My, Reg_Sub, Im_Reg_Sub_My)</l>
+<c>    </c>
+<c>    </c>
+<l>endfor</l>
+<c></c>
+<c></c>
+<c></c>
+<l>read_image (Im, path_image + 'Im1_1.tif')</l>
+<l>get_image_size(Im, Im_W, Im_H)</l>
+<c></c>
+<l>threshold(Im, Im_Reg, Thr, 255)</l>
+<l>threshold(Im, Im_RegN, 0, Thr)</l>
+<l>connection(Im_Reg, Im_Reg)</l>
+<l>connection(Im_RegN, Im_RegN)</l>
+<c></c>
+<c></c>
+<l>select_obj(Im_RegN, RegSel, 1)</l>
+<l>*gen_rectangle1 (ROI_0, 26.8772, 131.396, 33.5608, 140.608)</l>
+<l>gen_rectangle1 (ROI_0, 626.161, 543.499, 649.979, 577.392)</l>
+<c></c>
+<c></c>
+<l>intersection(RegSel, ROI_0, RegSel1)</l>
+<l>connection(RegSel1, RegSel1)</l>
+<l>count_obj(RegSel1, Reg_Count)</l>
+<c></c>
+<c></c>
+<l>Region_Threshold_SubPix (Im, RegSel1, Im_H, Im_W, Thr, RowsSub, ColsSub)</l>
+<c></c>
+<l>gen_contour_polygon_xld(Reg_Sub, RowsSub, ColsSub)</l>
+<c></c>
+<c></c>
+<l>stop()</l>
+<l>Thr:=150</l>
+<l>read_image (Im, path_image + 'Im1_1.tif')</l>
+<l>get_image_size(Im, Im_W, Im_H)</l>
+<c></c>
+<l>threshold(Im, Im_Reg, Thr, 255)</l>
+<l>threshold(Im, Im_RegN, 0, Thr)</l>
+<l>connection(Im_Reg, Im_Reg)</l>
+<l>connection(Im_RegN, Im_RegN)</l>
+<c></c>
+<c></c>
+<l>select_obj(Im_Reg, RegSel, 1)</l>
+<l>Region_Threshold_SubPix (Im, RegSel, Im_H, Im_W, Thr, RowsSub, ColsSub)</l>
+<c></c>
+<l>gen_contour_polygon_xld(Reg_Sub, RowsSub, ColsSub)</l>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<l>stop()</l>
+<c></c>
+<l>read_object (HoRegSub, 'C:/Temp/ho_Reg_Sub.hobj')</l>
+<c></c>
+<c></c>
+<c></c>
+<l>read_object (HoRegSub1, 'C:/Temp/ho_Reg_Sub1.hobj')</l>
+<l>read_object (HoRegSub1, 'C:/TmpIm/ho_Reg_Sub1.hobj')</l>
+<c></c>
+<c></c>
+<l>stop()</l>
+<l>stop()</l>
+<c></c>
+<l>Thr:=75</l>
+<l>gen_empty_obj(HoRegSub)</l>
+<l>Data_Exchange_Path := 'C:/Temp/Data_Exchange/'</l>
+<l>threshold(Im, Region, Thr, 255)</l>
+<l>connection(Region, ConnectedRegions)</l>
+<l>draw_region(Region1, 200000)</l>
+<l>intersection(Region1, Region, RegionIntersection)</l>
+<l>connection(RegionIntersection, ConnectedRegions)</l>
+<l>select_obj(ConnectedRegions,ObjectSelected, 1)</l>
+<l>Region_Threshold_SubPix_Ex (Im, ObjectSelected, HoRegSub, Data_Exchange_Path, Thr)</l>
+<l>close_contours_xld(HoRegSub, ClosedContours)</l>
+<c></c>
+<l>threshold_sub_pix(Im, Border, Thr)</l>
+<l>stop()</l>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<l>stop()</l>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+<procedure name="dev_update_off">
+<interface/>
+<body>
+<c>* This procedure sets different update settings to 'off'.</c>
+<c>* This is useful to get the best performance and reduce overhead.</c>
+<c></c>
+<l>dev_update_pc ('off')</l>
+<l>dev_update_var ('off')</l>
+<l>dev_update_window ('off')</l>
+<l>return ()</l>
+</body>
+<docu id="dev_update_off">
+<abstract lang="en_US">This procedure sets dev_update_pc, dev_update_var and dev_update_window to 'off'.</abstract>
+<alternatives>
+<item>dev_update_pc</item>
+<item>dev_update_var</item>
+<item>dev_update_window</item>
+</alternatives>
+<chapters lang="de_DE">
+<item>Develop</item>
+</chapters>
+<chapters lang="en_US">
+<item>Develop</item>
+</chapters>
+<example lang="en_US">dev_update_off ()
+* do something
+dev_update_on ()</example>
+<keywords lang="de_DE">
+<item>Aktualisierungsmodus setzen</item>
+</keywords>
+<keywords lang="en_US">
+<item>set update mode</item>
+</keywords>
+<library lang="de_DE">MVTec Standard Procedures</library>
+<library lang="en_US">MVTec Standard Procedures</library>
+<see_also>
+<item>dev_update_on</item>
+</see_also>
+<short lang="de_DE">Switch dev_update_pc, dev_update_var and dev_update_window to 'off'.</short>
+<short lang="en_US">Switch dev_update_pc, dev_update_var and dev_update_window to 'off'.</short>
+<parameters/>
+</docu>
+</procedure>
+<procedure name="Region_Threshold_SubPix">
+<interface>
+<io>
+<par name="Im" base_type="iconic" dimension="0"/>
+<par name="RegSel" base_type="iconic" dimension="0"/>
+</io>
+<ic>
+<par name="Im_H" base_type="ctrl" dimension="0"/>
+<par name="Im_W" base_type="ctrl" dimension="0"/>
+<par name="Thr" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="RowsSub" base_type="ctrl" dimension="0"/>
+<par name="ColsSub" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>RowsSub := []</l>
+<l>ColsSub := []</l>
+<l>Pos_Sub := 0</l>
+<c></c>
+<c></c>
+<l>get_region_contour(RegSel, Rows, Cols)</l>
+<l>tuple_length(Rows, Cont_Len)</l>
+<c></c>
+<c>* Тест на дырку</c>
+<l>for Pos := 0 to Cont_Len - 1 by 1</l>
+<l>    get_grayval(Im, Rows[Pos], Cols[Pos], Gray0)</l>
+<c>    </c>
+<l>    if (Gray0 &lt; Thr)</l>
+<l>        Hole := 1</l>
+<l>        break</l>
+<l>    elseif (Gray0 &gt; Thr)</l>
+<l>        Hole := 0</l>
+<l>        break</l>
+<l>    endif</l>
+<c>    </c>
+<l>endfor</l>
+<c></c>
+<c></c>
+<l>for Pos := 0 to Cont_Len - 1 by 1</l>
+<l>    get_grayval(Im, Rows[Pos], Cols[Pos], Gray0)</l>
+<c></c>
+<l>    Pos_Next := Pos + 1</l>
+<l>    if (Pos_Next &gt; Cont_Len - 1)</l>
+<l>        Pos_Next := 0</l>
+<l>    endif</l>
+<l>    Pos_Prev := Pos - 1</l>
+<l>    if (Pos_Prev &lt; 0)</l>
+<l>        Pos_Prev := Cont_Len - 1</l>
+<l>    endif</l>
+<l>    Row_Prev := Rows[Pos_Prev]</l>
+<l>    Col_Prev := Cols[Pos_Prev]</l>
+<l>    Row_Next := Rows[Pos_Next]</l>
+<l>    Col_Next := Cols[Pos_Next]</l>
+<l>    Row_Curr := Rows[Pos]</l>
+<l>    Col_Curr := Cols[Pos]</l>
+<c></c>
+<l>    dev_set_color('red')</l>
+<l>    gen_cross_contour_xld(Cross, Row_Curr, Col_Curr, 0.8, 0)</l>
+<c>    </c>
+<c>    </c>
+<l>    if (Row_Curr &gt;= Im_H - 1 or Col_Curr &gt;= Im_W - 1 or Row_Curr == 0 or Col_Curr == 0)</l>
+<l>        continue</l>
+<l>    endif</l>
+<c>    </c>
+<c>    * Направление</c>
+<l>    if (Row_Curr &gt; Row_Prev or Row_Curr &lt; Row_Next)</l>
+<l>        Down := 1</l>
+<l>    else</l>
+<l>        Down := 0</l>
+<l>    endif</l>
+<c></c>
+<l>    if (Col_Curr &lt; Col_Prev or Col_Curr &gt; Col_Next)</l>
+<l>        Left := 1</l>
+<l>    else</l>
+<l>        Left := 0</l>
+<l>    endif</l>
+<c>    </c>
+<c>    *-- Cols -------------------------------------------</c>
+<l>    get_grayval(Im, Row_Curr, Col_Curr + 1, Gray1)</l>
+<l>    get_grayval(Im, Row_Curr, Col_Curr - 1, Gray2)</l>
+<l>    X0 := -1</l>
+<l>    X1 := 0</l>
+<l>    X2 := 0</l>
+<l>    Xr1 := -1</l>
+<c>    </c>
+<c>    * Идем вниз. Сравниваем с полем справа</c>
+<l>    if (Down and ((Hole == 1 and Gray1 &gt; Thr) or (Hole == 0 and Gray1 &lt; Thr)))</l>
+<l>        X0 := Thr</l>
+<l>        X1 := Gray0</l>
+<l>        X2 := Gray1</l>
+<l>        Y1 := Cols[Pos]</l>
+<l>        Y2 := Cols[Pos] + 1</l>
+<c>    * Идем вверх. Сравниваем с полем слева</c>
+<l>    elseif (not Down and ((Hole == 1 and Gray2 &gt; Thr) or (Hole == 0 and Gray2 &lt; Thr)))</l>
+<l>        X0 := Thr</l>
+<l>        X1 := Gray2</l>
+<l>        X2 := Gray0</l>
+<l>        Y1 := Cols[Pos] - 1</l>
+<l>        Y2 := Cols[Pos]</l>
+<l>    endif</l>
+<c>    </c>
+<l>    if (X0 &gt;= 0 and X2 != X1)</l>
+<l>        Xr1 := real(Y1) + real(X0 - X1) * real(Y2 - Y1) / real(X2 - X1)</l>
+<l>        Yr1 := Rows[Pos]</l>
+<c>        </c>
+<l>        dev_set_color('green')</l>
+<l>        gen_cross_contour_xld(Cross, Yr1, Xr1, 0.5, 0)</l>
+<l>    endif</l>
+<c>    </c>
+<c>    *--- Rows -------------------------------------------</c>
+<l>    get_grayval(Im, Row_Curr + 1, Col_Curr, Gray1)</l>
+<l>    get_grayval(Im, Row_Curr - 1, Col_Curr, Gray2)</l>
+<l>    X0 := -1</l>
+<l>    Yr2 := -1</l>
+<c>    </c>
+<c>    * Идем влево. Сравниваем с полем снизу</c>
+<l>    if (Left and ((Hole == 1 and Gray1 &gt; Thr) or (Hole == 0 and Gray1 &lt; Thr)))</l>
+<l>        X0 := Thr</l>
+<l>        X1 := Gray0</l>
+<l>        X2 := Gray1</l>
+<l>        Y1 := Rows[Pos]</l>
+<l>        Y2 := Rows[Pos] + 1</l>
+<c>    * Идем вправо. Сравниваем с полем сверху</c>
+<l>    elseif (not Left and ((Hole == 1 and Gray2 &gt; Thr) or (Hole == 0 and Gray2 &lt; Thr)))</l>
+<l>        X0 := Thr</l>
+<l>        X1 := Gray2</l>
+<l>        X2 := Gray0</l>
+<l>        Y1 := Rows[Pos] - 1</l>
+<l>        Y2 := Rows[Pos]</l>
+<l>    endif</l>
+<c></c>
+<l>    if (X0 &gt;= 0 and X2 != X1)</l>
+<l>        Yr2 := real(Y1) + real(X0 - X1) * real(Y2 - Y1) / real(X2 - X1)</l>
+<l>        Xr2 := Cols[Pos]</l>
+<c></c>
+<l>        dev_set_color('red')</l>
+<l>        gen_cross_contour_xld(Cross, Yr2, Xr2, 0.5, 0)</l>
+<l>    endif        </l>
+<c>    </c>
+<c>    </c>
+<c>    </c>
+<l>    if (Xr1 &gt;= 0 and Yr2 &gt;= 0)</l>
+<l>        if (Xr1 &gt; Xr2)</l>
+<l>            if (Yr1 &gt; Yr2)</l>
+<l>                RowsSub[Pos_Sub] := Yr2</l>
+<l>                ColsSub[Pos_Sub] := Xr2</l>
+<l>                Pos_Sub := Pos_Sub + 1</l>
+<c>                </c>
+<l>                RowsSub[Pos_Sub] := Yr1</l>
+<l>                ColsSub[Pos_Sub] := Xr1</l>
+<l>                Pos_Sub := Pos_Sub + 1</l>
+<l>            else</l>
+<l>                RowsSub[Pos_Sub] := Yr1</l>
+<l>                ColsSub[Pos_Sub] := Xr1</l>
+<l>                Pos_Sub := Pos_Sub + 1</l>
+<c>                </c>
+<l>                RowsSub[Pos_Sub] := Yr2</l>
+<l>                ColsSub[Pos_Sub] := Xr2</l>
+<l>                Pos_Sub := Pos_Sub + 1</l>
+<l>            endif</l>
+<l>        else</l>
+<l>            if (Yr1 &lt; Yr2)</l>
+<l>                RowsSub[Pos_Sub] := Yr2</l>
+<l>                ColsSub[Pos_Sub] := Xr2</l>
+<l>                Pos_Sub := Pos_Sub + 1</l>
+<c>                </c>
+<l>                RowsSub[Pos_Sub] := Yr1</l>
+<l>                ColsSub[Pos_Sub] := Xr1</l>
+<l>                Pos_Sub := Pos_Sub + 1</l>
+<l>            else</l>
+<l>                RowsSub[Pos_Sub] := Yr1</l>
+<l>                ColsSub[Pos_Sub] := Xr1</l>
+<l>                Pos_Sub := Pos_Sub + 1</l>
+<c>                </c>
+<l>                RowsSub[Pos_Sub] := Yr2</l>
+<l>                ColsSub[Pos_Sub] := Xr2</l>
+<l>                Pos_Sub := Pos_Sub + 1</l>
+<l>            endif</l>
+<l>        endif</l>
+<l>    elseif (Xr1 &gt;= 0)</l>
+<l>        RowsSub[Pos_Sub] := Yr1</l>
+<l>        ColsSub[Pos_Sub] := Xr1</l>
+<l>        Pos_Sub := Pos_Sub + 1</l>
+<l>    elseif (Yr2 &gt;= 0)</l>
+<l>        RowsSub[Pos_Sub] := Yr2</l>
+<l>        ColsSub[Pos_Sub] := Xr2</l>
+<l>        Pos_Sub := Pos_Sub + 1</l>
+<l>    endif</l>
+<c>    </c>
+<l>endfor</l>
+<l>return ()</l>
+</body>
+<docu id="Region_Threshold_SubPix">
+<parameters>
+<parameter id="ColsSub"/>
+<parameter id="Im"/>
+<parameter id="Im_H"/>
+<parameter id="Im_W"/>
+<parameter id="RegSel"/>
+<parameter id="RowsSub"/>
+<parameter id="Thr"/>
+</parameters>
+</docu>
+</procedure>
+<procedure name="Check_Hole_Val">
+<interface>
+<ic>
+<par name="Hole" base_type="ctrl" dimension="0"/>
+<par name="Gray1" base_type="ctrl" dimension="0"/>
+<par name="Thr" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="Result" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>    Result := 0</l>
+<l>    if (Hole == 1)</l>
+<l>        if (Gray1 &gt; Thr)</l>
+<l>          Result := 1  </l>
+<l>        endif</l>
+<l>    else</l>
+<l>        if (Gray1 &lt; Thr)</l>
+<l>          Result := 1  </l>
+<l>        endif</l>
+<l>    endif</l>
+<l>return ()</l>
+</body>
+<docu id="Check_Hole_Val">
+<parameters>
+<parameter id="Gray1"/>
+<parameter id="Hole"/>
+<parameter id="Result"/>
+<parameter id="Thr"/>
+</parameters>
+</docu>
+</procedure>
+<procedure name="Region_Threshold_SubPix_Ex">
+<interface>
+<io>
+<par name="Im" base_type="iconic" dimension="0"/>
+<par name="RegSel" base_type="iconic" dimension="0"/>
+</io>
+<oo>
+<par name="RegSubPix" base_type="iconic" dimension="0"/>
+</oo>
+<ic>
+<par name="Data_Exchange_Path" base_type="ctrl" dimension="0"/>
+<par name="Thr" base_type="ctrl" dimension="0"/>
+</ic>
+</interface>
+<body>
+<l>Function_Name := 'Region_Threshold_SubPix'</l>
+<l>Return_File_Name := 'ho_Reg_Sub.hobj'</l>
+<c></c>
+<c>* Удалить все файлы из папки</c>
+<l>system_call('cd ' + Data_Exchange_Path + ' &amp;&amp; del ' + '*.hobj *.ser *.old /Q')</l>
+<c></c>
+<c>* Сохраним необходимые объекты и туплы</c>
+<l>write_object(RegSel, Data_Exchange_Path + 'RegSel')</l>
+<l>write_object(Im, Data_Exchange_Path + 'Im')</l>
+<c></c>
+<c>* Сохраним параметры с именем файла функции</c>
+<l>Param1 := Thr</l>
+<l>Param2 := 2</l>
+<l>Params := [Param1, Param2]</l>
+<l>serialize_tuple (Params, SerializedItemHandle)</l>
+<l>open_file (Data_Exchange_Path + Function_Name + '.ser', 'output_binary', FileHandle)</l>
+<l>fwrite_serialized_item (FileHandle, SerializedItemHandle)</l>
+<l>close_file (FileHandle)</l>
+<c></c>
+<c>* Ждем</c>
+<l>Exception_Count := 1000</l>
+<l>repeat</l>
+<l>    wait_seconds(0.01)</l>
+<l>    file_exists(Data_Exchange_Path + Return_File_Name, FileExists)</l>
+<l>    Exception_Count := Exception_Count - 1</l>
+<l>until (FileExists == 1 or Exception_Count == 0)</l>
+<l>if (Exception_Count == 0)</l>
+<l>    throw(['Нет ответа от Inspect_Testing программы'])</l>
+<l>endif</l>
+<c></c>
+<c></c>
+<c>* Читаем результирующие файлы</c>
+<l>read_object (RegSubPix, Data_Exchange_Path + Return_File_Name)</l>
+<c></c>
+<c></c>
+<l>return ()</l>
+</body>
+<docu id="Region_Threshold_SubPix_Ex">
+<parameters>
+<parameter id="Data_Exchange_Path"/>
+<parameter id="Im"/>
+<parameter id="RegSel"/>
+<parameter id="RegSubPix"/>
+<parameter id="Thr"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>

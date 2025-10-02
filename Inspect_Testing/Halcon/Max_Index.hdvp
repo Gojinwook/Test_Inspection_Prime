@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="Max_Index">
+<interface>
+<ic>
+<par name="Max21" base_type="ctrl" dimension="0"/>
+<par name="FAbsoluteHistosm1" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="Max_Index" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>Max_Pos := 0</l>
+<l>Max_Val := 0</l>
+<l>Max_Index := 0</l>
+<l>tuple_length(Max21, Length)</l>
+<l>for Index := 0 to Length - 1 by 1</l>
+<c>    </c>
+<l>    Extr_Pos := Max21[Index]</l>
+<l>    tuple_int(Extr_Pos, Extr_Pos)</l>
+<l>    Extr_Val := FAbsoluteHistosm1[Extr_Pos]</l>
+<l>    if (Extr_Val &gt; Max_Val)</l>
+<l>        Max_Val := Extr_Val</l>
+<l>        Max_Pos := Extr_Pos</l>
+<l>        Max_Index := Index</l>
+<l>    endif</l>
+<l>endfor</l>
+<l>return ()</l>
+</body>
+<docu id="Max_Index">
+<parameters>
+<parameter id="FAbsoluteHistosm1"/>
+<parameter id="Max21"/>
+<parameter id="Max_Index"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>

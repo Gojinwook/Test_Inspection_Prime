@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="FilterFloadMedn">
+<interface>
+<ic>
+<par name="W" base_type="ctrl" dimension="0"/>
+<par name="sz" base_type="ctrl" dimension="0"/>
+<par name="prcmb" base_type="ctrl" dimension="0"/>
+<par name="prcsp" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="Def" base_type="ctrl" dimension="0"/>
+<par name="Wfilt" base_type="ctrl" dimension="0"/>
+<par name="Wch" base_type="ctrl" dimension="0"/>
+<par name="Prc" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>tuple_length (W, nW)</l>
+<l>tuple_gen_const (nW, -prcmb, ThrMB)</l>
+<l>tuple_gen_const (nW, prcsp, ThrSp)</l>
+<l>tuple_gen_const (sz, W[0], Wbeg)</l>
+<l>tuple_gen_const (sz, W[nW-1], Wend)</l>
+<l>tuple_insert (W, 0, Wbeg, Wext)</l>
+<l>tuple_concat (Wext, Wend, Wext)</l>
+<l>Wfilt := []</l>
+<l>i := 0</l>
+<l>for j := sz to nW+sz-1 by 1</l>
+<l>    beg := j-sz</l>
+<l>    end := nW-1</l>
+<l>    tuple_select_range (Wext, j-sz, j+sz, Sel)</l>
+<l>    tuple_median (Sel, medSel)</l>
+<l>    tuple_concat (Wfilt, medSel, Wfilt)</l>
+<l>endfor</l>
+<c></c>
+<l>Wch := W-Wfilt</l>
+<l>Prc := Wch*100.0/(Wfilt+0.001)</l>
+<l>tuple_greater_equal_elem (Prc, ThrSp, DefSp)</l>
+<l>tuple_less_equal_elem (Prc, ThrMB, DefMB)</l>
+<l>Def := -DefMB+DefSp</l>
+<l>return ()</l>
+</body>
+<docu id="FilterFloadMedn">
+<parameters>
+<parameter id="Def"/>
+<parameter id="Prc"/>
+<parameter id="W"/>
+<parameter id="Wch"/>
+<parameter id="Wfilt"/>
+<parameter id="prcmb"/>
+<parameter id="prcsp"/>
+<parameter id="sz"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>

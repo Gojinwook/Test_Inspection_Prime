@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="Teach_Slice">
+<interface>
+<io>
+<par name="Skel_FWMS" base_type="iconic" dimension="0"/>
+</io>
+<ic>
+<par name="Win" base_type="ctrl" dimension="0"/>
+<par name="SensLen" base_type="ctrl" dimension="0"/>
+<par name="path_teach_tuples" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="Pointer_Skel" base_type="ctrl" dimension="0"/>
+<par name="Pointer_Sens" base_type="ctrl" dimension="0"/>
+<par name="Rows_Sens" base_type="ctrl" dimension="0"/>
+<par name="Cols_Sens" base_type="ctrl" dimension="0"/>
+<par name="Pointer_Pos" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>gen_contours_skeleton_xld(Skel_FWMS, Reg_SEL1_XLD, 1, 'filter')</l>
+<c></c>
+<l>Pointer_Skel := []</l>
+<l>Pointer_Sens := []</l>
+<l>Rows_Sens := []</l>
+<l>Cols_Sens := []</l>
+<l>Pointer_Pos := 0</l>
+<c></c>
+<l>WinD2 := Win/2</l>
+<l>SensLenD2 := SensLen / 2</l>
+<c></c>
+<l>*tuple_concat(Pointer_Skel, 0, Pointer_Skel)</l>
+<l>count_obj(Reg_SEL1_XLD, Count)</l>
+<l>for Index := 1 to Count by 1</l>
+<l>    select_obj (Reg_SEL1_XLD, Reg_SEL1, Index)</l>
+<l>    get_contour_xld(Reg_SEL1, Rows, Cols)    </l>
+<c>    </c>
+<c></c>
+<l>    tuple_length(Rows, Len)</l>
+<l>*     for Ind := WinD2 to Len - WinD2 - 2 by 1</l>
+<l>    for Ind := 0 to Len - 1 by 1</l>
+<c>        </c>
+<l>        if (Ind &lt; WinD2)</l>
+<l>            Ind0 := 0</l>
+<l>            Ind1 := Ind + Win</l>
+<l>        elseif (Ind &gt; Len - 1 - WinD2)</l>
+<l>            Ind0 := Len - 1 - Win </l>
+<l>            Ind1 := Len - 1</l>
+<l>        else</l>
+<l>            Ind0 := Ind - WinD2</l>
+<l>            Ind1 := Ind + WinD2</l>
+<l>        endif</l>
+<c>        </c>
+<c>        </c>
+<l>        tuple_atan2(Rows[Ind0] - Rows[Ind1], Cols[Ind0] - Cols[Ind1], Angle) </l>
+<l>        tuple_deg(Angle, Angle_Deg)</l>
+<c>        </c>
+<l>        tuple_cos(Angle + 1.5708, Cos)</l>
+<l>        tuple_sin(Angle + 1.5708, Sin)</l>
+<l>        P1X := Cols[Ind] + Cos * SensLenD2</l>
+<l>        P1Y := Rows[Ind] + Sin * SensLenD2</l>
+<c>    </c>
+<l>        tuple_cos(Angle + 4.71239, Cos)</l>
+<l>        tuple_sin(Angle + 4.71239, Sin)</l>
+<l>        P2X := Cols[Ind] + Cos * SensLenD2</l>
+<l>        P2Y := Rows[Ind] + Sin * SensLenD2</l>
+<c>        </c>
+<l>        gen_region_line(Reg_Sens, P1Y, P1X, P2Y, P2X)</l>
+<l>        gen_contours_skeleton_xld(Reg_Sens, Reg_Sens_XLD, 1, 'filter')</l>
+<l>        get_contour_xld(Reg_Sens_XLD, Rows_S, Cols_S)    </l>
+<c>    </c>
+<l>        tuple_concat(Rows_Sens, Rows_S, Rows_Sens)</l>
+<l>        tuple_concat(Cols_Sens, Cols_S, Cols_Sens)</l>
+<l>        tuple_concat(Pointer_Sens, Pointer_Pos, Pointer_Sens)</l>
+<c></c>
+<l>        tuple_length(Rows_S, Length)</l>
+<l>        Pointer_Pos := Pointer_Pos + Length</l>
+<l>    endfor</l>
+<c>    </c>
+<l>    tuple_length(Pointer_Sens, Len_Sens)</l>
+<l>    tuple_concat(Pointer_Skel, Len_Sens - 1, Pointer_Skel)</l>
+<c>    </c>
+<c>    </c>
+<l> endfor</l>
+<l>tuple_concat(Pointer_Sens, Pointer_Pos, Pointer_Sens)</l>
+<c></c>
+<l>tuple_int(Rows_Sens, Rows_Sens)</l>
+<l>tuple_int(Cols_Sens, Cols_Sens)</l>
+<l>write_tuple(Pointer_Skel, path_teach_tuples + 'Pointer_Skel.tup')</l>
+<l>write_tuple(Pointer_Sens, path_teach_tuples + 'Pointer_Sens.tup')</l>
+<l>write_tuple(Rows_Sens, path_teach_tuples + 'Rows_Sens.tup')</l>
+<l>write_tuple(Cols_Sens, path_teach_tuples + 'Cols_Sens.tup')</l>
+<c></c>
+<l>return ()</l>
+</body>
+<docu id="Teach_Slice">
+<parameters>
+<parameter id="Cols_Sens"/>
+<parameter id="Pointer_Pos"/>
+<parameter id="Pointer_Sens"/>
+<parameter id="Pointer_Skel"/>
+<parameter id="Rows_Sens"/>
+<parameter id="SensLen"/>
+<parameter id="Skel_FWMS"/>
+<parameter id="Win"/>
+<parameter id="path_teach_tuples"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>

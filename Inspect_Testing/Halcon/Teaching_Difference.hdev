@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="main">
+<interface/>
+<body>
+<l>path1 := 'G:/SAMSUNG/Image/2024-05-27/Model/Model_p2309-001t1_2P0/Model_p2309-001t1_2P0/Model0/Teach/'</l>
+<l>path2 := 'G:/SAMSUNG/Image/2024-05-27/Model/Model_p2309-001t1_2P0/Model_p2309-001t1_2P0/Model127/Teach/'</l>
+<c></c>
+<l>read_image(Gi1, path1 + 'Gi.tif')</l>
+<l>read_image(Gi2, path2 + 'Gi.tif')</l>
+<c></c>
+<c></c>
+<l>read_object (Obj1, path1 + 'CircsAPver.hobj')</l>
+<l>read_object (Obj2, path2 + 'CircsAPver.hobj')</l>
+<l>symm_difference(Obj1, Obj2, Reg_Diff1)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'RegionCut.hobj')</l>
+<l>read_object (Obj2, path2 + 'RegionCut.hobj')</l>
+<l>symm_difference(Obj1, Obj2, Reg_Diff2)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'RegionFWM.hobj')</l>
+<l>read_object (Obj2, path2 + 'RegionFWM.hobj')</l>
+<l>symm_difference(Obj1, Obj2, Reg_Diff3)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'RegionG.hobj')</l>
+<l>read_object (Obj2, path2 + 'RegionG.hobj')</l>
+<l>symm_difference(Obj1, Obj2, Reg_Diff4)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'RegionGS.hobj')</l>
+<l>read_object (Obj2, path2 + 'RegionGS.hobj')</l>
+<l>symm_difference(Obj1, Obj2, Reg_Diff5)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'RegionsEMPTY.hobj')</l>
+<l>read_object (Obj2, path2 + 'RegionsEMPTY.hobj')</l>
+<l>symm_difference(Obj1, Obj2, Reg_Diff6)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'RegionsGND.hobj')</l>
+<l>read_object (Obj2, path2 + 'RegionsGND.hobj')</l>
+<l>symm_difference(Obj1, Obj2, Reg_Diff7)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'RegionsPNPi.hobj')</l>
+<l>read_object (Obj2, path2 + 'RegionsPNPi.hobj')</l>
+<l>difference(Obj1, Obj2, Reg_Diff8)</l>
+<l>difference(Obj2, Obj1, Reg_Diff8)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'RegionsPNSi.hobj')</l>
+<l>read_object (Obj2, path2 + 'RegionsPNSi.hobj')</l>
+<l>difference(Obj1, Obj2, Reg_Diff9)</l>
+<l>difference(Obj2, Obj1, Reg_Diff9)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'RegNoProc.hobj')</l>
+<l>read_object (Obj2, path2 + 'RegNoProc.hobj')</l>
+<l>symm_difference(Obj1, Obj2, Reg_Diff10)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'SkeletonG.hobj')</l>
+<l>read_object (Obj2, path2 + 'SkeletonG.hobj')</l>
+<l>symm_difference(Obj1, Obj2, Reg_Diff11)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'SkeletonGS.hobj')</l>
+<l>read_object (Obj2, path2 + 'SkeletonGS.hobj')</l>
+<l>symm_difference(Obj1, Obj2, Reg_Diff12)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'SkeletonsFWM.hobj')</l>
+<l>read_object (Obj2, path2 + 'SkeletonsFWM.hobj')</l>
+<l>symm_difference(Obj1, Obj2, Reg_Diff13)</l>
+<l>difference(Obj1, Obj2, Reg_Diff13)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'SkeletonsFWMcut.hobj')</l>
+<l>read_object (Obj2, path2 + 'SkeletonsFWMcut.hobj')</l>
+<l>difference(Obj1, Obj2, Reg_Diff14)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'SkeletonsFWMS.hobj')</l>
+<l>read_object (Obj2, path2 + 'SkeletonsFWMS.hobj')</l>
+<l>difference(Obj1, Obj2, Reg_Diff15)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'SkeletonsFWMScut.hobj')</l>
+<l>read_object (Obj2, path2 + 'SkeletonsFWMScut.hobj')</l>
+<l>difference(Obj1, Obj2, Reg_Diff16)</l>
+<l>difference(Obj2, Obj1, Reg_Diff16)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'SkelsAPver.hobj')</l>
+<l>read_object (Obj2, path2 + 'SkelsAPver.hobj')</l>
+<l>difference(Obj1, Obj2, Reg_Diff17)</l>
+<c></c>
+<l>read_object (Obj1, path1 + 'SkelSEP.hobj')</l>
+<l>read_object (Obj2, path2 + 'SkelSEP.hobj')</l>
+<l>difference(Obj1, Obj2, Reg_Diff18)</l>
+<c></c>
+<c></c>
+<c></c>
+<l>read_tuple(path1 + 'WG.tup', Tuple1)</l>
+<l>read_tuple(path2 + 'WG.tup', Tuple2)</l>
+<l>tuple_sub(Tuple2, Tuple2, Diff)</l>
+<l>tuple_sum(Diff, Sum1)</l>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>

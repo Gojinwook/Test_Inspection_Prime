@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="Auto_Threshold5">
+<interface>
+<io>
+<par name="SkeletonsFWMS" base_type="iconic" dimension="0"/>
+<par name="Im" base_type="iconic" dimension="0"/>
+</io>
+<oc>
+<par name="thr" base_type="ctrl" dimension="0"/>
+<par name="thrS" base_type="ctrl" dimension="0"/>
+<par name="thrP" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<l>union1(SkeletonsFWMS, SkeletonFWMS)</l>
+<l>dilation_circle(SkeletonFWMS, SkeletonFWMSd, 9.5)</l>
+<l>reduce_domain(Im, SkeletonFWMSd, Imp)</l>
+<c></c>
+<l>gray_histo_abs(SkeletonFWMSd, Imp, 1, AbsoluteHisto1)</l>
+<c></c>
+<l>create_funct_1d_array(AbsoluteHisto1, FAbsoluteHisto1)</l>
+<l>smooth_funct_1d_mean(FAbsoluteHisto1, 15, 5, FAbsoluteHistosm1)</l>
+<l>local_min_max_funct_1d(FAbsoluteHistosm1, 'strict_min_max', 'true', Min21, Max21)</l>
+<c></c>
+<l>*Middle := 140</l>
+<l>Middle := int(Min21[0])</l>
+<c></c>
+<l>if (Middle == 0)</l>
+<l>    thr := 0</l>
+<l>    thrS := 0</l>
+<l>    thrP := 0</l>
+<l>    return()</l>
+<l>endif</l>
+<c></c>
+<l>tuple_first_n(AbsoluteHisto1, Middle, Space_T)</l>
+<l>create_funct_1d_array(Space_T, FSpace_T)</l>
+<l>smooth_funct_1d_mean(FSpace_T, 9, 3, FSpace_T)</l>
+<l>local_min_max_funct_1d(FSpace_T, 'plateaus_center', 'true', MinS, MaxS)</l>
+<c></c>
+<l>Max_Index (MaxS, FSpace_T, Idx)</l>
+<l>thrS := MaxS[Idx]</l>
+<c></c>
+<c></c>
+<c></c>
+<l>tuple_last_n (AbsoluteHisto1, Middle, Patern_T)</l>
+<l>create_funct_1d_array(Patern_T, FPatern_T)</l>
+<l>smooth_funct_1d_mean(FPatern_T, 9, 3, FPatern_T)</l>
+<l>local_min_max_funct_1d(FPatern_T, 'plateaus_center', 'true', MinP, MaxP)</l>
+<c></c>
+<l>Max_Index (MaxP, FPatern_T, Idx)</l>
+<l>thrP := MaxP[Idx] + Middle</l>
+<c></c>
+<l>tuple_mean ([thrS, thrP], thr)</l>
+<c></c>
+<c></c>
+<l>return ()</l>
+</body>
+<docu id="Auto_Threshold5">
+<parameters>
+<parameter id="Im"/>
+<parameter id="SkeletonsFWMS"/>
+<parameter id="thr"/>
+<parameter id="thrP"/>
+<parameter id="thrS"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>

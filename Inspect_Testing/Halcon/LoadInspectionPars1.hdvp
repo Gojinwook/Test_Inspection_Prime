@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="LoadInspectionPars1">
+<interface>
+<ic>
+<par name="pathfile" base_type="ctrl" dimension="0"/>
+<par name="SetDefault" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="thr" base_type="ctrl" dimension="0"/>
+<par name="fumax" base_type="ctrl" dimension="0"/>
+<par name="aislmax" base_type="ctrl" dimension="0"/>
+<par name="PHrmin" base_type="ctrl" dimension="0"/>
+<par name="PHamin" base_type="ctrl" dimension="0"/>
+<par name="Islrmin" base_type="ctrl" dimension="0"/>
+<par name="Islamin" base_type="ctrl" dimension="0"/>
+<par name="aphmax" base_type="ctrl" dimension="0"/>
+<par name="dilS" base_type="ctrl" dimension="0"/>
+<par name="dilFWM" base_type="ctrl" dimension="0"/>
+<par name="expsize" base_type="ctrl" dimension="0"/>
+<par name="dil" base_type="ctrl" dimension="0"/>
+<par name="EPexp" base_type="ctrl" dimension="0"/>
+<par name="lMB" base_type="ctrl" dimension="0"/>
+<par name="prcMB" base_type="ctrl" dimension="0"/>
+<par name="absMB" base_type="ctrl" dimension="0"/>
+<par name="minMB" base_type="ctrl" dimension="0"/>
+<par name="lSP" base_type="ctrl" dimension="0"/>
+<par name="prcSP" base_type="ctrl" dimension="0"/>
+<par name="absSP" base_type="ctrl" dimension="0"/>
+<par name="minSP" base_type="ctrl" dimension="0"/>
+<par name="sz1" base_type="ctrl" dimension="0"/>
+<par name="lMBS" base_type="ctrl" dimension="0"/>
+<par name="sz2" base_type="ctrl" dimension="0"/>
+<par name="ang" base_type="ctrl" dimension="0"/>
+<par name="prcMBS" base_type="ctrl" dimension="0"/>
+<par name="absMBS" base_type="ctrl" dimension="0"/>
+<par name="minMBS" base_type="ctrl" dimension="0"/>
+<par name="minWSpace" base_type="ctrl" dimension="0"/>
+<par name="dclcmax" base_type="ctrl" dimension="0"/>
+<par name="LG_SensLen" base_type="ctrl" dimension="0"/>
+<par name="LG_m_szw" base_type="ctrl" dimension="0"/>
+<par name="LG_m_prcLG" base_type="ctrl" dimension="0"/>
+<par name="mmat_shift" base_type="ctrl" dimension="0"/>
+<par name="mmat_fsz" base_type="ctrl" dimension="0"/>
+<par name="PHash" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<c>* *************************************</c>
+<c>* **** Inspection deserialization   *****</c>
+<c>* *************************************</c>
+<l>if (SetDefault == 1)</l>
+<l>    thr:=88</l>
+<c>    </c>
+<c>    *****</c>
+<l>    fumax:=1000</l>
+<c>**** Comp</c>
+<l>* aislmax:=8000</l>
+<c>****LG</c>
+<l>aislmax:=8000</l>
+<l>PHrmin:=3.0</l>
+<l>PHamin:=5</l>
+<c></c>
+<l>Islrmin:=2</l>
+<l>Islamin:=10</l>
+<l>*aislmax:=300</l>
+<l>aphmax:=300</l>
+<c></c>
+<c></c>
+<c>********** Short</c>
+<l>dilS:=9.5</l>
+<l>* Ops:=2.5</l>
+<l>* ClS:=2.5</l>
+<l>dilFWM:=10</l>
+<c></c>
+<c>**** for FWMS</c>
+<l>expsize:=19.5</l>
+<c>**** for FWMS</c>
+<l>dil := 7</l>
+<l>EPexp:=5</l>
+<c></c>
+<l>lMB:=1</l>
+<l>prcMB:=40.</l>
+<l>absMB:=30.</l>
+<l>minMB:=1.5</l>
+<l>lSP:=1</l>
+<l>prcSP:=30.</l>
+<l>absSP:=10.</l>
+<l>minSP:=1.5</l>
+<l>sz1:=51</l>
+<l>lMBS:=0</l>
+<l>sz2:=50</l>
+<l>ang:=3.</l>
+<l>prcMBS:=30.</l>
+<l>absMBS:=10.</l>
+<l>minMBS:=4.5</l>
+<l>minWSpace:=0.4</l>
+<l>dclcmax:=72</l>
+<l>LG_SensLen:=50</l>
+<l>LG_m_szw:=8</l>
+<l>LG_m_prcLG:=20</l>
+<l>mmat_shift:=20</l>
+<l>mmat_fsz:=91</l>
+<c></c>
+<c>*// if pinhole area is bigger the value, than it's not removed from ho_RegionInoPhnoIsl (used in ThresholdPHIsp() )</c>
+<c></c>
+<l>PHash := 200 </l>
+<l>else</l>
+<l>    open_file (pathfile, 'input_binary', FileHandleIn)</l>
+<l>    fread_serialized_item (FileHandleIn, SerializedItemHandle1)</l>
+<l>    deserialize_tuple (SerializedItemHandle1, InspectionParsIn)</l>
+<l>    close_file (FileHandleIn)</l>
+<l>*     tuple_equal(InspectionParsIn, InspectionParsOut, equal)</l>
+<l>*     stop ()</l>
+<c>    </c>
+<l>    InspectionPars := InspectionParsIn</l>
+<l>    i := 0</l>
+<l>    thr := InspectionParsIn[i]</l>
+<l>    i := i+1</l>
+<l>    fumax := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    aislmax := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<c>    * *** for skeletons *******</c>
+<l>    PHrmin := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<c></c>
+<l>    PHamin := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<c>    </c>
+<l>    Islrmin := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    aislmax := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    aphmax := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    dilS := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    dilFWM := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    expsize := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    dil := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    EPexp := InspectionPars[i]</l>
+<c>    *</c>
+<l>    i := i+1</l>
+<l>    lMB := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    prcMB := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    absMB := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    minMB := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    lSP := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    prcSP := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    absSP := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    minSP := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    sz1 := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    lMBS := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    sz2 := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    ang := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    prcMBS := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    absMBS := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    minMBS := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    minWSpace := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    dclcmax := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    LG_SensLen := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    LG_m_szw := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    LG_m_prcLG := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    mmat_shift := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    mmat_fsz := InspectionPars[i]</l>
+<l>    i := i+1</l>
+<l>    PHash := InspectionPars[i]</l>
+<c>   </c>
+<l>endif</l>
+<c></c>
+<c></c>
+<c>* **********************************</c>
+<l>return ()</l>
+</body>
+<docu id="LoadInspectionPars1">
+<parameters>
+<parameter id="EPexp"/>
+<parameter id="Islamin"/>
+<parameter id="Islrmin"/>
+<parameter id="LG_SensLen"/>
+<parameter id="LG_m_prcLG"/>
+<parameter id="LG_m_szw"/>
+<parameter id="PHamin"/>
+<parameter id="PHash"/>
+<parameter id="PHrmin"/>
+<parameter id="SetDefault"/>
+<parameter id="absMB"/>
+<parameter id="absMBS"/>
+<parameter id="absSP"/>
+<parameter id="aislmax"/>
+<parameter id="ang"/>
+<parameter id="aphmax"/>
+<parameter id="dclcmax"/>
+<parameter id="dil"/>
+<parameter id="dilFWM"/>
+<parameter id="dilS"/>
+<parameter id="expsize"/>
+<parameter id="fumax"/>
+<parameter id="lMB"/>
+<parameter id="lMBS"/>
+<parameter id="lSP"/>
+<parameter id="minMB"/>
+<parameter id="minMBS"/>
+<parameter id="minSP"/>
+<parameter id="minWSpace"/>
+<parameter id="mmat_fsz"/>
+<parameter id="mmat_shift"/>
+<parameter id="pathfile"/>
+<parameter id="prcMB"/>
+<parameter id="prcMBS"/>
+<parameter id="prcSP"/>
+<parameter id="sz1"/>
+<parameter id="sz2"/>
+<parameter id="thr"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>

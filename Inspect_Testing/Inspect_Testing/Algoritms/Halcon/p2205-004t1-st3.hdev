@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="main">
+<interface/>
+<body>
+<l>read_image (Frame1Ima, 'C:/WORK_CURR/SAMSUNG/Inspection/Inspect_Testing/Inspect_Testing/Algoritms/Halcon/Models/spir5-240216/Teach/Test/p2205-004t1-st3/Frame_12.ima.tif')</l>
+<c></c>
+<l>threshold(Frame1Ima, RegionI, 85, 255)</l>
+<l>threshold(Frame1Ima, RegionLGi, 90, 120)</l>
+<l>opening_circle(RegionLGi, RegionLG, 2.5)</l>
+<c></c>
+<l>row1:=18700</l>
+<l>col1:=1580</l>
+<c></c>
+<l>row2:=57230</l>
+<l>col2:=5050</l>
+<c></c>
+<l>row3:=107690</l>
+<l>col3:=5980</l>
+<c></c>
+<l>row4:=107690</l>
+<l>col4:=5980</l>
+<c></c>
+<l>row4:=108610</l>
+<l>col4:=5980</l>
+<c></c>
+<l>row5:=57240</l>
+<l>col5:=10650</l>
+<c></c>
+<l>row6:=79990</l>
+<l>col6:=8580</l>
+<c></c>
+<c></c>
+<l>row7:=81410</l>
+<l>col7:=8690</l>
+<c></c>
+<l>row8:=89040</l>
+<l>col8:=8430</l>
+<c></c>
+<l>row9:=127890</l>
+<l>col9:=8260</l>
+<c></c>
+<l>row10:=169940</l>
+<l>col10:=8205</l>
+<c></c>
+<l>row11:=175440</l>
+<l>col11:=615</l>
+<c></c>
+<l>Rows:=[row1,row2,row3,row4,row5,row6,row7,row8,row9,row10,row11]</l>
+<l>Cols:=[col1,col2,col3,col4,col5,col6,col7,col8,col9,col10,col11]</l>
+<l>tuple_length(Cols, Length)</l>
+<l>tuple_gen_const(Length, 20, Rads)</l>
+<l>dev_display(Frame1Ima)</l>
+<l>gen_circle(Circles, Rows, Cols, Rads)</l>
+<l>dev_display(Circles)</l>
+<l>stop()</l>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>

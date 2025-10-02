@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="18.11.0.1">
+<procedure name="Moving_Avg">
+<interface>
+<ic>
+<par name="Tuple_In" base_type="ctrl" dimension="0"/>
+<par name="Move_Avg" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="Tuple_Avg" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<c>* Скользящее среднее</c>
+<l>tuple_length (Tuple_In, t_len)</l>
+<l>move_avg_h := Move_Avg</l>
+<l>sum_mov := Tuple_In[0] * move_avg_h</l>
+<l>tuple_gen_const (t_len, 0, Tuple_Avg)</l>
+<l>for k := 0 to t_len + move_avg_h/2 - 1 by 1</l>
+<l>    if (k &gt;= move_avg_h / 2)</l>
+<l>        Tuple_Avg[k - move_avg_h / 2] := sum_mov / move_avg_h</l>
+<l>    endif</l>
+<c>    </c>
+<l>    if (k &gt;= move_avg_h)</l>
+<l>        sum_mov := sum_mov - Tuple_In[k - move_avg_h]</l>
+<l>    else</l>
+<l>        sum_mov := sum_mov - Tuple_In[0]</l>
+<l>    endif</l>
+<c>    </c>
+<l>    if (k &lt; t_len)</l>
+<l>        sum_mov := sum_mov + Tuple_In[k]</l>
+<l>    else</l>
+<l>        sum_mov := sum_mov + Tuple_In[t_len - 1]</l>
+<l>    endif</l>
+<l>endfor</l>
+<c></c>
+<l>return ()</l>
+</body>
+<docu id="Moving_Avg">
+<parameters>
+<parameter id="Move_Avg">
+<default_type>integer</default_type>
+<default_value>30</default_value>
+<type_list>
+<item>integer</item>
+</type_list>
+<value_max>0</value_max>
+</parameter>
+<parameter id="Tuple_Avg"/>
+<parameter id="Tuple_In"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>

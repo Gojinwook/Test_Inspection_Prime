@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="main">
+<interface/>
+<body>
+<l>path_model := 'G:/SAMSUNG/Image/p2401-013t1/2024-07-22/Model-20240721T211038Z-001/Model/p2401-013t1_LayerL1-SHORT3.3-0200/Model/'</l>
+<c></c>
+<l>read_image (Gi, 'C:/WORK_CURR/HI-Resolution/TMP/Alignment bug/p2209-030d1_LayerL1-SHORT3.3-0200/Model/Gi.tif')</l>
+<l>read_object (HoRegionssp, 'C:/Temp/ho_RegionsSP.hobj')</l>
+<l>read_object (HoRegionsmb, 'C:/Temp/ho_RegionsMB.hobj')</l>
+<l>read_object (HoRegionsmbs, 'C:/Temp/ho_RegionsMBS.hobj')</l>
+<l>read_object (HoRegionslg, 'C:/Temp/ho_RegionsLG.hobj')</l>
+<l>read_object (HoRegionssps, 'C:/Temp/ho_RegionsSPS.hobj')</l>
+<l>read_object (HoRegionsop, 'C:/Temp/ho_RegionsOp.hobj')</l>
+<l>read_object (HoRegionsshi, 'C:/Temp/ho_RegionsShi.hobj')</l>
+<c></c>
+<l>Defect_Dist := 30</l>
+<c></c>
+<c></c>
+<l>Union_Defects (HoRegionsshi, HoRegionsop, HoRegionsshi, HoRegionsop, Defect_Dist)</l>
+<l>Union_Defects (HoRegionsshi, HoRegionssps, HoRegionsshi, HoRegionssps, Defect_Dist)</l>
+<l>Union_Defects (HoRegionsshi, HoRegionslg, HoRegionsshi, HoRegionslg, Defect_Dist)</l>
+<l>Union_Defects (HoRegionsshi, HoRegionsmbs, HoRegionsshi, HoRegionsmbs, Defect_Dist)</l>
+<l>Union_Defects (HoRegionsshi, HoRegionsmb, HoRegionsshi, HoRegionsmb, Defect_Dist)</l>
+<l>Union_Defects (HoRegionsshi, HoRegionssp, HoRegionsshi, HoRegionssp, Defect_Dist)</l>
+<c></c>
+<c></c>
+<c></c>
+<c>*------------------------------------------------------------</c>
+<c></c>
+<l>read_image (Gi_Im, path_model + 'Gi.tif')</l>
+<l>gen_circle (ROI_10, 235.017, 672.921, 55.3345)</l>
+<l>gen_circle (ROI_11, 258.642, 641.948, 42.4351)</l>
+<l>gen_circle (ROI_12, 463.673, 1120.16, 48.0692)</l>
+<l>union2(ROI_10, ROI_11, ROI1)</l>
+<l>union2(ROI1, ROI_12, ROI1)</l>
+<c></c>
+<c></c>
+<c></c>
+<l>gen_circle (ROI_20, 288.214, 756.324, 46.8371)</l>
+<l>gen_circle (ROI_21, 509.016, 1084.66, 33.6515)</l>
+<l>gen_circle (ROI_22, 793.891, 804.637, 52.999)</l>
+<l>gen_circle (ROI_23, 509.016, 273.186, 73.2257)</l>
+<l>union2(ROI_20, ROI_21, ROI2)</l>
+<l>union2(ROI2, ROI_22, ROI2)</l>
+<l>union2(ROI2, ROI_23, ROI2)</l>
+<c></c>
+<l>stop()</l>
+<l>Defect_Dist := 10</l>
+<l>Union_Defects (ROI1, ROI2, ROI1_Ret, ROI2_Ret, Defect_Dist)</l>
+<c></c>
+<c></c>
+<l>read_object (MHoRegionssp, 'C:/Temp/m_ho_RegionsSP.hobj')</l>
+<l>read_object (MHoRegionsmbs, 'C:/Temp/m_ho_RegionsMBS.hobj')</l>
+<l>read_object (MHoRegionssps, 'C:/Temp/m_ho_RegionsSPS.hobj')</l>
+<l>read_object (MHoRegionsmb, 'C:/Temp/m_ho_RegionsMB.hobj')</l>
+<l>read_object (MHoRegionslg, 'C:/Temp/m_ho_RegionsLG.hobj')</l>
+<c></c>
+<c></c>
+<c></c>
+<l>read_image (Gi, 'C:/WORK_CURR/SAMSUNG/Samsung-AOI/Vision/AOI/Run/Model/p2309-011t1_2P0/Model/Gi.tif')</l>
+<c></c>
+<l>Union_Defects (MHoRegionssps, MHoRegionsmbs, MHoRegionssps, MHoRegionsmbs, Defect_Dist)</l>
+<l>Union_Defects (MHoRegionssps, MHoRegionslg, MHoRegionssps, MHoRegionslg, Defect_Dist)</l>
+<c></c>
+<l>Union_Defects (MHoRegionsmbs, MHoRegionslg, MHoRegionsmbs, MHoRegionslg, Defect_Dist)</l>
+<c></c>
+<l>Union_Defects (MHoRegionslg, MHoRegionsmb, MHoRegionslg, MHoRegionsmb, Defect_Dist)</l>
+<c></c>
+<l>count_obj(MHoRegionslg, Cnt1)</l>
+<c></c>
+<l>area_center(MHoRegionslg, Area1, Row1, Col1)</l>
+<c></c>
+<l>stop()</l>
+<l>read_image (Im2259, 'C:/TmpIm/Inspect_Testing/Im2_67.tif')</l>
+<c></c>
+<l>read_object (Regions_op, 'C:/TmpIm/Inspect_Testing/Im2_67_RegionsOP.hobj')</l>
+<l>read_object (Regions_lg, 'C:/TmpIm/Inspect_Testing/Im2_67_RegionsLG.hobj')</l>
+<l>read_object (Regions_mb, 'C:/TmpIm/Inspect_Testing/Im2_67_RegionsMB.hobj')</l>
+<l>read_object (Regions_mbs, 'C:/TmpIm/Inspect_Testing/Im2_67_RegionsMBS.hobj')</l>
+<c></c>
+<c></c>
+<l>Union_Defects (Regions_op, Regions_mb, Reg11, Reg21, Defect_Dist)</l>
+<c></c>
+<l>stop()</l>
+<c></c>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+<procedure name="Union_Defects">
+<interface>
+<io>
+<par name="ROI1" base_type="iconic" dimension="0"/>
+<par name="ROI2" base_type="iconic" dimension="0"/>
+</io>
+<oo>
+<par name="ROI1_Ret" base_type="iconic" dimension="0"/>
+<par name="ROI2_Ret" base_type="iconic" dimension="0"/>
+</oo>
+<ic>
+<par name="Defect_Dist" base_type="ctrl" dimension="0"/>
+</ic>
+</interface>
+<body>
+<l>union1(ROI1, ROI1)</l>
+<l>union1(ROI2, ROI2)</l>
+<c></c>
+<l>connection(ROI1, ROI1_C)</l>
+<l>connection(ROI2, ROI2_C)</l>
+<l>count_obj(ROI1_C, Cnt1)</l>
+<l>count_obj(ROI2_C, Cnt2)</l>
+<c></c>
+<l>if (Cnt1 == 0 or Cnt2 == 0)</l>
+<l>    ROI1_Ret := ROI1</l>
+<l>    ROI2_Ret := ROI2</l>
+<l>    return()</l>
+<l>endif</l>
+<c></c>
+<l>ROI1_Res := ROI1</l>
+<l>ROI2_Res := ROI2</l>
+<l>connection(ROI1_Res, ROI1_Res)</l>
+<l>connection(ROI2_Res, ROI2_Res)</l>
+<c></c>
+<l>for I1 := 1 to Cnt1 by 1</l>
+<l>    select_obj(ROI1_C, ObjSel1, I1)</l>
+<l>    *area_center(ObjSel1, Area1, Row1, Col1)</l>
+<c></c>
+<l>    for I2 := 1 to Cnt2 by 1</l>
+<l>        select_obj(ROI2_C, ObjSel2, I2)</l>
+<l>        *area_center(ObjSel2, Area2, Row2, Col2)</l>
+<c>        </c>
+<l>        skeleton(ObjSel1, Skeleton1)</l>
+<l>        dilation_circle(Skeleton1, RegionDilation1, Defect_Dist)</l>
+<l>        skeleton(ObjSel2, Skeleton2)</l>
+<l>        dilation_circle(Skeleton2, RegionDilation2, Defect_Dist)</l>
+<c>        </c>
+<l>        intersection(RegionDilation1, RegionDilation2, RegionIntersection)</l>
+<l>        area_center(RegionIntersection, Area, Row, Col)</l>
+<c>        </c>
+<l>        if (Area &gt; 0)</l>
+<l>            obj_diff(ROI1_Res, ObjSel1, ROI1_Res)</l>
+<l>            obj_diff(ROI2_Res, ObjSel2, ROI2_Res)</l>
+<l>            union2(ROI1_Res, ObjSel1, ROI1_Res)</l>
+<l>        endif</l>
+<c>        </c>
+<l>*         DRow := abs(Row1 - Row2)</l>
+<l>*         DCol := abs(Col1 - Col2)</l>
+<l>*         if (DRow &lt; Defect_Dist and DCol &lt; Defect_Dist)</l>
+<l>*             union2(ROI1_Res, ObjSel2, ROI1_Res)</l>
+<l>*             obj_diff(ROI1_Res, ObjSel1, ROI1_Res)</l>
+<l>*             obj_diff(ROI2_Res, ObjSel2, ROI2_Res)</l>
+<l>*             gen_circle(Circle, Row1, Col1, Defect_Dist / 2)</l>
+<l>*             union2(ROI1_Res, Circle, ROI1_Res)</l>
+<l>*         endif</l>
+<l>    endfor</l>
+<l>endfor</l>
+<c></c>
+<l>dilation_circle(ROI1_Res, ROI1_Ret, Defect_Dist)</l>
+<c></c>
+<c></c>
+<l>* ROI1_Ret := ROI1_Res</l>
+<l>ROI2_Ret := ROI2_Res</l>
+<l>return ()</l>
+</body>
+<docu id="Union_Defects">
+<parameters>
+<parameter id="Defect_Dist"/>
+<parameter id="ROI1"/>
+<parameter id="ROI1_Ret"/>
+<parameter id="ROI2"/>
+<parameter id="ROI2_Ret"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>

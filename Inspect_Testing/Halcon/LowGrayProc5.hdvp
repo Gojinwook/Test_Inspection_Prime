@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="LowGrayProc5">
+<interface>
+<io>
+<par name="SkeletonsFWMS" base_type="iconic" dimension="0"/>
+<par name="Im" base_type="iconic" dimension="0"/>
+</io>
+<oo>
+<par name="RegionLG" base_type="iconic" dimension="0"/>
+</oo>
+<ic>
+<par name="thr" base_type="ctrl" dimension="0"/>
+<par name="thrS" base_type="ctrl" dimension="0"/>
+<par name="maxexp" base_type="ctrl" dimension="0"/>
+<par name="fixedthr" base_type="ctrl" dimension="0"/>
+<par name="dt" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="thrlga" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<c>*******************************************************</c>
+<c>*** Определение области инспектирования Imp</c>
+<c>*******************************************************</c>
+<l>union1(SkeletonsFWMS, SkeletonFWMS)</l>
+<l>dilation_circle(SkeletonFWMS, SkeletonFWMSd,9.5)</l>
+<l>reduce_domain(Im, SkeletonFWMSd, Imp)</l>
+<c></c>
+<c>*******************************************************</c>
+<c>*** Определение уровня thrLG </c>
+<c>*******************************************************</c>
+<c></c>
+<l>thrLG := thrS + 10</l>
+<c></c>
+<c>*******************************************************</c>
+<c>*** Определение кандидатов Reg_Cand</c>
+<c>*******************************************************</c>
+<l>threshold(Imp, RegTh, thrLG, thr)</l>
+<l>opening_circle(RegTh, RegTh_O, 1.5)</l>
+<l>connection(RegTh_O, RegTh_O_C)</l>
+<l>select_shape(RegTh_O_C, Reg_Cand, 'area', 'and', 5, 50)</l>
+<c></c>
+<c>*******************************************************</c>
+<c>*** Фильтрация кандидатов</c>
+<c>*******************************************************</c>
+<l>gen_empty_obj (RegLG)</l>
+<l>count_obj (Reg_Cand, Count)</l>
+<l>for i := 1 to Count by 1</l>
+<c>    </c>
+<l>    i := 184</l>
+<l>    i := 107</l>
+<l>    i := 128</l>
+<l>    i := 1</l>
+<c>    </c>
+<l>    i := 45</l>
+<l>    select_obj (Reg_Cand, Reg_SEL, i)</l>
+<l>    area_center(Reg_SEL, Area, Row, Col)</l>
+<c>    </c>
+<c>    * Получим кусок скелетона</c>
+<l>    dilation_circle(Reg_SEL, Reg_DIL, 10)</l>
+<l>    intersection(SkeletonFWMS, Reg_DIL, Reg_DIL_SKL)</l>
+<c>    </c>
+<c>    </c>
+<c>    * Сместим скелетон в центор кандидата</c>
+<l>    area_center(Reg_DIL_SKL, Area, Row_SKL, Col_SKL)</l>
+<l>    Row_Move := Row-Row_SKL</l>
+<l>    Col_Move := Col-Col_SKL</l>
+<l>    move_region (Reg_DIL_SKL, Reg_DIL_SKL_T, Row_Move, Col_Move)</l>
+<l>    *area_center(Reg_DIL_SKL_T, Area, Row_SKL, Col_SKL)</l>
+<c>    </c>
+<c>     * График серого по скелетону </c>
+<l>    gen_contours_skeleton_xld(Reg_DIL_SKL_T, Reg_DIL_SKL_T0, 1, 'filter')</l>
+<l>    get_contour_xld(Reg_DIL_SKL_T0, Rows_Cont, Cols_Cont)    </l>
+<c>    </c>
+<l>    GrayC := []</l>
+<l>    tuple_length(Rows_Cont, Len_Cont)</l>
+<l>    for S := 0 to Len_Cont - 1 by 1</l>
+<l>        get_grayval (Im, Rows_Cont[S], Cols_Cont[S], Gray)</l>
+<l>        GrayC[S] := Gray</l>
+<l>    endfor</l>
+<c>    </c>
+<l>    create_funct_1d_array(GrayC, FGrayC)</l>
+<l>    smooth_funct_1d_mean(FGrayC, 5, 2, FGrayCS)</l>
+<c></c>
+<c>    * Для анализа патернов  - определние пыли - оверкиллов</c>
+<l>*     dilation_circle(Reg_DIL_SKL_T, Reg_DIL_SKL_T1, 1)</l>
+<l>*     get_region_contour(Reg_DIL_SKL_T1, Rows_Cont, Cols_Cont)</l>
+<c>    </c>
+<c>    </c>
+<c>    * Анализ кривых серых</c>
+<l>    local_min_max_funct_1d(FGrayCS, 'plateaus_center', 'true', MinS, MaxS)</l>
+<c>    </c>
+<l>endfor</l>
+<c></c>
+<c></c>
+<c></c>
+<l>stop()</l>
+<c></c>
+<l>gen_contours_skeleton_xld(SkeletonFWMS, Reg_SEL1_XLD, 1, 'filter')</l>
+<l>select_obj (Reg_SEL1_XLD, Reg_SEL1, 2)</l>
+<l>get_contour_xld(Reg_SEL1, Rows, Cols)    </l>
+<c></c>
+<l>tuple_length(Rows, Len)</l>
+<l>Win := 200</l>
+<l>WinD2 := Win/2</l>
+<l>for Ind := WinD2 to Len - 1 by 1</l>
+<l>    Ind0 := Ind - WinD2</l>
+<l>    Ind1 := Ind + WinD2</l>
+<c>    </c>
+<l>    tuple_atan2(Rows[Ind0] - Rows[Ind1], Cols[Ind0] - Cols[Ind1], Angle) </l>
+<l>    tuple_deg(Angle, Angle_Deg)</l>
+<c>    </c>
+<l>    tuple_cos(Angle + 1.5708, Cos)</l>
+<l>    tuple_sin(Angle + 1.5708, Sin)</l>
+<l>    P1X := Cols[Ind] + Cos * 20</l>
+<l>    P1Y := Rows[Ind] + Sin * 20</l>
+<c></c>
+<l>    tuple_cos(Angle + 4.71239, Cos)</l>
+<l>    tuple_sin(Angle + 4.71239, Sin)</l>
+<l>    P2X := Cols[Ind] + Cos * 20</l>
+<l>    P2Y := Rows[Ind] + Sin * 20</l>
+<c>    </c>
+<l>    gen_region_line(Reg_Sens, P1Y, P1X, P2Y, P2X)</l>
+<l>    gen_contours_skeleton_xld(Reg_Sens, Reg_Sens_XLD, 1, 'filter')</l>
+<l>    get_contour_xld(Reg_Sens_XLD, Rows_S, Cols_S)    </l>
+<c></c>
+<l>    GrayC := []</l>
+<l>    tuple_length(Rows_S, Len_S)</l>
+<l>    for S := 0 to Len_S - 1 by 1</l>
+<l>        get_grayval (Im, Rows_S[S], Cols_S[S], Gray)</l>
+<l>        GrayC[S] := Gray</l>
+<l>    endfor</l>
+<c>    </c>
+<l>    create_funct_1d_array(GrayC, FGrayC)</l>
+<l>    smooth_funct_1d_mean(FGrayC, 1, 2, FGrayCS)</l>
+<c>    </c>
+<c>    </c>
+<l>*     gen_region_points(Reg1, Rows[Ind], Cols[Ind])</l>
+<l>*     gen_region_points(Reg1, P1Y, P1X)</l>
+<c>    </c>
+<l>endfor</l>
+<c></c>
+<c></c>
+<c></c>
+<l>stop()</l>
+<c></c>
+<c></c>
+<c>*******************************************************</c>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<l>gen_empty_obj (RegionsLowDefs)</l>
+<l>connection (RegionLG, RegionLG_CON)</l>
+<l>count_obj (RegionLG_CON, Count)</l>
+<l>for i := 1 to Count by 1</l>
+<c></c>
+<l>    i := 70</l>
+<l>    select_obj (RegionLG_CON, RegL_SEL, i)</l>
+<l>    area_center(RegL_SEL, Area, Row, Col)</l>
+<l>    if (Area == 0 or Area &gt; 30)</l>
+<l>        continue</l>
+<l>    endif</l>
+<c>    </c>
+<l>    difference(RegL_SEL, RegionTh1, RegLopi_Diff)</l>
+<l>    get_region_points (RegLopi_Diff, Rows, Columns)</l>
+<l>    get_grayval (Im, Rows, Columns, Locality_Gray)</l>
+<c>    </c>
+<l>    tuple_sort(Locality_Gray, Sorted)</l>
+<l>    tuple_length(Sorted, Length)</l>
+<l>    tuple_first_n(Sorted, Length/2, Selected)</l>
+<l>    tuple_mean (Selected, mean_RegLopi)</l>
+<c>    </c>
+<c>***************************************</c>
+<l>*     dilation_circle(RegL_SEL, RegL_Vect, 12)</l>
+<l>    dilation_circle(RegL_SEL, RegL_DIL, 5)</l>
+<c>    </c>
+<l>    Angle_Cont := []</l>
+<l>    get_region_contour(RegL_DIL, Rows_Cont, Cols_Cont)</l>
+<l>    tuple_length(Rows_Cont, Len_Cont)</l>
+<l>    for Idx_Cont := 0 to Len_Cont - 1 by 1</l>
+<l>        gen_region_line(RegionLines,  Row, Col, Rows_Cont[Idx_Cont], Cols_Cont[Idx_Cont])</l>
+<c></c>
+<l>        get_region_points (RegionLines, Rows, Columns)</l>
+<l>        get_grayval (Im, Rows, Columns, Locality_Gray)</l>
+<l>        tuple_mean (Locality_Gray, mean_Line)</l>
+<c>        </c>
+<l>        dt1 := mean_RegLopi - mean_Line</l>
+<c></c>
+<l>        if (dt1 &gt; dt)</l>
+<l>            tuple_atan2(Row - Rows_Cont[Idx_Cont], Col - Cols_Cont[Idx_Cont], Angle) </l>
+<l>            tuple_concat(Angle_Cont, Angle, Angle_Cont)</l>
+<l>        endif    </l>
+<l>    endfor</l>
+<c></c>
+<c>    * Ищем противоположный угол</c>
+<l>    Count_Ang := 0</l>
+<l>    tuple_length(Angle_Cont, Len)</l>
+<l>    for Ind_Ang1 := 0 to Len - 1 by 1</l>
+<l>        Ang1 := Angle_Cont[Ind_Ang1] + 3.14</l>
+<l>        if (Ang1 &gt; 6.28)</l>
+<l>            Ang1 := Ang1 - 6.28</l>
+<l>        endif</l>
+<c>        </c>
+<l>        for Ind_Ang2 := 0 to Len - 1 by 1</l>
+<l>            Ang2 := Angle_Cont[Ind_Ang2]</l>
+<c>            </c>
+<l>            if (abs(Ang1- Ang2) &lt; 0.5)</l>
+<l>                Count_Ang := Count_Ang + 1   </l>
+<l>            endif</l>
+<l>        endfor</l>
+<l>    endfor</l>
+<c>    </c>
+<l>    if (Count_Ang &gt; 0)</l>
+<l>        concat_obj (RegionsLowDefs, RegL_SEL, RegionsLowDefs)</l>
+<l>    endif    </l>
+<c>    </c>
+<c>    </c>
+<c>    </c>
+<c>    </c>
+<c>***************************************</c>
+<l>*     dilation_circle(RegL_SEL, RegL_DIL, 4)</l>
+<l>*     difference(RegL_DIL, RegL_SEL, RegL_Diff)</l>
+<l>*     difference(RegL_Diff, RegionTh1, RegL_Diff)</l>
+<l>*     difference(RegL_Diff, RegionTh3, RegL_Diff)</l>
+<c></c>
+<c>    * Рисуем круг и бежим по контуру. </c>
+<c>    * Ищем пересечение с RegL_Diff и оцениваем углы пересечения</c>
+<l>*     Angle_Cont := []</l>
+<l>    *gen_circle(Circle, Row, Col, 7)</l>
+<l>*     dilation_circle(RegL_SEL, Circle, 3)</l>
+<l>*     get_region_contour(Circle, Rows_Cont, Cols_Cont)</l>
+<l>*     tuple_length(Rows_Cont, Len_Cont)</l>
+<l>*     for Idx_Cont := 0 to Len_Cont - 1 by 1</l>
+<l>*         test_region_point(RegL_Diff, Rows_Cont[Idx_Cont], Cols_Cont[Idx_Cont], IsInside)</l>
+<c></c>
+<l>*         tuple_atan2(Row - Rows_Cont[Idx_Cont], Col - Cols_Cont[Idx_Cont], Angle) </l>
+<l>*         tuple_concat(Angle_Cont, Angle, Angle_Cont)</l>
+<c>        </c>
+<l>*         if (IsInside == 1)</l>
+<c>            * Расчет угла и добавление в тупл</c>
+<l>*             tuple_atan2(Row - Rows_Cont[Idx_Cont], Col - Cols_Cont[Idx_Cont], Angle) </l>
+<l>*             tuple_concat(Angle_Cont, Angle, Angle_Cont)</l>
+<l>*             gen_circle(Circle1, Rows_Cont[Idx_Cont], Cols_Cont[Idx_Cont], 1)</l>
+<l>*         endif</l>
+<l>*     endfor</l>
+<c></c>
+<c>    * Ищем противоположный угол</c>
+<l>*     Count_Ang := 0</l>
+<l>*     tuple_length(Angle_Cont, Len)</l>
+<l>*     for Ind_Ang1 := 0 to Len - 1 by 1</l>
+<l>*         Ang1 := Angle_Cont[Ind_Ang1] + 3.14</l>
+<l>*         if (Ang1 &gt; 6.28)</l>
+<l>*             Ang1 := Ang1 - 6.28</l>
+<l>*         endif</l>
+<c>        </c>
+<l>*         for Ind_Ang2 := 0 to Len - 1 by 1</l>
+<l>*             Ang2 := Angle_Cont[Ind_Ang2]</l>
+<c>            </c>
+<l>*             if (abs(Ang1- Ang2) &lt; 0.5)</l>
+<l>*                 Count_Ang := Count_Ang + 1   </l>
+<l>*             endif</l>
+<l>*         endfor</l>
+<l>*     endfor</l>
+<c>    </c>
+<l>*     get_region_points (RegL_Diff, Rows, Columns)</l>
+<l>*     get_grayval (Im, Rows, Columns, Locality_Gray)</l>
+<l>*     tuple_sort(Locality_Gray, Sorted)</l>
+<l>*     tuple_length(Sorted, Length)</l>
+<l>*     if (Length == 0)</l>
+<l>*         continue</l>
+<l>*     endif</l>
+<l>*     tuple_first_n(Sorted, Length/2, Selected)</l>
+<l>*     tuple_mean (Selected, mean_RegL)</l>
+<l>*     dt1 := mean_RegLopi - mean_RegL</l>
+<c>    </c>
+<l>*     if (dt1 &gt; dt and Count_Ang &gt; 0)</l>
+<l>*         concat_obj (RegionsLowDefs, RegL_SEL, RegionsLowDefs)</l>
+<l>*     endif    </l>
+<c>    </c>
+<c>***************************************</c>
+<l>*     get_region_points (RegL_Diff, Rows, Columns)</l>
+<l>*     get_grayval (Im, Rows, Columns, Locality_Gray)</l>
+<l>*     tuple_sort(Locality_Gray, Sorted)</l>
+<l>*     tuple_length(Sorted, Length)</l>
+<l>*     if (Length == 0)</l>
+<l>*         continue</l>
+<l>*     endif</l>
+<l>*     tuple_first_n(Sorted, Length/2, Selected)</l>
+<l>*     tuple_mean (Selected, mean_RegL)</l>
+<l>*     dt1 := mean_RegLopi - mean_RegL</l>
+<c>    </c>
+<c>    </c>
+<c>    </c>
+<c>    </c>
+<l>*     connection (RegL_Diff, RegL_Diff_CON)</l>
+<l>*     select_obj (RegL_Diff_CON, Reg_SEL, 2)</l>
+<c>    </c>
+<l>*     select_region_spatial(RegL_Diff, RegL_SEL, 'above', RegionIndex11, RegionIndex21)</l>
+<l>*     select_region_spatial(RegL_Diff, RegL_SEL, 'below', RegionIndex12, RegionIndex22)</l>
+<l>*     select_region_spatial(RegL_Diff, RegL_SEL, 'left', RegionIndex13, RegionIndex23)</l>
+<l>*     select_region_spatial(RegL_Diff, RegL_SEL, 'right', RegionIndex14, RegionIndex24)</l>
+<c>     </c>
+<c>    </c>
+<c>***************************************</c>
+<c>    </c>
+<l>*     dilation_circle(RegL_SEL, RegL_DIL, 8)</l>
+<l>*     difference(RegL_DIL, RegL_SEL, RegL_Diff)</l>
+<l>*     difference(RegL_Diff, RegionTh1, RegL_Diff)</l>
+<l>*     get_region_points (RegL_Diff, Rows, Columns)</l>
+<l>*     get_grayval (Im, Rows, Columns, Locality_Gray)</l>
+<c></c>
+<l>*     tuple_sort(Locality_Gray, Sorted)</l>
+<l>*     tuple_length(Sorted, Length)</l>
+<l>*     if (Length == 0)</l>
+<l>*         continue</l>
+<l>*     endif</l>
+<l>*     tuple_first_n(Sorted, Length/2, Selected)</l>
+<l>*     tuple_mean (Selected, mean_RegL)</l>
+<c>    </c>
+<l>*     dt1 := mean_RegLopi - mean_RegL</l>
+<l>*     if (dt1 &gt; dt)</l>
+<l>*         concat_obj (RegionsLowDefs, RegL_SEL, RegionsLowDefs)</l>
+<l>*     endif    </l>
+<c>    </c>
+<l>*     dilation_circle(RegL_SEL, RegL_DIL, 5)</l>
+<l>*     difference(RegL_DIL, RegL_SEL, RegL_Diff)</l>
+<l>    *difference(RegL_Diff, RegionH_DIL, RegL_Diff)</l>
+<l>*     difference(RegL_Diff, RegionTh1, RegL_Diff)</l>
+<l>*     connection (RegL_Diff, RegL_Diff_CON)</l>
+<l>*     count_obj(RegL_Diff_CON, Number)</l>
+<l>*     N_Fl := 1</l>
+<l>*     for n := 1 to Number by 1</l>
+<c>       </c>
+<c>        </c>
+<l>*         select_obj (RegL_Diff_CON, RegL_Diff_SEL, n)</l>
+<l>*         get_region_points (RegL_Diff_SEL, Rows, Columns)</l>
+<l>*         get_grayval (Im, Rows, Columns, Locality_Gray)</l>
+<c>        </c>
+<l>*         tuple_sort(Locality_Gray, Sorted)</l>
+<l>*         tuple_length(Sorted, Length)</l>
+<l>*         tuple_first_n(Sorted, Length/2, Selected)</l>
+<l>*         tuple_median (Selected, mean_RegL)</l>
+<c>        </c>
+<c>        </c>
+<l>*         tuple_mean (Locality_Gray, mean_RegL)</l>
+<l>*         tuple_median (Locality_Gray, mean_RegL)</l>
+<c></c>
+<l>*         dt1 := mean_RegLopi - mean_RegL</l>
+<l>*         if (dt1 &lt; dt)</l>
+<l>*            N_Fl := 0</l>
+<l>*            break</l>
+<l>*         endif    </l>
+<c></c>
+<l>*     endfor</l>
+<c>    </c>
+<l>*     if (N_Fl == 1)</l>
+<l>*         concat_obj (RegionsLowDefs, RegL_SEL, RegionsLowDefs)</l>
+<l>*     endif    </l>
+<c>        </c>
+<c>        </c>
+<c>  </c>
+<c>    </c>
+<l>endfor</l>
+<c>   </c>
+<c></c>
+<l>RegionLG := RegionsLowDefs</l>
+<c></c>
+<c></c>
+<c></c>
+<c></c>
+<l>return ()</l>
+</body>
+<docu id="LowGrayProc5">
+<parameters>
+<parameter id="Im"/>
+<parameter id="RegionLG"/>
+<parameter id="SkeletonsFWMS"/>
+<parameter id="dt"/>
+<parameter id="fixedthr"/>
+<parameter id="maxexp"/>
+<parameter id="thr"/>
+<parameter id="thrS"/>
+<parameter id="thrlga"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>
