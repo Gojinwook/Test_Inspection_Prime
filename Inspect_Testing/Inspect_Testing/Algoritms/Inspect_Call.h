@@ -24,6 +24,7 @@
 //#include "Alig2.h"
 #include ".\Lib\Slice.h"
 #include ".\Lib\Open_Short_2.h"
+#include "CBMFuncs.h"
 
 #define  WRTEST 0
 
@@ -119,7 +120,7 @@ namespace inspect_call
 	//	//  Thresholding
 	//	bool inspect_Auto_Thr = false;  // Auto thresholding //specifies if use automatic threshold (or not)
 	//	bool inspect_Preproc = false;  // Auto thresholding //specifies if use automatic threshold (or not)
-	//	int threashold = 130;			// Main threshold
+	//	int threashold = 150;			// Main threshold
 
 	//	// Inspection stages
 	//	bool inspect_Pinhole = false;   // Inspect Pinholes// specifies if inspect pinholes (or not)
@@ -273,7 +274,7 @@ namespace inspect_call
 		CFWM* m_pFWM;
 		CSlice* m_slice;
 		Open_Short_2 *op2;
-
+		CCBM* m_pCBM;
 
 
 		//HObject m_pIm;
@@ -330,7 +331,14 @@ namespace inspect_call
 		HTuple m_hv_pDefMB;
 		HTuple m_hv_pDefSP;
 
-		
+		HObject m_ho_RegionsMeanderMB;
+		HObject m_ho_RegionsMeanderSP;
+		HObject m_ho_RegionsPadMB;
+		HObject m_ho_RegionsPadSP;
+		HObject m_ho_RegionsConnPadMB;
+		HObject m_ho_RegionsConnPadSP;
+		HObject m_ho_RegionsWireAngleMB;
+		HObject m_ho_RegionsWireAngleSP;
 
 	public:
 		void Init();
@@ -352,6 +360,12 @@ namespace inspect_call
 		void FixThinSpace(HObject ho_RegionInoD, HObject ho_DomainG, HObject *ho_RegionInoDr);
 		int SetWpNarrowWide(HObject ho_SkeletonFWMi, HObject ho_WidthImageP, HTuple hv_kw, HTuple hv_dw,// Setting of narrowwp and widewp
 			float *narrowwp, float *widewp);
+
+		int Proc_CBM_Meander();
+		int Proc_CBM_Pad();
+		int Proc_CBM_ConnPad();
+		int Proc_CBM_WireAngle();
+
 	};
 
 
@@ -409,6 +423,13 @@ namespace inspect_call
 	extern HTuple m_ho_FWMpar;
 
 	extern int m_num_teach;
+
+	extern HObject m_ho_Gi_CbmTest;
+	extern HObject m_ho_ContoursGrsm, m_ho_MeanderRects;
+	extern HObject m_ho_ContoursGrsmPi, m_ho_RectanglesPadsIsol;
+	extern HObject m_ho_ContoursGrsmPc, m_ho_RectanglesPadsCon;
+	extern HObject m_ho_ContoursWireAngles, m_ho_RectanglesWireAngles;
+
 	/* ************************************************************************** */
 	/* Section: Function Prototypes                                               */
 	/* ************************************************************************** */
@@ -427,6 +448,7 @@ namespace inspect_call
 		HTuple hv_cutfrombeg, HTuple hv_cutfromend);
 
 	bool Load_Teach(CString path_model);
+	bool Load_Teach3(CString path_model, int &iNoMeander, int &iNoPad, int &iNoConnPad, int &iNoWireAngle);
 	bool Load_Model(CString path_model);
 	bool Convert_To_Bin(CString path_teach, bool replace);
 	bool Load_Params(CString szModelPath, int iVersion, struct Inspection_Params *params, TSQueueSM<CString>* queue_log);

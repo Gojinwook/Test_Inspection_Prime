@@ -305,6 +305,7 @@ copy Algoritms\FWMFuncs.h Algoritms\Lib\ /y</Command>
   <ItemGroup>
     <ClInclude Include="Algoritms\Alig2.h" />
     <ClInclude Include="Algoritms\BuildIRB.h" />
+    <ClInclude Include="Algoritms\CBMFuncs.h" />
     <ClInclude Include="Algoritms\FWMFuncs.h" />
     <ClInclude Include="Algoritms\Inspect_Call.h">
       <SubType>
@@ -349,6 +350,9 @@ copy Algoritms\FWMFuncs.h Algoritms\Lib\ /y</Command>
     <ClCompile Include="Algoritms\BuildIRB.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_DLL|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Algoritms\CBMFuncs.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Algoritms\FWMFuncs.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>

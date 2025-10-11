@@ -55,7 +55,7 @@ struct Inspection_Params
 	//  Thresholding
 	bool inspect_Auto_Thr = false;  // Auto thresholding //specifies if use automatic threshold (or not)
 	bool inspect_Preproc = false;  // Auto thresholding //specifies if use automatic threshold (or not)
-	int threashold = 130;			// Main threshold
+	int threashold = 150;			// Main threshold
 
 	// Inspection stages
 	bool inspect_Pinhole = false;   // Inspect Pinholes// specifies if inspect pinholes (or not)
@@ -172,8 +172,21 @@ struct Inspection_Params
 	int mmat_fsz = 251;   // filter size
 	int running_medians_span = 351;	// 중앙값 실행 범위 // Running Median Filter Size
 
-
 	int alignment_type = 1;
+
+	// --- CBMs --------------------------------------
+	float fCBM_AbsMB_Meander = 0.9; 		// absolute MB value for Meander (in pixels)
+	float fCBM_AbsSP_Meander = 0.9; 		// absolute SP value for Meander (in pixels)
+	int   iCBM_Rmsize_Meander = 21;			// running median sizes for Meander (in pixels)
+	float fCBM_AbsMB_Pad = 0.7; 			// absolute MB value for Pad (in pixels)
+	float fCBM_AbsSP_Pad = 0.7; 			// absolute SP value for Pad (in pixels)
+	int   iCBM_Rmsize_Pad = 15;				// running median sizes for Pad (in pixels)
+	float fCBM_AbsMB_ConnPad = 0.7; 		// absolute MB value for Connnected Pad (in pixels)
+	float fCBM_AbsSP_ConnPad = 0.7; 		// absolute SP value for Connnected Pad (in pixels)
+	int   iCBM_Rmsize_ConnPad = 15;			// running median sizes for Connnected Pad (in pixels)
+	float fCBM_AbsMB_WireAngle = 0.7; 		// absolute MB value for Wire Angle (in pixels)
+	float fCBM_AbsSP_WireAngle = 0.7; 		// absolute SP value for Wire Angle (in pixels)
+	int   iCBM_Rmsize_WireAngle = 15;		// running median sizes for Wire Angle (in pixels)
 
 	void resetToDefault() {
 		*this = Inspection_Params();  // 새로운 구조체 인스턴스를 디폴트 값으로 생성

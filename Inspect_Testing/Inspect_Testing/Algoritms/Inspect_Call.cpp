@@ -1583,7 +1583,267 @@ namespace inspect_call
 
 		return 0;
 	}
-	
+
+	int CInspect_Call::Proc_CBM_Meander()
+	{
+		m_inspect_status = "Proc_CBM_Meander()";
+
+		DWORD time_start = GetTickCount();
+
+		HObject ho_MeanderDefect, ho_MeanderDefects, ho_Rect;
+		HTuple hv_DOut, hv_nObj;
+		HTuple ht1, ht3, ht2, ht;
+
+		CountObj(m_ho_ContoursGrsm, &hv_nObj);
+		int nObj = hv_nObj.I();
+
+		HTuple m_hv_meander;
+		HObject m_ho_CG, m_ho_CI;
+		HTuple m_hv_thr, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz;
+
+		HTuple HCnt;
+
+		m_hv_thr = HTuple(m_Inspection_Params.threashold);
+		m_hw_absmb = HTuple(m_Inspection_Params.fCBM_AbsMB_Meander);
+		m_hw_abssp = HTuple(m_Inspection_Params.fCBM_AbsSP_Meander);
+		m_hv_ctype = HTuple(true);
+		m_fsz = HTuple(m_Inspection_Params.iCBM_Rmsize_Meander);
+
+		GenEmptyObj(&ho_MeanderDefects);
+
+		for (int i = 1; i <= nObj; i++)
+		{
+			m_hv_meander = (HTuple)i;
+
+			GenEmptyObj(&ho_MeanderDefect);
+
+			m_pCBM->ProcessMeander(m_local_Im, m_ho_ContoursGrsm, m_ho_MeanderRects, /*m_ho_Gi*/m_ho_Gi_CbmTest,
+				&ho_MeanderDefect, &ho_Rect, &m_ho_CG, &m_ho_CI,
+				m_hv_thr, m_hv_meander, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz,
+				&hv_DOut);
+
+			HCnt = 0;
+			CountObj(ho_MeanderDefect, &HCnt);
+			if (HCnt>0)
+				ConcatObj(ho_MeanderDefects, ho_MeanderDefect, &ho_MeanderDefects);
+		}
+
+		HTuple DefMnum;
+		CountObj(ho_MeanderDefects, &DefMnum);
+
+		if (DefMnum > 0)
+		{
+			m_ho_RegionsMeanderMB = ho_MeanderDefects;
+			GenEmptyObj(&m_ho_RegionsMeanderSP);
+		}
+		else
+		{
+			GenEmptyObj(&m_ho_RegionsMeanderMB);
+			GenEmptyObj(&m_ho_RegionsMeanderSP);
+		}
+
+		DWORD time_end = GetTickCount();
+		Queue_Add(m_queue_log, NULL, "--- Proc_CBM_Meander() - OK (FrameNo=%d, UnitNo=%d, Thread=%d): Lead Time %0*.4f s",
+			inspect_param.iFrameNo, inspect_param.iUnitNo, m_thread_num, 3, (double)(time_end - time_start) / 1000.);
+
+		return 0;
+	}
+
+	int CInspect_Call::Proc_CBM_Pad()
+	{
+		m_inspect_status = "Proc_CBM_Pad()";
+
+		DWORD time_start = GetTickCount();
+
+		HObject ho_PadIDefect, ho_PadIDefects, ho_Rect;
+		HTuple hv_DOut, hv_nObj;
+		HTuple ht1, ht3, ht2, ht;
+
+		CountObj(m_ho_ContoursGrsmPi, &hv_nObj);
+		int nObj = hv_nObj.I();
+
+		HTuple m_hv_meander;
+		HObject m_ho_CG, m_ho_CI;
+		HTuple m_hv_thr, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz;
+
+		HTuple HCnt;
+
+		m_hv_thr = HTuple(m_Inspection_Params.threashold);
+		m_hw_absmb = HTuple(m_Inspection_Params.fCBM_AbsMB_Pad);
+		m_hw_abssp = HTuple(m_Inspection_Params.fCBM_AbsSP_Pad);
+		m_hv_ctype = HTuple(true);
+		m_fsz = HTuple(m_Inspection_Params.iCBM_Rmsize_Pad);
+
+		GenEmptyObj(&ho_PadIDefects);
+
+		for (int i = 1; i <= nObj; i++)
+		{
+			m_hv_meander = (HTuple)i;
+
+			GenEmptyObj(&ho_PadIDefect);
+
+			m_pCBM->ProcessMeander(m_local_Im, m_ho_ContoursGrsmPi, m_ho_RectanglesPadsIsol, /*m_ho_Gi*/m_ho_Gi_CbmTest,
+				&ho_PadIDefect, &ho_Rect, &m_ho_CG, &m_ho_CI,
+				m_hv_thr, m_hv_meander, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz,
+				&hv_DOut);
+
+			HCnt = 0;
+			CountObj(ho_PadIDefect, &HCnt);
+			if (HCnt > 0)
+				ConcatObj(ho_PadIDefects, ho_PadIDefect, &ho_PadIDefects);
+		}
+
+		HTuple DefMnum;
+		CountObj(ho_PadIDefects, &DefMnum);
+
+		if (DefMnum > 0)
+		{
+			m_ho_RegionsPadMB = ho_PadIDefects;
+			GenEmptyObj(&m_ho_RegionsPadSP);
+		}
+		else
+		{
+			GenEmptyObj(&m_ho_RegionsPadMB);
+			GenEmptyObj(&m_ho_RegionsPadSP);
+		}
+
+		DWORD time_end = GetTickCount();
+		Queue_Add(m_queue_log, NULL, "--- Proc_CBM_Pad() - OK (FrameNo=%d, UnitNo=%d, Thread=%d): Lead Time %0*.4f s",
+			inspect_param.iFrameNo, inspect_param.iUnitNo, m_thread_num, 3, (double)(time_end - time_start) / 1000.);
+
+		return 0;
+	}
+
+	int CInspect_Call::Proc_CBM_ConnPad()
+	{
+		m_inspect_status = "Proc_CBM_ConnPad()";
+
+		DWORD time_start = GetTickCount();
+
+		HObject ho_PadCDefect, ho_PadCDefects, ho_Rect;
+		HTuple hv_DOut, hv_nObj;
+		HTuple ht1, ht3, ht2, ht;
+
+		CountObj(m_ho_ContoursGrsmPc, &hv_nObj);
+		int nObj = hv_nObj.I();
+
+		HTuple m_hv_meander;
+		HObject m_ho_CG, m_ho_CI;
+		HTuple m_hv_thr, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz;
+
+		HTuple HCnt;
+
+		m_hv_thr = HTuple(m_Inspection_Params.threashold);
+		m_hw_absmb = HTuple(m_Inspection_Params.fCBM_AbsMB_ConnPad);
+		m_hw_abssp = HTuple(m_Inspection_Params.fCBM_AbsSP_ConnPad);
+		m_hv_ctype = HTuple(true);
+		m_fsz = HTuple(m_Inspection_Params.iCBM_Rmsize_ConnPad);
+
+		GenEmptyObj(&ho_PadCDefects);
+
+		for (int i = 1; i <= nObj; i++)
+		{
+			m_hv_meander = (HTuple)i;
+
+			GenEmptyObj(&ho_PadCDefect);
+
+			m_pCBM->ProcessMeander(m_local_Im, m_ho_ContoursGrsmPc, m_ho_RectanglesPadsCon, /*m_ho_Gi*/m_ho_Gi_CbmTest,
+				&ho_PadCDefect, &ho_Rect, &m_ho_CG, &m_ho_CI,
+				m_hv_thr, m_hv_meander, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz,
+				&hv_DOut);
+
+			HCnt = 0;
+			CountObj(ho_PadCDefect, &HCnt);
+			if (HCnt > 0)
+				ConcatObj(ho_PadCDefects, ho_PadCDefect, &ho_PadCDefects);
+		}
+
+		HTuple DefMnum;
+		CountObj(ho_PadCDefects, &DefMnum);
+
+		if (DefMnum > 0)
+		{
+			m_ho_RegionsConnPadMB = ho_PadCDefects;
+			GenEmptyObj(&m_ho_RegionsConnPadSP);
+		}
+		else
+		{
+			GenEmptyObj(&m_ho_RegionsConnPadMB);
+			GenEmptyObj(&m_ho_RegionsConnPadSP);
+		}
+
+		DWORD time_end = GetTickCount();
+		Queue_Add(m_queue_log, NULL, "--- Proc_CBM_ConnPad() - OK (FrameNo=%d, UnitNo=%d, Thread=%d): Lead Time %0*.4f s",
+			inspect_param.iFrameNo, inspect_param.iUnitNo, m_thread_num, 3, (double)(time_end - time_start) / 1000.);
+
+		return 0;
+	}
+
+	int CInspect_Call::Proc_CBM_WireAngle()
+	{
+		m_inspect_status = "Proc_CBM_WireAngle()";
+
+		DWORD time_start = GetTickCount();
+
+		HObject ho_WADefect, ho_WADefects, ho_Rect;
+		HTuple hv_DOut, hv_nObj;
+		HTuple ht1, ht3, ht2, ht;
+
+		CountObj(m_ho_ContoursWireAngles, &hv_nObj);
+		int nObj = hv_nObj.I();
+
+		HTuple m_hv_meander;
+		HObject m_ho_CG, m_ho_CI;
+		HTuple m_hv_thr, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz;
+
+		HTuple HCnt;
+
+		m_hv_thr = HTuple(m_Inspection_Params.threashold);
+		m_hw_absmb = HTuple(m_Inspection_Params.fCBM_AbsMB_WireAngle);
+		m_hw_abssp = HTuple(m_Inspection_Params.fCBM_AbsSP_WireAngle);
+		m_hv_ctype = HTuple(true);
+		m_fsz = HTuple(m_Inspection_Params.iCBM_Rmsize_WireAngle);
+
+		GenEmptyObj(&ho_WADefects);
+
+		for (int i = 1; i <= nObj; i++)
+		{
+			m_hv_meander = (HTuple)i;
+
+			GenEmptyObj(&ho_WADefect);
+
+			m_pCBM->ProcessMeander(m_local_Im, m_ho_ContoursWireAngles, m_ho_RectanglesWireAngles, /*m_ho_Gi*/m_ho_Gi_CbmTest,
+				&ho_WADefect, &ho_Rect, &m_ho_CG, &m_ho_CI,
+				m_hv_thr, m_hv_meander, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz,
+				&hv_DOut);
+
+			HCnt = 0;
+			CountObj(ho_WADefect, &HCnt);
+			if (HCnt > 0)
+				ConcatObj(ho_WADefects, ho_WADefect, &ho_WADefects);
+		}
+
+		HTuple DefMnum;
+		CountObj(ho_WADefects, &DefMnum);
+
+		if (DefMnum > 0)
+		{
+			m_ho_RegionsWireAngleMB = ho_WADefects;
+			GenEmptyObj(&m_ho_RegionsWireAngleSP);
+		}
+		else
+		{
+			GenEmptyObj(&m_ho_RegionsWireAngleMB);
+			GenEmptyObj(&m_ho_RegionsWireAngleSP);
+		}
+
+		DWORD time_end = GetTickCount();
+		Queue_Add(m_queue_log, NULL, "--- Proc_CBM_WireAngle() - OK (FrameNo=%d, UnitNo=%d, Thread=%d): Lead Time %0*.4f s",
+			inspect_param.iFrameNo, inspect_param.iUnitNo, m_thread_num, 3, (double)(time_end - time_start) / 1000.);
+
+		return 0;
+	}
+
 	void CInspect_Call::Inspect(InspectParam_t* inspect_paramI)
 	{
 		DWORD time_start = GetTickCount();
@@ -1628,6 +1888,15 @@ namespace inspect_call
 			GenEmptyObj(&m_ho_RegionsSPS);
 			GenEmptyObj(&m_ho_RegionsMB);
 			GenEmptyObj(&m_ho_RegionsSP);
+
+			GenEmptyObj(&m_ho_RegionsMeanderMB);
+			GenEmptyObj(&m_ho_RegionsMeanderSP);
+			GenEmptyObj(&m_ho_RegionsPadMB);
+			GenEmptyObj(&m_ho_RegionsPadSP);
+			GenEmptyObj(&m_ho_RegionsConnPadMB);
+			GenEmptyObj(&m_ho_RegionsConnPadSP);
+			GenEmptyObj(&m_ho_RegionsWireAngleMB);
+			GenEmptyObj(&m_ho_RegionsWireAngleSP);
 
 			Pinhole_Island();
 
@@ -1799,6 +2068,12 @@ namespace inspect_call
 
 	HTuple m_ho_FWMpar;
 
+	/// for CBM ***
+	HObject m_ho_Gi_CbmTest;
+	HObject m_ho_ContoursGrsm, m_ho_MeanderRects;
+	HObject m_ho_ContoursGrsmPi, m_ho_RectanglesPadsIsol;
+	HObject m_ho_ContoursGrsmPc, m_ho_RectanglesPadsCon;	
+	HObject m_ho_ContoursWireAngles, m_ho_RectanglesWireAngles;
 
 	// --- Params ---
 	struct Inspection_Params m_Inspection_Params;
@@ -2165,7 +2440,69 @@ namespace inspect_call
 		return ret;
 	}
 
+	bool Load_Teach3(CString path_model, int &iNoMeander, int &iNoPad, int &iNoConnPad, int &iNoWireAngle)
+	{
+		CString path_teach = path_model + "Teach3\\";
 
+		bool ret = true;
+
+		try
+		{
+			// --- Read HOBJ files ---------------------------------------------
+
+			HCall(ret, Read_HObject(&m_ho_Gi_CbmTest, HTuple(path_teach) + "Gi"));
+
+			HCall(ret, Read_HObject(&m_ho_ContoursGrsm, HTuple(path_teach) + "ContoursGrsmc"));
+			HCall(ret, Read_HObject(&m_ho_MeanderRects, HTuple(path_teach) + "MeanderRects"));
+
+			HCall(ret, Read_HObject(&m_ho_ContoursGrsmPi, HTuple(path_teach) + "ContoursGrsmPi"));
+			HCall(ret, Read_HObject(&m_ho_RectanglesPadsIsol, HTuple(path_teach) + "RectanglesPadsIsol"));
+
+			HCall(ret, Read_HObject(&m_ho_ContoursGrsmPc, HTuple(path_teach) + "ContoursGrsmPc"));
+			HCall(ret, Read_HObject(&m_ho_RectanglesPadsCon, HTuple(path_teach) + "RectanglesPadsCon"));
+
+			HCall(ret, Read_HObject(&m_ho_ContoursWireAngles, HTuple(path_teach) + "ContoursWireAngles"));
+			HCall(ret, Read_HObject(&m_ho_RectanglesWireAngles, HTuple(path_teach) + "RectanglesWireAngles"));
+
+			HTuple tnum;
+
+			CountObj(m_ho_MeanderRects, &tnum);
+			iNoMeander = tnum.I();
+
+			CountObj(m_ho_RectanglesPadsIsol, &tnum);
+			iNoPad = tnum.I();
+
+			CountObj(m_ho_RectanglesPadsCon, &tnum);
+			iNoConnPad = tnum.I();
+
+			CountObj(m_ho_ContoursWireAngles, &tnum);
+			iNoWireAngle = tnum.I();
+
+			m_num_teach += 1;
+			Queue_Add(&m_main_queue_log, NULL, "*-- Load_Teach3() - OK. %s", path_model);
+		}
+		catch (HException &except)
+		{
+			HTuple HExp;
+			HTuple HOperatorName, HErrMsg;
+			except.ToHTuple(&HExp);
+			except.GetExceptionData(HExp, "operator", &HOperatorName);
+			except.GetExceptionData(HExp, "error_message", &HErrMsg);
+
+			CString sOperatorName, sErrMsg;
+			sOperatorName = HOperatorName.S();
+			sErrMsg = HErrMsg.S();
+
+			Queue_Add(&m_main_queue_log, NULL, "***Halcon Exception*** Load_Teach3 <%s>, <%s>. %s", sOperatorName.GetBuffer(), sErrMsg.GetBuffer(), path_model);
+			return false;
+		}
+		catch (...)
+		{
+			Queue_Add(&m_main_queue_log, NULL, "***Exception*** Load_Teach3 %s", path_model);
+			return false;
+		}
+		return ret;
+	}
 
 	// -------------------------------------------------------------------------------------------------------
 	// -------------------------------------------------------------------------------------------------------

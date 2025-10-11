@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by InspectTesting.rc
+// Microsoft Visual C++에서 생성한 포함 파일입니다.
+// InspectTesting.rc에서 사용되고 있습니다.
 //
 #define IDM_ABOUTBOX                    0x0010
 #define IDD_ABOUTBOX                    100
@@ -158,8 +158,33 @@
 #define IDC_STATICSPP7                  1104
 #define IDC_CHECK_ALIG2                 1104
 #define IDC_EDITWIDEWP2                 1105
+#define IDC_BUTTON_PROC_CBM_MEANDER     1105
 #define IDC_STDWP                       1106
 #define IDC_BUTTON9                     1106
+#define IDC_BUTTON_PROC_CBM_PAD         1106
+#define IDC_EDIT_ABSMB_MEANDER          1107
+#define IDC_EDIT_ABSSP_MEANDER          1108
+#define IDC_EDIT_RMSIZE_MEANDER         1109
+#define IDC_EDIT_ABSMB_PAD              1110
+#define IDC_EDIT_ABSSP_PAD              1111
+#define IDC_EDIT_RMSIZE_PAD             1112
+#define IDC_BUTTON_PROC_CBM_CONN_PAD    1113
+#define IDC_EDIT_ABSMB_CONN_PAD         1114
+#define IDC_EDIT_ABSSP_CONN_PAD         1115
+#define IDC_EDIT_RMSIZE_CONN_PAD        1116
+#define IDC_EDIT_CBM_MEANDER            1117
+#define IDC_EDIT_CBM_PAD                1118
+#define IDC_EDIT_CBM_CONN_PAD           1119
+#define IDC_VIEW_CBM_MEANDER            1120
+#define IDC_VIEW_CBM_PAD                1121
+#define IDC_VIEW_CBM_CONN_PAD           1122
+#define IDC_EDIT_ABSMB_WIRE_ANGLE       1123
+#define IDC_EDIT_ABSSP_WIRE_ANGLE       1124
+#define IDC_EDIT_RMSIZE_WIRE_ANGLE      1125
+#define IDC_BUTTON_PROC_CBM_WIRE_ANGLE  1126
+#define IDC_EDIT_CBM_WIRE_ANGLE         1127
+#define IDC_VIEW_CBM_CONN_PAD2          1128
+#define IDC_VIEW_CBM_WIRE_ANGLE         1128
 #define IDC_BUT_UPDATE                  2060
 #define IDC_EDITMABS                    11035
 #define IDC_WPSET                       11106
@@ -176,7 +201,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1107
+#define _APS_NEXT_CONTROL_VALUE         1118
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

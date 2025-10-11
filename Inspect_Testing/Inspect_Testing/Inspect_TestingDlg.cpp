@@ -240,6 +240,21 @@ BEGIN_MESSAGE_MAP(CInspectTestingDlg, CDialog)
 	ON_BN_CLICKED(IDC_CHECK_DISP_DEFECTS, &CInspectTestingDlg::OnBnClickedCheckDispDefects)
 	ON_BN_CLICKED(IDC_CHECK_UNION_DEFECTS, &CInspectTestingDlg::OnBnClickedCheckUnionDefects)
 
+	ON_EN_CHANGE(IDC_EDIT_ABSMB_MEANDER, &CInspectTestingDlg::OnEnChangeEditAbsmbMeander)
+	ON_EN_CHANGE(IDC_EDIT_ABSSP_MEANDER, &CInspectTestingDlg::OnEnChangeEditAbsspMeander)
+	ON_EN_CHANGE(IDC_EDIT_RMSIZE_MEANDER, &CInspectTestingDlg::OnEnChangeEditRmsizeMeander)
+
+	ON_EN_CHANGE(IDC_EDIT_ABSMB_PAD, &CInspectTestingDlg::OnEnChangeEditAbsmbPad)
+	ON_EN_CHANGE(IDC_EDIT_ABSSP_PAD, &CInspectTestingDlg::OnEnChangeEditAbsspPad)
+	ON_EN_CHANGE(IDC_EDIT_RMSIZE_PAD, &CInspectTestingDlg::OnEnChangeEditRmsizePad)
+
+	ON_EN_CHANGE(IDC_EDIT_ABSMB_CONN_PAD, &CInspectTestingDlg::OnEnChangeEditAbsmbConnPad)
+	ON_EN_CHANGE(IDC_EDIT_ABSSP_CONN_PAD, &CInspectTestingDlg::OnEnChangeEditAbsspConnPad)
+	ON_EN_CHANGE(IDC_EDIT_RMSIZE_CONN_PAD, &CInspectTestingDlg::OnEnChangeEditRmsizeConnPad)
+
+	ON_EN_CHANGE(IDC_EDIT_ABSMB_WIRE_ANGLE, &CInspectTestingDlg::OnEnChangeEditAbsmbWireAngle)
+	ON_EN_CHANGE(IDC_EDIT_ABSSP_WIRE_ANGLE, &CInspectTestingDlg::OnEnChangeEditAbsspWireAngle)
+	ON_EN_CHANGE(IDC_EDIT_RMSIZE_WIRE_ANGLE, &CInspectTestingDlg::OnEnChangeEditRmsizeWireAngle)
 
 	ON_WM_CTLCOLOR()
 	//ON_EN_CHANGE(IDC_EDITLGPRC, &CInspectTestingDlg::OnEnChangeEditlgprc)
@@ -278,6 +293,14 @@ BEGIN_MESSAGE_MAP(CInspectTestingDlg, CDialog)
 		ON_BN_CLICKED(IDC_CHECK_OP2, &CInspectTestingDlg::OnBnClickedCheckOp2)
 		ON_BN_CLICKED(IDC_WPSET, &CInspectTestingDlg::OnBnClickedWpset)
 		ON_BN_CLICKED(IDC_WPSETI, &CInspectTestingDlg::OnBnClickedWpseti)
+		ON_BN_CLICKED(IDC_BUTTON_PROC_CBM_MEANDER, &CInspectTestingDlg::OnBnClickedButtonProcCbmMeander)
+		ON_BN_CLICKED(IDC_BUTTON_PROC_CBM_PAD, &CInspectTestingDlg::OnBnClickedButtonProcCbmPad)
+		ON_BN_CLICKED(IDC_BUTTON_PROC_CBM_CONN_PAD, &CInspectTestingDlg::OnBnClickedButtonProcCbmConnPad)
+		ON_BN_CLICKED(IDC_VIEW_CBM_MEANDER, &CInspectTestingDlg::OnBnClickedViewCbmMeander)
+		ON_BN_CLICKED(IDC_VIEW_CBM_PAD, &CInspectTestingDlg::OnBnClickedViewCbmPad)
+		ON_BN_CLICKED(IDC_VIEW_CBM_CONN_PAD, &CInspectTestingDlg::OnBnClickedViewCbmConnPad)
+		ON_BN_CLICKED(IDC_BUTTON_PROC_CBM_WIRE_ANGLE, &CInspectTestingDlg::OnBnClickedButtonProcCbmWireAngle)
+		ON_BN_CLICKED(IDC_VIEW_CBM_WIRE_ANGLE, &CInspectTestingDlg::OnBnClickedViewCbmWireAngle)
 		END_MESSAGE_MAP()
 
 // CInspectTestingDlg message handlers
@@ -991,6 +1014,8 @@ void CInspectTestingDlg::Read_Image(CString image_name)
 	}
 	else
 		AfxMessageBox(_T("Image file not found!"));
+
+	m_Window.ClearWindow();
 	Disp_Fit_Image(m_ho_Im);
 }
 
@@ -1045,6 +1070,14 @@ void CInspectTestingDlg::Clear_Defects()
 	GenEmptyObj(&m_inspect->op2->ho_Open);
 	GenEmptyObj(&m_inspect->op2->ho_Short);
 
+	GenEmptyObj(&m_inspect->m_ho_RegionsMeanderMB);
+	GenEmptyObj(&m_inspect->m_ho_RegionsMeanderSP);
+	GenEmptyObj(&m_inspect->m_ho_RegionsPadMB);
+	GenEmptyObj(&m_inspect->m_ho_RegionsPadSP);
+	GenEmptyObj(&m_inspect->m_ho_RegionsConnPadMB);
+	GenEmptyObj(&m_inspect->m_ho_RegionsConnPadSP);
+	GenEmptyObj(&m_inspect->m_ho_RegionsWireAngleMB);
+	GenEmptyObj(&m_inspect->m_ho_RegionsWireAngleSP);
 }
 
 void CInspectTestingDlg::OnBnClickedButtonReadImage()
@@ -1081,6 +1114,18 @@ void CInspectTestingDlg::OnBnClickedButtonLoadTeach()
 	{
 		Load_Model(m_model_Path);
 		Load_Teach(m_model_Path);
+
+		int iNoMeander, iNoPad, iNoConnPad, iNoWireAngle;
+		Load_Teach3(m_model_Path, iNoMeander, iNoPad, iNoConnPad, iNoWireAngle);
+		CString cstr;
+		cstr.Format(_T("%d"), iNoMeander);
+		SetDlgItemText(IDC_EDIT_CBM_MEANDER, cstr);
+		cstr.Format(_T("%d"), iNoPad);
+		SetDlgItemText(IDC_EDIT_CBM_PAD, cstr);
+		cstr.Format(_T("%d"), iNoConnPad);
+		SetDlgItemText(IDC_EDIT_CBM_CONN_PAD, cstr);
+		cstr.Format(_T("%d"), iNoWireAngle);
+		SetDlgItemText(IDC_EDIT_CBM_WIRE_ANGLE, cstr);
 
 		inspect_call::m_Path_Model = m_model_Path;
 		m_inspect->Init();
@@ -1186,6 +1231,7 @@ void CInspectTestingDlg::OnBnClickedButtonInspectionInit()
 		m_init = 1;
 	}
 
+	m_Window.ClearWindow();
 	Disp_Fit_Image(m_ho_Im);
 
 	if (!m_Raw_Image)
@@ -1586,6 +1632,31 @@ void CInspectTestingDlg::Update_Dlg_Params()
 
 
 	m_Check_Alig2 = inspect_call::m_Inspection_Params.alignment_type == 2;
+
+	cstr.Format(_T("%.1f"), m_Inspection_Params.fCBM_AbsMB_Meander);
+	SetDlgItemText(IDC_EDIT_ABSMB_MEANDER, cstr);
+	cstr.Format(_T("%.1f"), m_Inspection_Params.fCBM_AbsSP_Meander);
+	SetDlgItemText(IDC_EDIT_ABSSP_MEANDER, cstr);
+	cstr.Format(_T("%d"), m_Inspection_Params.iCBM_Rmsize_Meander);
+	SetDlgItemText(IDC_EDIT_RMSIZE_MEANDER, cstr);
+	cstr.Format(_T("%.1f"), m_Inspection_Params.fCBM_AbsMB_Pad);
+	SetDlgItemText(IDC_EDIT_ABSMB_PAD, cstr);
+	cstr.Format(_T("%.1f"), m_Inspection_Params.fCBM_AbsSP_Pad);
+	SetDlgItemText(IDC_EDIT_ABSSP_PAD, cstr);
+	cstr.Format(_T("%d"), m_Inspection_Params.iCBM_Rmsize_Pad);
+	SetDlgItemText(IDC_EDIT_RMSIZE_PAD, cstr);
+	cstr.Format(_T("%.1f"), m_Inspection_Params.fCBM_AbsMB_ConnPad);
+	SetDlgItemText(IDC_EDIT_ABSMB_CONN_PAD, cstr);
+	cstr.Format(_T("%.1f"), m_Inspection_Params.fCBM_AbsSP_ConnPad);
+	SetDlgItemText(IDC_EDIT_ABSSP_CONN_PAD, cstr);
+	cstr.Format(_T("%d"), m_Inspection_Params.iCBM_Rmsize_ConnPad);
+	SetDlgItemText(IDC_EDIT_RMSIZE_CONN_PAD, cstr);
+	cstr.Format(_T("%.1f"), m_Inspection_Params.fCBM_AbsMB_WireAngle);
+	SetDlgItemText(IDC_EDIT_ABSMB_WIRE_ANGLE, cstr);
+	cstr.Format(_T("%.1f"), m_Inspection_Params.fCBM_AbsSP_WireAngle);
+	SetDlgItemText(IDC_EDIT_ABSSP_WIRE_ANGLE, cstr);
+	cstr.Format(_T("%d"), m_Inspection_Params.iCBM_Rmsize_WireAngle);
+	SetDlgItemText(IDC_EDIT_RMSIZE_WIRE_ANGLE, cstr);
 
 
 	UpdateData(FALSE);
@@ -3455,6 +3526,89 @@ BOOL CInspectTestingDlg::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	//return OnMouseWheel(nFlags, zDelta, pt);
 }
 
+void CInspectTestingDlg::OnEnChangeEditAbsmbMeander()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_ABSMB_MEANDER, cstr);
+	m_Inspection_Params.fCBM_AbsMB_Meander = (float)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditAbsspMeander()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_ABSSP_MEANDER, cstr);
+	m_Inspection_Params.fCBM_AbsSP_Meander = (float)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditRmsizeMeander()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_RMSIZE_MEANDER, cstr);
+	m_Inspection_Params.iCBM_Rmsize_Meander = (int)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditAbsmbPad()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_ABSMB_PAD, cstr);
+	m_Inspection_Params.fCBM_AbsMB_Pad = (float)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditAbsspPad()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_ABSSP_PAD, cstr);
+	m_Inspection_Params.fCBM_AbsSP_Pad = (float)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditRmsizePad()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_RMSIZE_PAD, cstr);
+	m_Inspection_Params.iCBM_Rmsize_Pad = (int)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditAbsmbConnPad()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_ABSMB_CONN_PAD, cstr);
+	m_Inspection_Params.fCBM_AbsMB_ConnPad = (float)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditAbsspConnPad()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_ABSSP_CONN_PAD, cstr);
+	m_Inspection_Params.fCBM_AbsSP_ConnPad = (float)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditRmsizeConnPad()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_RMSIZE_CONN_PAD, cstr);
+	m_Inspection_Params.iCBM_Rmsize_ConnPad = (int)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditAbsmbWireAngle()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_ABSMB_WIRE_ANGLE, cstr);
+	m_Inspection_Params.fCBM_AbsMB_WireAngle = (float)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditAbsspWireAngle()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_ABSSP_WIRE_ANGLE, cstr);
+	m_Inspection_Params.fCBM_AbsSP_WireAngle = (float)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditRmsizeWireAngle()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_RMSIZE_WIRE_ANGLE, cstr);
+	m_Inspection_Params.iCBM_Rmsize_WireAngle = (int)_tstof(cstr);
+}
 
 void CInspectTestingDlg::OnEnChangeEditmid()
 {
@@ -3873,6 +4027,29 @@ void CInspectTestingDlg::OnBnClickedViewimmod()
 	m_Disp_Image = m_inspect->m_local_ImModified;
 }
 
+void CInspectTestingDlg::OnBnClickedViewCbmMeander()
+{
+	m_Window.SetColor("blue");
+	m_Window.DispObj(m_ho_ContoursGrsm);
+}
+
+void CInspectTestingDlg::OnBnClickedViewCbmPad()
+{
+	m_Window.SetColor("cyan");
+	m_Window.DispObj(m_ho_ContoursGrsmPi);
+}
+
+void CInspectTestingDlg::OnBnClickedViewCbmConnPad()
+{
+	m_Window.SetColor("magenta");
+	m_Window.DispObj(m_ho_ContoursGrsmPc);
+}
+
+void CInspectTestingDlg::OnBnClickedViewCbmWireAngle()
+{
+	m_Window.SetColor("yellow");
+	m_Window.DispObj(m_ho_ContoursWireAngles);
+}
 
 void CInspectTestingDlg::OnBnClickedCheckOp2()
 {
@@ -3914,4 +4091,44 @@ void CInspectTestingDlg::OnBnClickedWpseti()
 
 	cstr.Format(_T("%.1f"), m_Inspection_Params.widewp);
 	SetDlgItemText(IDC_EDITWIDEWP, cstr);
+}
+
+
+void CInspectTestingDlg::OnBnClickedButtonProcCbmMeander()
+{
+	m_inspect->Proc_CBM_Meander();
+
+	m_Window.DispObj(m_inspect->m_local_Im);
+	DispObject(m_inspect->m_ho_RegionsMeanderMB, "red");
+	//DispObject(m_inspect->m_ho_RegionsMeanderSP, "magenta");
+}
+
+
+void CInspectTestingDlg::OnBnClickedButtonProcCbmPad()
+{
+	m_inspect->Proc_CBM_Pad();
+
+	m_Window.DispObj(m_inspect->m_local_Im);
+	DispObject(m_inspect->m_ho_RegionsPadMB, "red");
+	//DispObject(m_inspect->m_ho_RegionsPadSP, "magenta");
+}
+
+
+void CInspectTestingDlg::OnBnClickedButtonProcCbmConnPad()
+{
+	m_inspect->Proc_CBM_ConnPad();
+
+	m_Window.DispObj(m_inspect->m_local_Im);
+	DispObject(m_inspect->m_ho_RegionsConnPadMB, "red");
+	//DispObject(m_inspect->m_ho_RegionsConnPadSP, "magenta");
+}
+
+
+void CInspectTestingDlg::OnBnClickedButtonProcCbmWireAngle()
+{
+	m_inspect->Proc_CBM_WireAngle();
+
+	m_Window.DispObj(m_inspect->m_local_Im);
+	DispObject(m_inspect->m_ho_RegionsWireAngleMB, "red");
+	//DispObject(m_inspect->m_ho_RegionsWireAngleSP, "magenta");
 }

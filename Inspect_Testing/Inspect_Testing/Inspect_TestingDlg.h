@@ -228,6 +228,20 @@ public:
 	afx_msg void OnBnClickedButtonParamsDlg();
 	afx_msg void OnBnClickedViewregioncut();
 	afx_msg void OnEnChangeEditwidewp();
+
+	afx_msg void OnEnChangeEditAbsmbMeander();
+	afx_msg void OnEnChangeEditAbsspMeander();
+	afx_msg void OnEnChangeEditRmsizeMeander();
+	afx_msg void OnEnChangeEditAbsmbPad();
+	afx_msg void OnEnChangeEditAbsspPad();
+	afx_msg void OnEnChangeEditRmsizePad();
+	afx_msg void OnEnChangeEditAbsmbConnPad();
+	afx_msg void OnEnChangeEditAbsspConnPad();
+	afx_msg void OnEnChangeEditRmsizeConnPad();
+	afx_msg void OnEnChangeEditAbsmbWireAngle();
+	afx_msg void OnEnChangeEditAbsspWireAngle();
+	afx_msg void OnEnChangeEditRmsizeWireAngle();
+
 protected:
 	afx_msg LRESULT OnUpdateParamsEvents(WPARAM wParam, LPARAM lParam);
 public:
@@ -241,4 +255,12 @@ public:
 	afx_msg void OnBnClickedCheckOp2();
 	afx_msg void OnBnClickedWpset();
 	afx_msg void OnBnClickedWpseti();
+	afx_msg void OnBnClickedButtonProcCbmMeander();
+	afx_msg void OnBnClickedButtonProcCbmPad();
+	afx_msg void OnBnClickedButtonProcCbmConnPad();
+	afx_msg void OnBnClickedViewCbmMeander();
+	afx_msg void OnBnClickedViewCbmPad();
+	afx_msg void OnBnClickedViewCbmConnPad();
+	afx_msg void OnBnClickedButtonProcCbmWireAngle();
+	afx_msg void OnBnClickedViewCbmWireAngle();
 };
