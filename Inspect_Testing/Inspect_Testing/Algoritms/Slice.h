@@ -17,6 +17,9 @@
 /* Section: Included Files                                                    */
 /* ************************************************************************** */
 #pragma once
+
+#ifdef USE_DLL
+
 #ifdef ALGORITHMSUB_EXPORTS
 #define ALGORITHMSUB_API __declspec(dllexport)
 #else
@@ -29,8 +32,9 @@ using namespace std;
 #define ALGORITHMSUB_API __declspec(dllimport)
 
 #endif
+#endif
 
-class ALGORITHMSUB_API CSlice_Teach
+class CSlice_Teach
 {
 public:
 	bool m_Readed;
@@ -38,19 +42,21 @@ public:
 	int *m_Rows_Sens;
 	int *m_Pointer_Sens;
 	int *m_Pointer_Skel;
+	int m_iNoSkel;
 
 	bool m_Readed_P;
 	int *m_Cols_Sens_P;
 	int *m_Rows_Sens_P;
 	int *m_Pointer_Sens_P;
 	int *m_Pointer_Skel_P;
+	int m_iNoSkel_P;
 public:
 	bool Read_Teach(const char* path_model);
 
 };
 
 
-class ALGORITHMSUB_API CSlice
+class CSlice
 {
 
 	/* ************************************************************************** */
@@ -90,8 +96,9 @@ public:
 	double *m_Thr_Step;
 	double *m_Intersect;
 
-private:
 	int m_Count_Skel = 0;
+
+private:
 	int *m_Loc_Min;
 	int *m_Loc_Min_Val;
 
@@ -126,6 +133,9 @@ public:
 	void Proc_P(UINT8 * pIm, int im_w, int im_h, HTuple * hv_Def_Rows, HTuple * hv_Def_Cols,
 		HTuple &hv_PrcM_Min, HTuple &hv_PrcM_Max, HTuple &hv_PrcM_Median);
 
+	void ProcFunc(UINT8 * pIm, int im_w, int im_h,
+		HTuple *hv_Def_Rows, HTuple *hv_Def_Cols,
+		HTuple &hv_PrcM_Min, HTuple &hv_PrcM_Max, HTuple &hv_PrcM_Median);
 
 
 };

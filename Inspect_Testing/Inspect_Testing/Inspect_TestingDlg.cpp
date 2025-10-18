@@ -256,6 +256,20 @@ BEGIN_MESSAGE_MAP(CInspectTestingDlg, CDialog)
 	ON_EN_CHANGE(IDC_EDIT_ABSSP_WIRE_ANGLE, &CInspectTestingDlg::OnEnChangeEditAbsspWireAngle)
 	ON_EN_CHANGE(IDC_EDIT_RMSIZE_WIRE_ANGLE, &CInspectTestingDlg::OnEnChangeEditRmsizeWireAngle)
 
+	ON_EN_CHANGE(IDC_EDIT_DT_DARK_SPACE, &CInspectTestingDlg::OnEnChangeEditDtDarkSpace)
+	ON_EN_CHANGE(IDC_EDIT_DT_BRIGHT_SPACE, &CInspectTestingDlg::OnEnChangeEditDtBrightSpace)
+	ON_EN_CHANGE(IDC_EDIT_DT_MEAN_SPACE, &CInspectTestingDlg::OnEnChangeEditDtMeanSpace)
+	ON_EN_CHANGE(IDC_EDIT_DT_MARGIN_SPACE, &CInspectTestingDlg::OnEnChangeEditDtMarginSpace)
+	ON_EN_CHANGE(IDC_EDIT_DT_AREA_SPACE, &CInspectTestingDlg::OnEnChangeEditDtAreaSpace)
+
+	ON_EN_CHANGE(IDC_EDIT_DT_DARK_PATTERN, &CInspectTestingDlg::OnEnChangeEditDtDarkPattern)
+	ON_EN_CHANGE(IDC_EDIT_DT_BRIGHT_PATTERN, &CInspectTestingDlg::OnEnChangeEditDtBrightPattern)
+	ON_EN_CHANGE(IDC_EDIT_DT_MARGIN_PATTERN, &CInspectTestingDlg::OnEnChangeEditDtMarginPattern)
+	ON_EN_CHANGE(IDC_EDIT_DT_AREA_PATTERN, &CInspectTestingDlg::OnEnChangeEditDtAreaPattern)
+	ON_EN_CHANGE(IDC_EDIT_DT_LENGTH_PATTERN, &CInspectTestingDlg::OnEnChangeEditDtLengthPattern)
+	ON_EN_CHANGE(IDC_EDIT_DT_WIDTH_PATTERN, &CInspectTestingDlg::OnEnChangeEditDtWidthPattern)
+	ON_EN_CHANGE(IDC_EDIT_DT_CONNECTION_DISTANCE, &CInspectTestingDlg::OnEnChangeEditDtConnectionDistance)
+
 	ON_WM_CTLCOLOR()
 	//ON_EN_CHANGE(IDC_EDITLGPRC, &CInspectTestingDlg::OnEnChangeEditlgprc)
 	ON_BN_CLICKED(IDC_BUTTON_READ, &CInspectTestingDlg::OnBnClickedButtonRead)
@@ -301,6 +315,10 @@ BEGIN_MESSAGE_MAP(CInspectTestingDlg, CDialog)
 		ON_BN_CLICKED(IDC_VIEW_CBM_CONN_PAD, &CInspectTestingDlg::OnBnClickedViewCbmConnPad)
 		ON_BN_CLICKED(IDC_BUTTON_PROC_CBM_WIRE_ANGLE, &CInspectTestingDlg::OnBnClickedButtonProcCbmWireAngle)
 		ON_BN_CLICKED(IDC_VIEW_CBM_WIRE_ANGLE, &CInspectTestingDlg::OnBnClickedViewCbmWireAngle)
+		ON_BN_CLICKED(IDC_BUTTON_PROC_DT_SPACE, &CInspectTestingDlg::OnBnClickedButtonProcDtSpace)
+		ON_BN_CLICKED(IDC_BUTTON_PROC_DT_PATTERN, &CInspectTestingDlg::OnBnClickedButtonProcDtPattern)
+		ON_BN_CLICKED(IDC_CHECK_DT_CONNECTION, &CInspectTestingDlg::OnBnClickedCheckDtConnection)
+
 		END_MESSAGE_MAP()
 
 // CInspectTestingDlg message handlers
@@ -1078,6 +1096,9 @@ void CInspectTestingDlg::Clear_Defects()
 	GenEmptyObj(&m_inspect->m_ho_RegionsConnPadSP);
 	GenEmptyObj(&m_inspect->m_ho_RegionsWireAngleMB);
 	GenEmptyObj(&m_inspect->m_ho_RegionsWireAngleSP);
+
+	GenEmptyObj(&m_inspect->m_ho_RegionsDT_S);
+	GenEmptyObj(&m_inspect->m_ho_RegionsDT_P);
 }
 
 void CInspectTestingDlg::OnBnClickedButtonReadImage()
@@ -1126,6 +1147,9 @@ void CInspectTestingDlg::OnBnClickedButtonLoadTeach()
 		SetDlgItemText(IDC_EDIT_CBM_CONN_PAD, cstr);
 		cstr.Format(_T("%d"), iNoWireAngle);
 		SetDlgItemText(IDC_EDIT_CBM_WIRE_ANGLE, cstr);
+
+		// Temporarily load a CAD file for testing.
+		Load_Teach_DT(m_model_Path);
 
 		inspect_call::m_Path_Model = m_model_Path;
 		m_inspect->Init();
@@ -1658,7 +1682,33 @@ void CInspectTestingDlg::Update_Dlg_Params()
 	cstr.Format(_T("%d"), m_Inspection_Params.iCBM_Rmsize_WireAngle);
 	SetDlgItemText(IDC_EDIT_RMSIZE_WIRE_ANGLE, cstr);
 
-
+	cstr.Format(_T("%d"), m_Inspection_Params.iDt_Dark_Space);
+	SetDlgItemText(IDC_EDIT_DT_DARK_SPACE, cstr);
+	cstr.Format(_T("%d"), m_Inspection_Params.iDt_Bright_Space);
+	SetDlgItemText(IDC_EDIT_DT_BRIGHT_SPACE, cstr);
+	cstr.Format(_T("%d"), m_Inspection_Params.iDt_Mean_Space);
+	SetDlgItemText(IDC_EDIT_DT_MEAN_SPACE, cstr);
+	cstr.Format(_T("%d"), m_Inspection_Params.iDt_Margin_Space);
+	SetDlgItemText(IDC_EDIT_DT_MARGIN_SPACE, cstr);
+	cstr.Format(_T("%d"), m_Inspection_Params.iDt_Area_Space);
+	SetDlgItemText(IDC_EDIT_DT_AREA_SPACE, cstr);
+	cstr.Format(_T("%d"), m_Inspection_Params.iDt_Dark_Pattern);
+	SetDlgItemText(IDC_EDIT_DT_DARK_PATTERN, cstr);
+	cstr.Format(_T("%d"), m_Inspection_Params.iDt_Bright_Pattern);
+	SetDlgItemText(IDC_EDIT_DT_BRIGHT_PATTERN, cstr);
+	cstr.Format(_T("%d"), m_Inspection_Params.iDt_Margin_Pattern);
+	SetDlgItemText(IDC_EDIT_DT_MARGIN_PATTERN, cstr);
+	cstr.Format(_T("%d"), m_Inspection_Params.iDt_Area_Pattern);
+	SetDlgItemText(IDC_EDIT_DT_AREA_PATTERN, cstr);
+	cstr.Format(_T("%d"), m_Inspection_Params.iDt_Length_Pattern);
+	SetDlgItemText(IDC_EDIT_DT_LENGTH_PATTERN, cstr);
+	cstr.Format(_T("%d"), m_Inspection_Params.iDt_Width_Pattern);
+	SetDlgItemText(IDC_EDIT_DT_WIDTH_PATTERN, cstr);
+	CButton *m_ctlCheck = (CButton*)GetDlgItem(IDC_CHECK_DT_CONNECTION);
+	m_ctlCheck->SetCheck(m_Inspection_Params.bDtConnectDef);
+	cstr.Format(_T("%d"), m_Inspection_Params.iDt_Connect_Distance);
+	SetDlgItemText(IDC_EDIT_DT_CONNECTION_DISTANCE, cstr);
+	
 	UpdateData(FALSE);
 }
 void CInspectTestingDlg::OnBnClickedButtonLoadParams()
@@ -1680,7 +1730,9 @@ void CInspectTestingDlg::OnBnClickedButtonSaveParams()
 
 void CInspectTestingDlg::OnBnClickedButtonLowGray()
 {
-
+	m_Window.DispObj(m_inspect->m_local_Im);
+	m_Disp_Image = m_inspect->m_local_Im;
+	
 	//m_Inspection_Params.LG_m_prsLG = 70;
 	GenEmptyObj(&m_inspect->m_ho_RegionsLG);
 	m_inspect->Low_Gray(m_inspect->threshold);
@@ -2529,6 +2581,9 @@ int CInspectTestingDlg::Disp_Defects()
 	{
 		HColor = "red";
 	}
+
+	DispObjImage(m_inspect->m_ho_RegionsDT_S, "red");
+	DispObjImage(m_inspect->m_ho_RegionsDT_P, "red");
 
 	HTuple Txt = "MB=" + (hv_nMB)+" SP=" + (hv_nSP)+" MBS=" + (hv_nMBS)+" SPS=" + (hv_nSPS)+" Open=" + (hv_nOp)+" LG=" + (hv_nLG)+" Ph=" + (hv_nPh);
 	CString str_Txt = Txt.ToString();
@@ -3610,6 +3665,96 @@ void CInspectTestingDlg::OnEnChangeEditRmsizeWireAngle()
 	m_Inspection_Params.iCBM_Rmsize_WireAngle = (int)_tstof(cstr);
 }
 
+void CInspectTestingDlg::OnEnChangeEditDtDarkSpace()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_DT_DARK_SPACE, cstr);
+	m_Inspection_Params.iDt_Dark_Space = (int)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditDtBrightSpace()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_DT_BRIGHT_SPACE, cstr);
+	m_Inspection_Params.iDt_Bright_Space = (int)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditDtMeanSpace()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_DT_MEAN_SPACE, cstr);
+	m_Inspection_Params.iDt_Mean_Space = (int)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditDtMarginSpace()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_DT_MARGIN_SPACE, cstr);
+	m_Inspection_Params.iDt_Margin_Space = (int)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditDtAreaSpace()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_DT_AREA_SPACE, cstr);
+	m_Inspection_Params.iDt_Area_Space = (int)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditDtDarkPattern()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_DT_DARK_PATTERN, cstr);
+	m_Inspection_Params.iDt_Dark_Pattern = (int)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditDtBrightPattern()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_DT_BRIGHT_PATTERN, cstr);
+	m_Inspection_Params.iDt_Bright_Pattern = (int)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditDtMarginPattern()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_DT_MARGIN_PATTERN, cstr);
+	m_Inspection_Params.iDt_Margin_Pattern = (int)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditDtAreaPattern()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_DT_AREA_PATTERN, cstr);
+	m_Inspection_Params.iDt_Area_Pattern = (int)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditDtLengthPattern()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_DT_LENGTH_PATTERN, cstr);
+	m_Inspection_Params.iDt_Length_Pattern = (int)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditDtWidthPattern()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_DT_WIDTH_PATTERN, cstr);
+	m_Inspection_Params.iDt_Width_Pattern = (int)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnEnChangeEditDtConnectionDistance()
+{
+	CString cstr;
+	GetDlgItemText(IDC_EDIT_DT_CONNECTION_DISTANCE, cstr);
+	m_Inspection_Params.iDt_Connect_Distance = (int)_tstof(cstr);
+}
+
+void CInspectTestingDlg::OnBnClickedCheckDtConnection()
+{
+	CButton *m_ctlCheck = (CButton*)GetDlgItem(IDC_CHECK_DT_CONNECTION);
+	m_Inspection_Params.bDtConnectDef = m_ctlCheck->GetCheck();
+}
+
 void CInspectTestingDlg::OnEnChangeEditmid()
 {
 	CString cstr;
@@ -4131,4 +4276,26 @@ void CInspectTestingDlg::OnBnClickedButtonProcCbmWireAngle()
 	m_Window.DispObj(m_inspect->m_local_Im);
 	DispObject(m_inspect->m_ho_RegionsWireAngleMB, "red");
 	//DispObject(m_inspect->m_ho_RegionsWireAngleSP, "magenta");
+}
+
+
+void CInspectTestingDlg::OnBnClickedButtonProcDtSpace()
+{
+	m_Window.DispObj(m_inspect->m_local_Im);
+	m_Disp_Image = m_inspect->m_local_Im;
+
+	GenEmptyObj(&m_inspect->m_ho_RegionsDT_S);
+	m_inspect->m_ho_RegionsDT_S = m_inspect->Proc_DynThres_Space();
+	DispObject(m_inspect->m_ho_RegionsDT_S, "red");
+}
+
+
+void CInspectTestingDlg::OnBnClickedButtonProcDtPattern()
+{
+	m_Window.DispObj(m_inspect->m_local_Im);
+	m_Disp_Image = m_inspect->m_local_Im;
+
+	GenEmptyObj(&m_inspect->m_ho_RegionsDT_P);
+	m_inspect->m_ho_RegionsDT_P = m_inspect->Proc_DynThres_Pattern();
+	DispObject(m_inspect->m_ho_RegionsDT_P, "red");
 }

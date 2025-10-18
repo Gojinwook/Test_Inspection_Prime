@@ -22,7 +22,8 @@
 //#include "PinholeIsland.h"
 //#include "OpenShort.h"
 //#include "Alig2.h"
-#include ".\Lib\Slice.h"
+//#include ".\Lib\Slice.h"
+#include "Slice.h"
 #include ".\Lib\Open_Short_2.h"
 #include "CBMFuncs.h"
 
@@ -340,6 +341,9 @@ namespace inspect_call
 		HObject m_ho_RegionsWireAngleMB;
 		HObject m_ho_RegionsWireAngleSP;
 
+		HObject m_ho_RegionsDT_S;
+		HObject m_ho_RegionsDT_P;
+
 	public:
 		void Init();
 		bool Alignment();
@@ -365,6 +369,9 @@ namespace inspect_call
 		int Proc_CBM_Pad();
 		int Proc_CBM_ConnPad();
 		int Proc_CBM_WireAngle();
+
+		HObject Proc_DynThres_Space();
+		HObject Proc_DynThres_Pattern();
 
 	};
 
@@ -430,6 +437,10 @@ namespace inspect_call
 	extern HObject m_ho_ContoursGrsmPc, m_ho_RectanglesPadsCon;
 	extern HObject m_ho_ContoursWireAngles, m_ho_RectanglesWireAngles;
 
+	/// for Dynthres Test ***
+	extern HObject m_ho_CadSpaceRegion_DynThresTest;
+	extern HObject m_ho_CadPatternRegion_DynThresTest;
+
 	/* ************************************************************************** */
 	/* Section: Function Prototypes                                               */
 	/* ************************************************************************** */
@@ -449,6 +460,7 @@ namespace inspect_call
 
 	bool Load_Teach(CString path_model);
 	bool Load_Teach3(CString path_model, int &iNoMeander, int &iNoPad, int &iNoConnPad, int &iNoWireAngle);
+	bool Load_Teach_DT(CString path_model);
 	bool Load_Model(CString path_model);
 	bool Convert_To_Bin(CString path_teach, bool replace);
 	bool Load_Params(CString szModelPath, int iVersion, struct Inspection_Params *params, TSQueueSM<CString>* queue_log);
@@ -462,8 +474,9 @@ namespace inspect_call
 	void VerifySPregnoproc(HObject ho_RegNoProc, HObject ho_RegionsInoD, HObject ho_RegionsSP,
 		HObject *ho_RegionsSPv, HTuple hv_mA);
 
-	
+	BOOL ValidHRegion(HObject rHObject);
 
+	BOOL BlobUnion(HObject *pInputRgn, long lMergeLength);
 
 }
 /* ************************************************************************** */

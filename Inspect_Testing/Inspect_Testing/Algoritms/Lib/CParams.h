@@ -188,6 +188,21 @@ struct Inspection_Params
 	float fCBM_AbsSP_WireAngle = 0.7; 		// absolute SP value for Wire Angle (in pixels)
 	int   iCBM_Rmsize_WireAngle = 15;		// running median sizes for Wire Angle (in pixels)
 
+	// --- Dynthres --------------------------------------
+	int iDt_Dark_Space = 30; 				// Dark deviation for space (GV)
+	int iDt_Bright_Space = 15; 				// Bright deviation for space (GV)
+	int iDt_Mean_Space = 31; 				// Mean filter size (in pixels)
+	int iDt_Margin_Space = 2; 				// Expansion bounary margin (in pixels)
+	int iDt_Area_Space = 1; 				// Defect area Spec in space (in pixels)
+	int iDt_Dark_Pattern = 30; 				// Dark deviation for space (GV)
+	int iDt_Bright_Pattern = 30;			// Bright deviation for space (GV)
+	int iDt_Margin_Pattern = 5; 			// Bounary margin (in pixels)
+	int iDt_Area_Pattern = 10; 				// Defect area spec in pattern (in pixels)
+	int iDt_Length_Pattern = 5; 			// Defect length spec in pattern (in pixels)
+	int iDt_Width_Pattern = 2; 				// Defect width spec in pattern (in pixels)
+	BOOL bDtConnectDef = TRUE;				// If or not connect defect blobs
+	int iDt_Connect_Distance = 30;			// Connect defect blobs if the distance between blobs is smaller than this (in pixels)
+	
 	void resetToDefault() {
 		*this = Inspection_Params();  // 새로운 구조체 인스턴스를 디폴트 값으로 생성
 	}

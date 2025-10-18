@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.4">
+<procedure name="main">
+<interface/>
+<body>
+<l>read_image (Im, 'D:/Projects/_Dev_GitHub/Test_Inspection_Prime/LowGray/Im.tif')</l>
+<l>read_image (Gi, 'D:/Projects/_Dev_GitHub/Test_Inspection_Prime/LowGray/Gi.tif')</l>
+<l>threshold (Gi, PatternRegion, 128, 255)</l>
+<l>threshold (Gi, SpaceRegion, 0, 128)</l>
+<l>connection (SpaceRegion, ConnSpaceRegions)</l>
+<l>select_shape (ConnSpaceRegions, ConnSpaceRegions, 'area', 'and', 3000, 999999)</l>
+<l>union1 (ConnSpaceRegions, RegionUnion)</l>
+<l>iExpansionMargin := 2</l>
+<l>erosion_circle (RegionUnion, EroRegionUnion, iExpansionMargin+0.5)</l>
+<c></c>
+<l>* reduce_domain (Im, RegionUnion, ImageReduced)</l>
+<l>reduce_domain (Im, EroRegionUnion, ImageReducedMedian)</l>
+<l>* median_image (ImageReduced, ImageReducedMedian, 'circle', 1, 'mirrored')</l>
+<l>iFilterSize := 31</l>
+<l>iBrightDTValue := 15</l>
+<l>iDarkDTValue := 30</l>
+<l>iExpandSize := iFilterSize/2+iExpansionMargin</l>
+<l>expand_domain_gray (ImageReducedMedian, HExpandImage, iExpandSize)</l>
+<l>reduce_domain (HExpandImage, RegionUnion, HExpandReduceImage)</l>
+<l>mean_image (HExpandReduceImage, ImageMean, iFilterSize, iFilterSize)</l>
+<l>dyn_threshold (HExpandReduceImage, ImageMean, BrightRegionDynThresh, iBrightDTValue, 'light')</l>
+<l>dyn_threshold (HExpandReduceImage, ImageMean, DarkRegionDynThresh, iDarkDTValue, 'dark')</l>
+<l>dev_set_draw ('margin')</l>
+<l>dev_display (Im)</l>
+<l>dev_display (BrightRegionDynThresh)</l>
+<l>opening_circle (BrightRegionDynThresh, BrightDefRegion, 1)</l>
+<l>closing_circle (BrightDefRegion, BrightDefRegion, 1)</l>
+<l>connection (BrightDefRegion, ConnectedRegions)</l>
+<l>area_center (ConnectedRegions, Area, Row, Column)</l>
+<l>count_obj (ConnectedRegions, Number)</l>
+<l>tuple_gen_const (Number, 20.5, Newtuple)</l>
+<l>gen_circle (DefectCircle, Row, Column, Newtuple)</l>
+<l>union1(DefectCircle, BrightDefectCircle)</l>
+<c></c>
+<l>opening_circle (DarkRegionDynThresh, DarkDefRegion, 1)</l>
+<l>closing_circle (DarkDefRegion, DarkDefRegion, 1)</l>
+<l>connection (DarkDefRegion, ConnectedRegions)</l>
+<l>area_center (ConnectedRegions, Area, Row, Column)</l>
+<l>count_obj (ConnectedRegions, Number)</l>
+<l>tuple_gen_const (Number, 20.5, Newtuple)</l>
+<l>gen_circle (DefectCircle, Row, Column, Newtuple)</l>
+<l>union1(DefectCircle, DarkDefectCircle)</l>
+<c></c>
+<l>dev_display (Im)</l>
+<l>dev_set_color ('red')</l>
+<l>* dev_display (BrightDefRegion)</l>
+<l>dev_display (BrightDefectCircle)</l>
+<l>dev_set_color ('blue')</l>
+<l>* dev_display (DarkDefRegion)</l>
+<l>dev_display (DarkDefectCircle)</l>
+<l>stop ()</l>
+<l>stop ()</l>
+<c>* Manual Mean Filtering</c>
+<l>dev_update_off ()</l>
+<l>get_image_pointer1 (ImageReducedMedian, Pointer, Type, Width, Height)</l>
+<l>region_to_bin (RegionUnion, BinImage, 255, 0, Width, Height)</l>
+<l>get_image_pointer1 (BinImage, Pointer_B, Type_B, Width_B, Height_B)</l>
+<l>gen_image_const (ManualMeanImage, 'byte', Width, Height)</l>
+<l>get_image_pointer1 (ManualMeanImage, Pointer_M, Type_M, Width_M, Height_M)</l>
+<l>for Index_Y := 0 to Height-1 by 1</l>
+<l>    for Index_X := 0 to Width - 1 by 1</l>
+<l>          test_region_point (RegionUnion, Index_Y, Index_X, IsInside1)        </l>
+<l>         if (IsInside1==1)</l>
+<l>            Sum := 0</l>
+<l>            iNoPoint := 0</l>
+<l>            for Index_SubY := -iExpandSize to iExpandSize by 1</l>
+<l>                for Index_SubX := -iExpandSize to iExpandSize by 1</l>
+<l>                    test_region_point (RegionUnion, Index_Y+Index_SubY, Index_X+Index_SubX, IsInside2)        </l>
+<l>                     if (IsInside2==1)</l>
+<l>                        get_grayval (ImageReducedMedian, Index_Y+Index_SubY, Index_X+Index_SubX, Grayval)                       </l>
+<l>                        Sum := Sum + Grayval</l>
+<l>                        iNoPoint := iNoPoint + 1</l>
+<l>                    endif</l>
+<l>                endfor</l>
+<l>            endfor</l>
+<l>            if (iNoPoint == 0)</l>
+<l>                break</l>
+<l>            endif</l>
+<l>            Sum := Sum / iNoPoint</l>
+<c>          </c>
+<l>            tuple_int (Sum, iMeanGV)</l>
+<l>            if (iMeanGV&gt;255)</l>
+<l>                iMeanGV := 255</l>
+<l>            endif</l>
+<l>            set_grayval (ManualMeanImage, Index_Y, Index_X, iMeanGV)</l>
+<l>        endif</l>
+<l>       endfor</l>
+<l>endfor</l>
+<c></c>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>

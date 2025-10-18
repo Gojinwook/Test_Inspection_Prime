@@ -242,6 +242,21 @@ public:
 	afx_msg void OnEnChangeEditAbsspWireAngle();
 	afx_msg void OnEnChangeEditRmsizeWireAngle();
 
+	afx_msg void OnEnChangeEditDtDarkSpace();
+	afx_msg void OnEnChangeEditDtBrightSpace();
+	afx_msg void OnEnChangeEditDtMeanSpace();
+	afx_msg void OnEnChangeEditDtMarginSpace();
+	afx_msg void OnEnChangeEditDtAreaSpace();
+
+	afx_msg void OnEnChangeEditDtDarkPattern();
+	afx_msg void OnEnChangeEditDtBrightPattern();
+	afx_msg void OnEnChangeEditDtMarginPattern();
+	afx_msg void OnEnChangeEditDtAreaPattern();
+	afx_msg void OnEnChangeEditDtLengthPattern();
+	afx_msg void OnEnChangeEditDtWidthPattern();
+	afx_msg void OnBnClickedCheckDtConnection();
+	afx_msg void OnEnChangeEditDtConnectionDistance();
+
 protected:
 	afx_msg LRESULT OnUpdateParamsEvents(WPARAM wParam, LPARAM lParam);
 public:
@@ -263,4 +278,6 @@ public:
 	afx_msg void OnBnClickedViewCbmConnPad();
 	afx_msg void OnBnClickedButtonProcCbmWireAngle();
 	afx_msg void OnBnClickedViewCbmWireAngle();
+	afx_msg void OnBnClickedButtonProcDtSpace();
+	afx_msg void OnBnClickedButtonProcDtPattern();
 };

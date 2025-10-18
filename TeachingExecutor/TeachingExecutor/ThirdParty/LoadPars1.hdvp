@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="13.0.3">
+<procedure name="LoadPars1">
+<interface>
+<ic>
+<par name="pathfile" base_type="ctrl" dimension="0"/>
+<par name="SetDefault" base_type="ctrl" dimension="0"/>
+</ic>
+<oc>
+<par name="GNDamin" base_type="ctrl" dimension="0"/>
+<par name="fwmhw" base_type="ctrl" dimension="0"/>
+<par name="parop" base_type="ctrl" dimension="0"/>
+<par name="gap" base_type="ctrl" dimension="0"/>
+<par name="jrad" base_type="ctrl" dimension="0"/>
+<par name="groundpn" base_type="ctrl" dimension="0"/>
+<par name="groundgval" base_type="ctrl" dimension="0"/>
+<par name="sm_factor" base_type="ctrl" dimension="0"/>
+<par name="lookaround" base_type="ctrl" dimension="0"/>
+<par name="wpl" base_type="ctrl" dimension="0"/>
+<par name="smoothCADcontours" base_type="ctrl" dimension="0"/>
+<par name="maxdirSP" base_type="ctrl" dimension="0"/>
+<par name="wFWM" base_type="ctrl" dimension="0"/>
+<par name="wside" base_type="ctrl" dimension="0"/>
+<par name="wFWMS" base_type="ctrl" dimension="0"/>
+<par name="wsideS" base_type="ctrl" dimension="0"/>
+<par name="eradMSe" base_type="ctrl" dimension="0"/>
+<par name="eradNFWMremove" base_type="ctrl" dimension="0"/>
+<par name="elengthend" base_type="ctrl" dimension="0"/>
+<par name="elengthnoend" base_type="ctrl" dimension="0"/>
+<par name="jpadd" base_type="ctrl" dimension="0"/>
+<par name="removeGNDfromFWM" base_type="ctrl" dimension="0"/>
+<par name="cutendMSS" base_type="ctrl" dimension="0"/>
+<par name="minWGS" base_type="ctrl" dimension="0"/>
+<par name="minWG" base_type="ctrl" dimension="0"/>
+<par name="useODB" base_type="ctrl" dimension="0"/>
+<par name="autowidth" base_type="ctrl" dimension="0"/>
+<par name="EPexp" base_type="ctrl" dimension="0"/>
+<par name="elongLG" base_type="ctrl" dimension="0"/>
+<par name="TeachPars" base_type="ctrl" dimension="0"/>
+</oc>
+</interface>
+<body>
+<c>* *************************************</c>
+<c>* **** Teaching deserialization   *****</c>
+<c>* *************************************</c>
+<l>if (SetDefault == 1)</l>
+<l>    GNDamin := 410000</l>
+<l>    fwmhw := 12.5</l>
+<l>    parop := 2.5</l>
+<c>    * *** for skeletons *******</c>
+<l>    gap := 1</l>
+<l>    jrad := 10</l>
+<c>    </c>
+<l>    groundpn := 1</l>
+<l>*     groundpn := TeachPars[0]</l>
+<c>    </c>
+<l>    groundgval := 3</l>
+<l>    sm_factor := 7</l>
+<l>    lookaround := 7</l>
+<l>    wpl := 15.5</l>
+<l>    smoothCADcontours := 1</l>
+<l>    maxdirSP := 40</l>
+<l>    wFWM := [30,40]</l>
+<l>    wside := 9</l>
+<l>    wFWMS := [20,31]</l>
+<l>    wsideS := 3</l>
+<l>    eradMSe := 9</l>
+<l>    eradNFWMremove := 9</l>
+<l>    elengthend := -1</l>
+<l>    elengthnoend := -25</l>
+<l>    jpadd := 3</l>
+<l>    removeGNDfromFWM := 0</l>
+<l>    cutendMSS := 25</l>
+<l>    minWGS := 3</l>
+<l>    minWG := 4</l>
+<l>    useODB := 0</l>
+<l>    autowidth := 1</l>
+<l>    EPexp := 5</l>
+<l>    elongLG := 10</l>
+<l>else</l>
+<l>    open_file (pathfile, 'input_binary', FileHandleIn)</l>
+<l>    fread_serialized_item (FileHandleIn, SerializedItemHandle1)</l>
+<l>    deserialize_tuple (SerializedItemHandle1, TeachParsIn)</l>
+<l>    close_file (FileHandleIn)</l>
+<l>*     tuple_equal(TeachParsIn, TeachParsOut, equal)</l>
+<l>*     stop ()</l>
+<c>    </c>
+<l>    TeachPars := TeachParsIn</l>
+<l>    i := 0</l>
+<l>    GNDamin := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    fwmhw := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    parop := TeachPars[i]</l>
+<l>    i := i+1</l>
+<c>    * *** for skeletons *******</c>
+<l>    jrad := TeachPars[i]</l>
+<l>    i := i+1</l>
+<c></c>
+<l>    gap := TeachPars[i]</l>
+<l>    i := i+1</l>
+<c>    </c>
+<l>    groundpn := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    groundgval := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    sm_factor := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    lookaround := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    wpl := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    smoothCADcontours := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    maxdirSP := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    wFWM := [TeachPars[i],TeachPars[i+1]]</l>
+<l>    i := i+2</l>
+<l>    wside := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    wFWMS := [TeachPars[i],TeachPars[i+1]]</l>
+<l>    i := i+2</l>
+<l>    wsideS := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    eradMSe := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    eradNFWMremove := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    elengthend := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    elengthnoend := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    jpadd := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    removeGNDfromFWM := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    cutendMSS := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    minWGS := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    minWG := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    useODB := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    autowidth := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    EPexp := TeachPars[i]</l>
+<l>    i := i+1</l>
+<l>    elongLG := TeachPars[i]    </l>
+<l>endif</l>
+<c></c>
+<c></c>
+<c>* **********************************</c>
+<l>return ()</l>
+</body>
+<docu id="LoadPars1">
+<parameters>
+<parameter id="EPexp"/>
+<parameter id="GNDamin"/>
+<parameter id="SetDefault"/>
+<parameter id="TeachPars"/>
+<parameter id="autowidth"/>
+<parameter id="cutendMSS"/>
+<parameter id="elengthend"/>
+<parameter id="elengthnoend"/>
+<parameter id="elongLG"/>
+<parameter id="eradMSe"/>
+<parameter id="eradNFWMremove"/>
+<parameter id="fwmhw"/>
+<parameter id="gap"/>
+<parameter id="groundgval"/>
+<parameter id="groundpn"/>
+<parameter id="jpadd"/>
+<parameter id="jrad"/>
+<parameter id="lookaround"/>
+<parameter id="maxdirSP"/>
+<parameter id="minWG"/>
+<parameter id="minWGS"/>
+<parameter id="parop"/>
+<parameter id="pathfile"/>
+<parameter id="removeGNDfromFWM"/>
+<parameter id="sm_factor"/>
+<parameter id="smoothCADcontours"/>
+<parameter id="useODB"/>
+<parameter id="wFWM"/>
+<parameter id="wFWMS"/>
+<parameter id="wpl"/>
+<parameter id="wside"/>
+<parameter id="wsideS"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>
