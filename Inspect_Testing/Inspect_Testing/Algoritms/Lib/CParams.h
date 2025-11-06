@@ -56,6 +56,7 @@ struct Inspection_Params
 	bool inspect_Auto_Thr = false;  // Auto thresholding //specifies if use automatic threshold (or not)
 	bool inspect_Preproc = false;  // Auto thresholding //specifies if use automatic threshold (or not)
 	int threashold = 150;			// Main threshold
+	//int inspect_AutoThres_Type = 1;
 
 	// Inspection stages
 	bool inspect_Pinhole = false;   // Inspect Pinholes// specifies if inspect pinholes (or not)
@@ -202,7 +203,7 @@ struct Inspection_Params
 	int iDt_Width_Pattern = 2; 				// Defect width spec in pattern (in pixels)
 	BOOL bDtConnectDef = TRUE;				// If or not connect defect blobs
 	int iDt_Connect_Distance = 30;			// Connect defect blobs if the distance between blobs is smaller than this (in pixels)
-	
+
 	void resetToDefault() {
 		*this = Inspection_Params();  // 새로운 구조체 인스턴스를 디폴트 값으로 생성
 	}

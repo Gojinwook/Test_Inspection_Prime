@@ -90,6 +90,9 @@
     <ClInclude Include="Algoritms\Slice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Algoritms\DynThres.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Inspect_Testing.cpp">

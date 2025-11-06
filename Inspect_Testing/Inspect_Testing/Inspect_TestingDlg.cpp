@@ -21,6 +21,7 @@
 #include "Halcon_Exchange.h"
 #include "Open_Short_2.h"
 #include "CParams_Dialog.h"
+#include "DynThres.h"
 
 //#include "CDialog_Params.h"
 //#include "Alg_Params.h"
@@ -122,6 +123,7 @@ CInspectTestingDlg::CInspectTestingDlg(CWnd* pParent /*=nullptr*/)
 	, m_Lg_Szw_S(_T(""))
 	, m_Lg_Avg_P(_T(""))
 	, m_Check_Alig2(FALSE)
+	, m_Check_AutoThres2(FALSE)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -157,6 +159,7 @@ void CInspectTestingDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST_UNIT_DEFECTS, m_List_Unit_Defects);
 	DDX_Control(pDX, IDC_LIST_DEFECT_ATTRIBUTE, m_Defect_Attribute);
 	DDX_Check(pDX, IDC_CHECK_ALIG2, m_Check_Alig2);
+	DDX_Check(pDX, IDC_CHECK_AUTOTHRES2, m_Check_AutoThres2);
 }
 
 BEGIN_MESSAGE_MAP(CInspectTestingDlg, CDialog)
@@ -301,6 +304,7 @@ BEGIN_MESSAGE_MAP(CInspectTestingDlg, CDialog)
 	ON_EN_CHANGE(IDC_EDITWIDEWP, &CInspectTestingDlg::OnEnChangeEditwidewp)
 		ON_MESSAGE(WM_UPDATE_PARAMS_EVENTS, &CInspectTestingDlg::OnUpdateParamsEvents)
 		ON_BN_CLICKED(IDC_CHECK_ALIG2, &CInspectTestingDlg::OnBnClickedCheckAlig2)
+		ON_BN_CLICKED(IDC_CHECK_AUTOTHRES2, &CInspectTestingDlg::OnBnClickedCheckAutoThres2)
 		ON_MESSAGE(WM_PARAM_APPLY_EVENTS, &CInspectTestingDlg::OnParamApplyEvents)
 		ON_BN_CLICKED(IDC_VIEWREGIONI, &CInspectTestingDlg::OnBnClickedViewregioni)
 		ON_BN_CLICKED(IDC_VIEWIMMOD, &CInspectTestingDlg::OnBnClickedViewimmod)
@@ -1136,17 +1140,18 @@ void CInspectTestingDlg::OnBnClickedButtonLoadTeach()
 		Load_Model(m_model_Path);
 		Load_Teach(m_model_Path);
 
-		int iNoMeander, iNoPad, iNoConnPad, iNoWireAngle;
-		Load_Teach3(m_model_Path, iNoMeander, iNoPad, iNoConnPad, iNoWireAngle);
-		CString cstr;
-		cstr.Format(_T("%d"), iNoMeander);
-		SetDlgItemText(IDC_EDIT_CBM_MEANDER, cstr);
-		cstr.Format(_T("%d"), iNoPad);
-		SetDlgItemText(IDC_EDIT_CBM_PAD, cstr);
-		cstr.Format(_T("%d"), iNoConnPad);
-		SetDlgItemText(IDC_EDIT_CBM_CONN_PAD, cstr);
-		cstr.Format(_T("%d"), iNoWireAngle);
-		SetDlgItemText(IDC_EDIT_CBM_WIRE_ANGLE, cstr);
+		//int iNoMeander, iNoPad, iNoConnPad, iNoWireAngle;
+
+		//Load_Teach3(m_model_Path, iNoMeander, iNoPad, iNoConnPad, iNoWireAngle);
+		//CString cstr;
+		//cstr.Format(_T("%d"), iNoMeander);
+		//SetDlgItemText(IDC_EDIT_CBM_MEANDER, cstr);
+		//cstr.Format(_T("%d"), iNoPad);
+		//SetDlgItemText(IDC_EDIT_CBM_PAD, cstr);
+		//cstr.Format(_T("%d"), iNoConnPad);
+		//SetDlgItemText(IDC_EDIT_CBM_CONN_PAD, cstr);
+		//cstr.Format(_T("%d"), iNoWireAngle);
+		//SetDlgItemText(IDC_EDIT_CBM_WIRE_ANGLE, cstr);
 
 		// Temporarily load a CAD file for testing.
 		Load_Teach_DT(m_model_Path);
@@ -1165,6 +1170,13 @@ void CInspectTestingDlg::OnBnClickedCheckAlig2()
 {
 	UpdateData(TRUE);
 	m_Inspection_Params.alignment_type = m_Check_Alig2 ? 2 : 1;
+	UpdateData(FALSE);
+}
+
+void CInspectTestingDlg::OnBnClickedCheckAutoThres2()
+{
+	UpdateData(TRUE);
+	//m_Inspection_Params.inspect_AutoThres_Type = m_Check_AutoThres2 ? 2 : 1;
 	UpdateData(FALSE);
 }
 
@@ -1631,6 +1643,8 @@ void CInspectTestingDlg::Update_Dlg_Params()
 	cstr.Format(_T("%d"), m_Inspection_Params.threashold);
 	SetDlgItemText(IDC_EDITTHR, cstr);
 
+	//m_Check_AutoThres2 = inspect_call::m_Inspection_Params.inspect_AutoThres_Type == 2;
+
 	cstr.Format(_T("%d"), m_Inspection_Params.sz1);
 	SetDlgItemText(IDC_EDITSZP, cstr);
 
@@ -1751,13 +1765,30 @@ void CInspectTestingDlg::OnBnClickedButtonLowGray()
 void CInspectTestingDlg::OnBnClickedButtonAutoThr()
 {
 	HTuple hv_thr;
+
 	//Auto_Threshold2(m_ho_SkeletonsFWMS, m_inspect->m_local_Im, &hv_thr);
 	int threshold;
 	if (m_Auto_Thr)
 	{
-		threshold = m_inspect->Proc_MinG(m_Inspection_Params.running_medians_span) + m_Inspection_Params.mmat_shift;
-		if (threshold  > 250)
-			threshold = 150;
+		//if (m_Inspection_Params.inspect_AutoThres_Type == 1)
+		//{
+		//	threshold = m_inspect->Proc_MinG(m_Inspection_Params.running_medians_span) + m_Inspection_Params.mmat_shift;
+		//	if (threshold > 250)
+		//		threshold = 150;
+		//}
+		//else
+		//{
+			threshold = Proc_HistoPeakG(m_ho_CadPatternRegion_DynThresTest, m_inspect->m_local_Im) - m_Inspection_Params.mmat_shift;
+			if (threshold < 50)
+				threshold = 150;
+
+			HObject HInspectRgn, HImageReduced;
+			ShapeTrans(m_ho_CadPatternRegion_DynThresTest, &HInspectRgn, "rectangle1");
+			ReduceDomain(m_inspect->m_local_Im, HInspectRgn, &HImageReduced);
+			Threshold(HImageReduced, &m_inspect->m_ho_RegionI, threshold, 255);
+			
+		//}
+
 		m_Inspection_Params.threashold = threshold;
 
 		//Auto_Threshold2(m_ho_SkeletonsFWMS, m_inspect->m_local_Im, &hv_thr);
@@ -2218,9 +2249,14 @@ bool Inspect_Units()
 
 	if (m_Inspection_Params.inspect_Auto_Thr)
 	{
-		m_Inspection_Params.threashold = m_inspect->Proc_MinG(m_Inspection_Params.running_medians_span) + m_Inspection_Params.mmat_shift;
-		if (m_Inspection_Params.threashold  > 250)
+		//m_Inspection_Params.threashold = m_inspect->Proc_MinG(m_Inspection_Params.running_medians_span) + m_Inspection_Params.mmat_shift;
+		//if (m_Inspection_Params.threashold  > 250)
+		//	m_Inspection_Params.threashold = 150;
+
+		m_Inspection_Params.threashold = m_inspect->Proc_HistoPeakG(m_ho_CadPatternRegion_DynThresTest, m_inspect->m_local_Im) - m_Inspection_Params.mmat_shift;
+		if (m_Inspection_Params.threashold < 50)
 			m_Inspection_Params.threashold = 150;
+
 		m_inspect->threshold = m_Inspection_Params.threashold;
 	}
 	else
@@ -3780,7 +3816,9 @@ void CInspectTestingDlg::OnBnClickedCheckMmatoff()
 
 void CInspectTestingDlg::OnBnClickedButtonMaxmin()
 {
-	m_inspect->Proc_MinG(m_Inspection_Params.running_medians_span);
+	//m_inspect->Proc_MinG(m_Inspection_Params.running_medians_span);
+
+	m_inspect->Proc_HistoPeakG(m_ho_CadPatternRegion_DynThresTest, m_inspect->m_local_Im);
 }
 
 
@@ -4285,7 +4323,14 @@ void CInspectTestingDlg::OnBnClickedButtonProcDtSpace()
 	m_Disp_Image = m_inspect->m_local_Im;
 
 	GenEmptyObj(&m_inspect->m_ho_RegionsDT_S);
-	m_inspect->m_ho_RegionsDT_S = m_inspect->Proc_DynThres_Space();
+	m_inspect->m_ho_RegionsDT_S = Proc_DynThres_Space(
+		m_ho_CadSpaceRegion_DynThresTest,
+		m_inspect->m_local_Im,
+		m_Inspection_Params.iDt_Dark_Space,
+		m_Inspection_Params.iDt_Bright_Space,
+		m_Inspection_Params.iDt_Mean_Space,
+		m_Inspection_Params.iDt_Margin_Space,
+		m_Inspection_Params.iDt_Area_Space);
 	DispObject(m_inspect->m_ho_RegionsDT_S, "red");
 }
 
@@ -4296,6 +4341,16 @@ void CInspectTestingDlg::OnBnClickedButtonProcDtPattern()
 	m_Disp_Image = m_inspect->m_local_Im;
 
 	GenEmptyObj(&m_inspect->m_ho_RegionsDT_P);
-	m_inspect->m_ho_RegionsDT_P = m_inspect->Proc_DynThres_Pattern();
+	m_inspect->m_ho_RegionsDT_P = Proc_DynThres_Pattern(
+		m_ho_CadPatternRegion_DynThresTest,
+		m_inspect->m_local_Im,
+		m_Inspection_Params.iDt_Dark_Pattern,
+		m_Inspection_Params.iDt_Bright_Pattern,
+		m_Inspection_Params.iDt_Margin_Pattern,
+		m_Inspection_Params.iDt_Area_Pattern,
+		m_Inspection_Params.iDt_Length_Pattern,
+		m_Inspection_Params.iDt_Width_Pattern,
+		m_Inspection_Params.bDtConnectDef,
+		m_Inspection_Params.iDt_Connect_Distance);
 	DispObject(m_inspect->m_ho_RegionsDT_P, "red");
 }

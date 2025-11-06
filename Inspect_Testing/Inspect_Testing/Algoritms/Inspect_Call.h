@@ -370,8 +370,7 @@ namespace inspect_call
 		int Proc_CBM_ConnPad();
 		int Proc_CBM_WireAngle();
 
-		HObject Proc_DynThres_Space();
-		HObject Proc_DynThres_Pattern();
+		int	Proc_HistoPeakG(HObject HCadPatternRgn, HObject local_lm);
 
 	};
 

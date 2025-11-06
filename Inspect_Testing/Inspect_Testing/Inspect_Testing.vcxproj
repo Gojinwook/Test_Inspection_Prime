@@ -306,6 +306,7 @@ copy Algoritms\FWMFuncs.h Algoritms\Lib\ /y</Command>
     <ClInclude Include="Algoritms\Alig2.h" />
     <ClInclude Include="Algoritms\BuildIRB.h" />
     <ClInclude Include="Algoritms\CBMFuncs.h" />
+    <ClInclude Include="Algoritms\DynThres.h" />
     <ClInclude Include="Algoritms\FWMFuncs.h" />
     <ClInclude Include="Algoritms\Inspect_Call.h">
       <SubType>

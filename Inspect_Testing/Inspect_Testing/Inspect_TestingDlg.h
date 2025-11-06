@@ -262,6 +262,8 @@ protected:
 public:
 	BOOL m_Check_Alig2;
 	afx_msg void OnBnClickedCheckAlig2();
+	BOOL m_Check_AutoThres2;
+	afx_msg void OnBnClickedCheckAutoThres2();
 protected:
 	afx_msg LRESULT OnParamApplyEvents(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnBnClickedViewregioni();

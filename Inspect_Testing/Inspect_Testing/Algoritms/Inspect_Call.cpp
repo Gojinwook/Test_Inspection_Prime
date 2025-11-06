@@ -1197,7 +1197,7 @@ namespace inspect_call
 		}
 		// ------
 		DWORD time_end = GetTickCount();
-		Queue_Add(m_queue_log, NULL, "--- Build_FWMS() - OK (FrameNo=%d, UnitNo=%d, Thread=%d): Lead Time %0*.4f s",
+		Queue_Add(m_queue_log, NULL, "--- Proc_MinG() - OK (FrameNo=%d, UnitNo=%d, Thread=%d): Lead Time %0*.4f s",
 			inspect_param.iFrameNo, inspect_param.iUnitNo, m_thread_num, 3, (double)(time_end - time_start) / 1000.);
 		if (gmaxmin > 250)
 		{
@@ -1205,6 +1205,44 @@ namespace inspect_call
 		}
 		return gmaxmin;
 	}
+
+	int	CInspect_Call::Proc_HistoPeakG(HObject HCadPatternRgn, HObject local_lm)
+	{
+		m_inspect_status = "Proc_HistoPeakG()";
+
+		DWORD time_start = GetTickCount();
+
+		int iHistoPeakGV = 170;
+
+		if (ValidHRegion(HCadPatternRgn) == FALSE)
+			return iHistoPeakGV;
+
+		HObject HImageReduced;
+		HTuple HAbsHisto, HRelHisto, HFunction, HSmoothFunction, Indices, Inverted;
+
+		ReduceDomain(local_lm, HCadPatternRgn, &HImageReduced);
+
+		GrayHisto(HCadPatternRgn, HImageReduced, &HAbsHisto, &HRelHisto);
+		CreateFunct1dArray(HAbsHisto, &HFunction);
+		SmoothFunct1dGauss(HFunction, 10.0, &HSmoothFunction);
+		TupleLastN(HSmoothFunction, 3, &HAbsHisto);
+		TupleSortIndex(HAbsHisto, &Indices);
+		TupleInverse(Indices, &Inverted);
+
+		iHistoPeakGV = Inverted[0].L();
+
+		if (iHistoPeakGV > 250)
+		{
+			iHistoPeakGV = 170;
+		}
+
+		DWORD time_end = GetTickCount();
+		Queue_Add(m_queue_log, NULL, "--- Proc_HistoPeakG() - OK (FrameNo=%d, UnitNo=%d, Thread=%d): Lead Time %0*.4f s",
+			inspect_param.iFrameNo, inspect_param.iUnitNo, m_thread_num, 3, (double)(time_end - time_start) / 1000.);
+
+		return iHistoPeakGV;
+	}
+
 
 	void SetNarrowWide(HTuple hv_W_tuple, HTuple hv_WG_tuple, HTuple hv_widewpprc, HTuple hv_narrowwpprc,
 		HTuple *hv_narrowwp, HTuple *hv_widewp)
@@ -1857,275 +1895,7 @@ namespace inspect_call
 
 		return 0;
 	}
-
-	HObject CInspect_Call::Proc_DynThres_Space()
-	{
-		HObject HDefectRgn;
-		GenEmptyObj(&HDefectRgn);
-
-		if (ValidHRegion(m_ho_CadSpaceRegion_DynThresTest) == FALSE)
-			return HDefectRgn;
-
-		m_inspect_status = "Proc_DynThres_Space()";
-
-		DWORD time_start = GetTickCount();
-
-		// Param
-		int iDt_Dark_Space = m_Inspection_Params.iDt_Dark_Space;
-		int iDt_Bright_Space = m_Inspection_Params.iDt_Bright_Space;
-		int iDt_Mean_Space = m_Inspection_Params.iDt_Mean_Space;
-		int iDt_Margin_Space = m_Inspection_Params.iDt_Margin_Space;
-		int iDt_Area_Space = m_Inspection_Params.iDt_Area_Space;
-
-		Hlong lNoDefect = 0;
-		HTuple HlNoDefect;
-
-		BYTE *pImageData;
-		char type[30];
-		Hlong lImageWidth, lImageHeight;
-		HTuple HpImageData, Htype, HlImageWidth, HlImageHeight;
-
-		GetImagePointer1(m_local_Im, &HpImageData, &Htype, &HlImageWidth, &HlImageHeight);
-		pImageData = (BYTE *)HpImageData.L();
-		lImageWidth = HlImageWidth.L();
-		lImageHeight = HlImageHeight.L();
-
-		HObject HInspectAreaRgn;
-		Connection(m_ho_CadSpaceRegion_DynThresTest, &HInspectAreaRgn);
-		SelectShape(HInspectAreaRgn, &HInspectAreaRgn, "area", "and", 3000, 999999);	// for testing the test input image
-		Union1(HInspectAreaRgn, &HInspectAreaRgn);
-
-		HObject HErodeInspectAreaRgn;
-		if (iDt_Margin_Space > 0)
-			ErosionCircle(HInspectAreaRgn, &HErodeInspectAreaRgn, (double)iDt_Margin_Space + 0.5);
-		else
-			HErodeInspectAreaRgn = HInspectAreaRgn;
-
-		HObject HBrightRgn, HDarkRgn, HDynThreshRgn;
-		HObject HDTImageReduced, HExpandReduceImage, HMeanImage;
-		HTuple HTuArea, HTuRow, HTuCol;
-
-		GenEmptyObj(&HBrightRgn);
-		GenEmptyObj(&HDarkRgn);
-
-		ReduceDomain(m_local_Im, HErodeInspectAreaRgn, &HDTImageReduced);
-
-		int iFilterSize;
-		iFilterSize = iDt_Mean_Space;
-		if (iFilterSize < 3)
-			iFilterSize = 3;
-		else
-			iFilterSize = iDt_Mean_Space / 2 * 2 + 1;
-
-		int iExpandSize;
-		iExpandSize = iFilterSize / 2 + iDt_Margin_Space;
-
-		ExpandDomainGray(HDTImageReduced, &HExpandReduceImage, iExpandSize);
-		ReduceDomain(HExpandReduceImage, HInspectAreaRgn, &HExpandReduceImage);
-		MeanImage(HExpandReduceImage, &HMeanImage, iFilterSize, iFilterSize);
-		DynThreshold(HExpandReduceImage, HMeanImage, &HBrightRgn, iDt_Bright_Space, "light");
-		DynThreshold(HExpandReduceImage, HMeanImage, &HDarkRgn, iDt_Dark_Space, "dark");
-
-		GenEmptyObj(&HDynThreshRgn);
-		Union2(HBrightRgn, HDarkRgn, &HDynThreshRgn);
-
-		OpeningCircle(HDynThreshRgn, &HDynThreshRgn, 1);
-		ClosingCircle(HDynThreshRgn, &HDynThreshRgn, 1);
-
-		Connection(HDynThreshRgn, &HDynThreshRgn);
-		SelectShape(HDynThreshRgn, &HDynThreshRgn, "area", "and", iDt_Area_Space, MAX_DEF);
-
-		if (ValidHRegion(HDynThreshRgn))
-		{
-			CountObj(HDynThreshRgn, &HlNoDefect);
-			lNoDefect = HlNoDefect.L();
-
-			HTuple HArea, HRow, HCol, hv_TR;
-			AreaCenter(HDynThreshRgn, &HArea, &HRow, &HCol);
-			TupleGenConst(lNoDefect, 20.5, &hv_TR);
-			GenCircle(&HDefectRgn, HRow, HCol, hv_TR);
-		}
-
-		DWORD time_end = GetTickCount();
-		Queue_Add(m_queue_log, NULL, "--- CInspect_Call Proc_DynThres_Space() - OK (FrameNo=%d, UnitNo=%d, Thread=%d): Lead Time: %0*.4f s, Defects=%d",
-			inspect_param.iFrameNo, inspect_param.iUnitNo, m_thread_num, 3, (double)(time_end - time_start) / 1000., lNoDefect);
-
-		return HDefectRgn;
-	}
-
-	HObject CInspect_Call::Proc_DynThres_Pattern()
-	{
-		HObject HDefectRgn;
-		GenEmptyObj(&HDefectRgn);
-
-		if (ValidHRegion(m_ho_CadPatternRegion_DynThresTest) == FALSE)
-			return HDefectRgn;
-
-		m_inspect_status = "Proc_DynThres_Pattern()";
-
-		DWORD time_start = GetTickCount();
-
-		// Param
-		int iDt_Dark_Pattern = m_Inspection_Params.iDt_Dark_Pattern;
-		int iDt_Bright_Pattern = m_Inspection_Params.iDt_Bright_Pattern;
-		int iDt_Margin_Pattern = m_Inspection_Params.iDt_Margin_Pattern;
-		int iDt_Area_Pattern = m_Inspection_Params.iDt_Area_Pattern;
-		int iDt_Length_Pattern = m_Inspection_Params.iDt_Length_Pattern;
-		int iDt_Width_Pattern = m_Inspection_Params.iDt_Width_Pattern;
-		BOOL bDtConnectDef = m_Inspection_Params.bDtConnectDef;
-		int iDt_Connect_Distance = m_Inspection_Params.iDt_Connect_Distance;
-
-		Hlong lNoDefect = 0;
-		HTuple HlNoDefect;
-
-		BYTE *pImageData;
-		char type[30];
-		Hlong lImageWidth, lImageHeight;
-		HTuple HpImageData, Htype, HlImageWidth, HlImageHeight;
-
-		GetImagePointer1(m_local_Im, &HpImageData, &Htype, &HlImageWidth, &HlImageHeight);
-		pImageData = (BYTE *)HpImageData.L();
-		lImageWidth = HlImageWidth.L();
-		lImageHeight = HlImageHeight.L();
-
-		HObject HInspectAreaRgn;
-		HInspectAreaRgn = m_ho_CadPatternRegion_DynThresTest;
-		if (iDt_Margin_Pattern > 0)
-			ErosionCircle(HInspectAreaRgn, &HInspectAreaRgn, (double)iDt_Margin_Pattern + 0.5);
-
-		HObject HBrightRgn, HDarkRgn, HDynThreshRgn;
-		HObject HDTImageReduced, HInvertImageReduced;
-		HTuple HTuArea, HTuRow, HTuCol;
-
-		GenEmptyObj(&HBrightRgn);
-		GenEmptyObj(&HDarkRgn);
-
-		ReduceDomain(m_local_Im, HInspectAreaRgn, &HDTImageReduced);
-
-		HObject HThresRgn;
-		HTuple HAbsHisto, HRelHisto, HFunction, HSmoothFunction, Indices, Inverted;
-		long lNoHisto, lPeak, lHystUpperThreshold, lHystLowThreshold;
-		BOOL bPeakFound;
-
-		GrayHisto(HInspectAreaRgn, HDTImageReduced, &HAbsHisto, &HRelHisto);
-		CreateFunct1dArray(HAbsHisto, &HFunction);
-		SmoothFunct1dGauss(HFunction, 10.0, &HSmoothFunction);
-		TupleLastN(HSmoothFunction, 3, &HAbsHisto);
-		TupleSortIndex(HAbsHisto, &Indices);
-		TupleInverse(Indices, &Inverted);
-
-		HTuple HlNoHisto;
-		TupleLength(Inverted, &HlNoHisto);
-		lNoHisto = HlNoHisto.L();
-
-		bPeakFound = FALSE;
-		for (int iii = 0; iii < lNoHisto; iii++)
-		{
-			lPeak = Inverted[iii].L();
-			if (lPeak >= 100 && lPeak <= 250)
-			{
-				bPeakFound = TRUE;
-				break;
-			}
-		}
-
-		if (bPeakFound)
-		{
-			lHystUpperThreshold = lPeak + iDt_Bright_Pattern;
-			if (lHystUpperThreshold > 255)
-				lHystUpperThreshold = 255;
-
-			lHystLowThreshold = lHystUpperThreshold - 10;
-			if (lHystLowThreshold < 0)
-				lHystLowThreshold = 0;
-
-			HysteresisThreshold(HDTImageReduced, &HThresRgn, lHystLowThreshold, lHystUpperThreshold, 1);
-
-			if (ValidHRegion(HThresRgn) == TRUE)
-				ConcatObj(HBrightRgn, HThresRgn, &HBrightRgn);
-		}
-
-		InvertImage(HDTImageReduced, &HInvertImageReduced);
-
-		GrayHisto(HInspectAreaRgn, HInvertImageReduced, &HAbsHisto, &HRelHisto);
-		CreateFunct1dArray(HAbsHisto, &HFunction);
-		SmoothFunct1dGauss(HFunction, 10.0, &HSmoothFunction);
-		TupleLastN(HSmoothFunction, 3, &HAbsHisto);
-		TupleSortIndex(HAbsHisto, &Indices);
-		TupleInverse(Indices, &Inverted);
-
-		TupleLength(Inverted, &HlNoHisto);
-		lNoHisto = HlNoHisto.L();
-
-		long lDarkPeakMin, lDarkPeakMax;
-		lDarkPeakMin = 255 - 250;
-		if (lDarkPeakMin < 0)
-			lDarkPeakMin = 0;
-
-		lDarkPeakMax = 255 - 100;
-		if (lDarkPeakMax < 0)
-			lDarkPeakMax = 0;
-
-		bPeakFound = FALSE;
-		for (int iii = 0; iii < lNoHisto; iii++)
-		{
-			lPeak = Inverted[iii].L();
-			if (lPeak >= lDarkPeakMin && lPeak <= lDarkPeakMax)
-			{
-				bPeakFound = TRUE;
-				break;
-			}
-		}
-
-		if (bPeakFound)
-		{
-			lHystUpperThreshold = lPeak + iDt_Dark_Pattern;
-			if (lHystUpperThreshold > 255)
-				lHystUpperThreshold = 255;
-
-			lHystLowThreshold = lHystUpperThreshold - 10;
-			if (lHystLowThreshold < 0)
-				lHystLowThreshold = 0;
-
-			HysteresisThreshold(HInvertImageReduced, &HThresRgn, lHystLowThreshold, lHystUpperThreshold, 1);
-
-			if (ValidHRegion(HThresRgn) == TRUE)
-				ConcatObj(HDarkRgn, HThresRgn, &HDarkRgn);
-		}
-
-		GenEmptyObj(&HDynThreshRgn);
-		Union2(HBrightRgn, HDarkRgn, &HDynThreshRgn);
-
-		OpeningCircle(HDynThreshRgn, &HDynThreshRgn, 1);
-		ClosingCircle(HDynThreshRgn, &HDynThreshRgn, 1);
-
-		Connection(HDynThreshRgn, &HDynThreshRgn);
-		SelectShape(HDynThreshRgn, &HDynThreshRgn, "area", "and", iDt_Area_Pattern, MAX_DEF);
-		SelectShape(HDynThreshRgn, &HDynThreshRgn, "max_diameter", "and", iDt_Length_Pattern, MAX_DEF);
-		SelectShape(HDynThreshRgn, &HDynThreshRgn, "inner_radius", "and", iDt_Width_Pattern / 2, MAX_DEF);
-
-		if (bDtConnectDef)
-			BlobUnion(&HDynThreshRgn, iDt_Connect_Distance);
-
-		if (ValidHRegion(HDynThreshRgn))
-		{
-			CountObj(HDynThreshRgn, &HlNoDefect);
-			lNoDefect = HlNoDefect.L();
-
-			HTuple HArea, HRow, HCol, hv_TR;
-			AreaCenter(HDynThreshRgn, &HArea, &HRow, &HCol);
-			TupleGenConst(lNoDefect, 20.5, &hv_TR);
-			GenCircle(&HDefectRgn, HRow, HCol, hv_TR);
-		}
-
-		DWORD time_end = GetTickCount();
-		Queue_Add(m_queue_log, NULL, "--- CInspect_Call Proc_DynThres_Pattern() - OK (FrameNo=%d, UnitNo=%d, Thread=%d): Lead Time: %0*.4f s, Defects=%d",
-			inspect_param.iFrameNo, inspect_param.iUnitNo, m_thread_num, 3, (double)(time_end - time_start) / 1000., lNoDefect);
-
-		return HDefectRgn;
-	}
-
-
+	
 	void CInspect_Call::Inspect(InspectParam_t* inspect_paramI)
 	{
 		DWORD time_start = GetTickCount();

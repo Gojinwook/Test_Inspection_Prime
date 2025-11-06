@@ -201,6 +201,8 @@
 #define IDC_EDIT_DT_WIDTH_PATTERN       1143
 #define IDC_EDIT_DT_CONNECTION_DISTANCE 1144
 #define IDC_CHECK_DT_CONNECTION         1145
+#define IDC_CHECK_AUTO_THRES2           1146
+#define IDC_CHECK_AUTOTHRES2            1146
 #define IDC_BUT_UPDATE                  2060
 #define IDC_EDITMABS                    11035
 #define IDC_WPSET                       11106
