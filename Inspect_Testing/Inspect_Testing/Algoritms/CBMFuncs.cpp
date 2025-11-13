@@ -235,6 +235,359 @@ void CCBM::ProcessMeander(HObject ho_Im, HObject ho_ContoursGrsm, HObject ho_Mea
 	free(pFilt);
 }
 
+int ipad;
+void CCBM::ProcessPads(HObject ho_Im, HObject ho_ContoursGrsm, HObject ho_PadRects, HObject ho_Gi, HObject ho_RegionI, HObject ho_RegionGPad,
+	HObject *ho_PadDefects, HObject *ho_Rectangle, HObject *ho_ContourGmv, HObject *ho_ContourI, HObject *ho_RegionIR, HObject *ho_RBEp, // defects found as regions
+	HTuple hv_thr, HTuple hv_pad, HTuple hw_absmb, HTuple hw_abssp, HTuple hv_ctype, int fsz, HTuple hv_pdil,
+	HTuple *hv_Dout) // Filtered displacement
+{
+	int nopad = 0;
+	HObject ho_CG, ho_Imr, ho_Imc, ho_Rectangle5, ho_ContourOut, ho_ContourGm, ho_BorderEPs;
+	HTuple hv_RowI, hv_ColI, hv_RowG, hv_ColG, hv_ai, hv_rowIc, hv_colIc, hv_poI, hv_ag, hv_rowGc, hv_colGc, hv_poG, hv_mr, hv_mc, Sign, Displacement,
+		Isinside, hv_DFilt;// , hv_Dout;
+	CountSeconds(&ht1);
+	ipad = hv_pad.I();
+
+	SelectObj(ho_ContoursGrsm, &ho_CG, hv_pad);
+	SelectObj(ho_PadRects, &ho_Rectangle5, hv_pad);
+	//GetContourXld(m_ho_CG, &m_hv_RowG, &m_hv_ColG);
+	*ho_Rectangle = ho_Rectangle5;
+	//if (ipad == 105)
+	//	ipad = ipad;
+	//Dilation
+	//FillUp(ho_Rectangle5, &ho_Rectangle5);
+	//OpeningCircle(ho_Rectangle5, &ho_Rectangle5, 20);
+
+	ReduceDomain(ho_Im, ho_Rectangle5, &ho_Imr);
+	CropDomain(ho_Imr, &ho_Imc);
+	//if (save)
+	//{
+	//	WriteObject(ho_Rectangle5, "C:\\Temp1\\ho_Rectangle5.hobj");
+	//	WriteObject(ho_Imr, "C:\\Temp1\\ho_Imr.hobj");
+	//	//WriteObject(ho_Rectangle5, "C:\\Temp1\\ho_Rectangle5.hobj");
+	//}
+	CountSeconds(&ht1);
+	BuildRealContourI(ho_Imr, ho_Rectangle5, ho_RegionI, ho_RegionGPad,//  building I contour
+		&ho_ContourOut, &ho_BorderEPs, ho_RegionIR, ho_RBEp,
+		hv_ctype, hv_thr, hv_pdil);
+	HTuple ha, hr, hc, hl, CRow, CCol;
+	if (hv_ctype == 0)
+	{
+		HObject RegC;
+		GetContourXld(ho_ContourOut, &CRow, &CCol);
+		GenRegionPoints(&RegC, CRow, CCol);
+		//DilationCircle(RegC, &RegC, 1);
+
+	}
+	//GenEmptyObj(ho_RBEp);
+//AreaCenter(ho_BorderEPs, &ha, &hr, &hc);
+	CountSeconds(&ht2);
+	GetContourXld(ho_ContourOut, &hv_RowI, &hv_ColI);
+	GetContourXld(ho_CG, &hv_RowG, &hv_ColG);
+	TupleLength(hv_RowI, &hl);
+
+	HTuple hv_nI, hv_nG, hv_D;
+	HTuple hv_DispElong, hv_Wch, hv_Wch1, hv_Def, hv_Def1;
+	HTuple hv_sz = 31;
+
+	HTuple ThrMB, ThrSP, DefSP, DefMB, Def, Def1, DefA, RowD, ColD, nD, Rd, numD;
+	HObject CircleD, CirclesD, CircleDu;
+	HObject RBI, RBG;
+	HObject ho_ObjectD;
+
+	TupleLength(hv_RowI, &hv_nI);
+	TupleLength(hv_RowG, &hv_nG);
+	int nI = hv_nI.I();
+	int nG = hv_nG.I();
+	int isz = 5;
+	float aprc = 1.;
+	if (hv_nI > hv_sz + 1) // normal case
+	{
+		//goto norealcontour;
+		//if(ho_PadDefects)
+		//CountObj(*ho_PadDefects, &numD);
+
+		GenRegionPoints(&RBG, hv_RowG, hv_ColG);
+		GenRegionPoints(&RBI, hv_RowI, hv_ColI);
+
+		AreaCenterXld(ho_ContourOut, &hv_ai, &hv_rowIc, &hv_colIc, &hv_poI);
+		AreaCenterXld(ho_CG, &hv_ag, &hv_rowGc, &hv_colGc, &hv_poG);
+		aprc = (float)(hv_ai.D() / hv_ag.D());
+		if (hv_poI != hv_poG)
+		{
+			ReverseContourH(ho_ContourOut, &ho_ContourOut);
+			AreaCenterXld(ho_ContourOut, &hv_ai, &hv_rowIc, &hv_colIc, &hv_poI);
+		}
+		AreaCenter(RBG, &hv_ag, &hv_rowGc, &hv_colGc);
+		AreaCenter(RBI, &hv_ai, &hv_rowIc, &hv_colIc);
+		hv_mr = hv_rowIc - hv_rowGc;
+		hv_mc = hv_colIc - hv_colGc;
+
+		//hv_mr = -3.58;
+		//hv_mc = -4.5;
+
+		// Region-based center
+		//HObject RegionGr, RegionGr5, RegionGr5b, ho_RegionIRb;
+		//HTuple Area, RowG5, ColG5;
+		//GenRegionContourXld(m_ho_CG, &RegionGr, "filled");
+		//Intersection(RegionGr, ho_Rectangle5, &RegionGr5);
+		//Boundary(RegionGr5, &RegionGr5b, "inner");
+		//AreaCenter(RegionGr5b, &Area, &RowG5, &ColG5);
+
+		//HTuple AreaIR, RowIR, ColIR;
+		//Boundary(ho_RegionIR, &ho_RegionIRb, "inner");
+		//AreaCenter(ho_RegionIRb, &AreaIR, &RowIR, &ColIR);
+		//hv_mr = RowIR - RowG5;
+		//hv_mc = ColIR - ColG5;
+
+		hv_RowG = hv_RowG + hv_mr;
+		hv_ColG = hv_ColG + hv_mc;
+		GenContourPolygonXld(&ho_ContourGm, hv_RowG, hv_ColG);
+		//GenRegionPolygonXld
+
+		//HTuple hv_nI, hv_nG, hv_D;
+
+		float* pRowI = ConvertTupleToFloat(hv_RowI);
+		float* pColI = ConvertTupleToFloat(hv_ColI);
+		float* pRowG = ConvertTupleToFloat(hv_RowG);
+		float* pColG = ConvertTupleToFloat(hv_ColG);
+
+		float *pD = (float *)malloc((nI) * sizeof(float));
+
+		DistanceContours2(pRowI, pColI, nI, pRowG, pColG, nG,
+			isz, pD, 0);
+
+		//HTuple hv_isz = (HTuple)isz;
+		//DistanceContours2H(m_hv_RowI, m_hv_ColI, m_hv_RowG, m_hv_ColG,
+		//	hv_isz, &m_hv_DistIG2);
+		//hv_D = m_hv_DistIG2;
+
+		FloatToTuple(pD, nI, hv_D);
+		//TupleGenConst((HTuple)nI, false, &Isinside);
+		CountSeconds(&ht3);
+
+
+		//HObject ho_RegionGm;
+		//GenRegionContourXld(ho_ContourGm, &ho_RegionGm, "filled"); // simplified "is inside" check
+		//HTuple Row, Beg, End;
+		//GetRegionRuns(ho_RegionGm, &Row,&Beg, &End);*/
+		//HTuple RowGA1, ColGA1, RowGA2, ColGA2;
+		//SmallestRectangle1(ho_RegionGm, &RowGA1, &ColGA1, &RowGA2, &ColGA2);
+		//SmallestRectangle1(ho_RegionGm, &RowGA1, &ColGA1, &RowGA2, &ColGA2);
+		//HObject ImGA;
+		//RegionToBin(ho_RegionGm, &ImGA, 1, 0, ColGA2 - ColGA1, RowGA2 - RowGA1);
+
+		// Gi-based, not working yet (19.09.2025)
+		//GetGrayval(ho_Gi, hv_RowI, hv_ColI, &Isinside);
+
+		//Polygon-based.... Working, ~160 msec for 165 meanders (19.09.2025)
+		HObject Pol;
+		GenPolygonsXld(ho_ContourGm, &Pol, "ramer", 0.25);
+		TestXldPoint(Pol, hv_RowI, hv_ColI, &Isinside);
+		//Contour-based.... Working, ~470 msec for 165 meanders (19.09.2025)
+		//TestXldPoint(ho_ContourGm, hv_RowI, hv_ColI, &Isinside);
+
+		//gen_region_contour_xld(ContourGrsma, RegionGA, 'filled')
+		//test_region_point(RegionGA, RowI, ColI, IsInside)
+
+		//GenRegionContourXld(ho_ContourGm, &ho_RegionGm, "filled"); // simplified "is inside" check
+		//TestRegionPoint(ho_RegionGm, hv_RowI, hv_ColI, &Isinside);
+		CountSeconds(&ht4);
+		Sign = Isinside * 2.0 - 1.0;
+		//Sign = 1.0;
+		Displacement = -Sign * hv_D;
+
+
+		float *pFilt = (float *)malloc(1 * sizeof(float));
+		nD = 0;
+
+		// making elongation (one side)
+		hv_DispElong.Clear();
+		hv_DispElong.Append(Displacement.TupleSelectRange((hv_nI - hv_sz) - 0, hv_nI - 1));
+		hv_DispElong.Append(Displacement);
+		/*FilterFloatMedDef((*hv_DispElong), hv_sz, hv_absmb, hv_abssp, &(*hv_Wfilt), &(*hv_Wch1),
+			&(*hv_Def1));*/
+
+		float* pDisp = ConvertTupleToFloat(hv_DispElong);
+		int sz = hv_sz.L();
+		int nIe = nI + sz;
+		pFilt = (float *)malloc(nIe * sizeof(float));
+
+		SrunmedSLI(pDisp, pFilt, (long)(nIe), fsz, 0, 0);
+		FloatToTuple(pFilt, (nIe), hv_DFilt);
+
+		HTuple hv_nIe = nIe;
+		hv_Wch1 = hv_DispElong - hv_DFilt;
+		(*hv_Dout) = hv_Wch1;
+		////////////////////////////////
+
+		TupleGenConst(hv_nIe, -hw_absmb, &ThrMB);
+		TupleGenConst(hv_nIe, hw_abssp, &ThrSP);
+		TupleGreaterEqualElem(hv_Wch1, ThrSP, &DefSP);
+		TupleLessEqualElem(hv_Wch1, ThrMB, &DefMB);
+		Def1 = DefSP - DefMB;
+		//TupleAbs(Def1, &DefA);
+
+		hv_Wch.Clear();
+		hv_Wch.Append(hv_Wch1.TupleSelectRange(hv_sz, hv_nI - 1));
+		hv_Wch.Append(hv_Wch1.TupleSelectRange(0, hv_sz - 1));
+		//hv_Def.Clear();
+		//hv_Def.Append(hv_Def1.TupleSelectRange(hv_sz, hv_nI - 1));
+		//hv_Def.Append(hv_Def1.TupleSelectRange(0, hv_sz - 1));
+		hv_Def = Def1.TupleSelectRange(hv_sz, (hv_nI + hv_sz) - 1);
+		TupleAbs(hv_Def, &DefA);
+		TupleSelectMask(hv_RowI, DefA, &RowD);
+		TupleSelectMask(hv_ColI, DefA, &ColD);
+		TupleLength(RowD, &nD);
+		if (aprc<0.7 || aprc > 1.3)
+		{
+			TupleInt(hv_RowI, &RowD);
+			TupleInt(hv_ColI, &ColD);
+			TupleLength(RowD, &nD);
+			nopad = 1;
+		}
+
+
+		free(pD);
+		free(pRowI);
+		free(pColI);
+		free(pRowG);
+		free(pColG);
+		free(pFilt);
+	}
+	else // missing pad case
+	{
+		CircleD = ho_Rectangle5;
+		*ho_ContourGmv = ho_Rectangle5;
+		*ho_ContourI = ho_Rectangle5;
+		*ho_PadDefects = ho_Rectangle5;
+		ho_ObjectD = ho_Rectangle5;
+		//nDef = 1;
+		CountSeconds(&ht3);
+		CountSeconds(&ht4);
+		nD = -1;
+		nopad = 1;
+	}
+
+	//norealcontour:
+	//	;
+		//float* pDisp = ConvertTupleToFloat(Displacement);
+
+		//float *pFilt = (float *)malloc((nI) * sizeof(float));
+		//
+		//SrunmedSLI(pDisp, pFilt, (long)nI, fsz, 0, 0);
+
+		/*FloatToTuple(pFilt, nI, hv_DFilt);
+		(*hv_Dout) = Displacement - hv_DFilt;*/
+	CountSeconds(&ht5);
+
+	int save = 0;
+
+	if (save)
+	{
+		WriteObject(ho_CG, "C:\\Temp1\\m_ho_CG.hobj");
+		//WriteObject(ho_CI, "C:\\Temp1\\m_ho_CI.hobj");
+		WriteObject(ho_ContourOut, "C:\\Temp1\\ho_ContourOut.hobj");
+
+		WriteTuple(hv_D, "C:\\Temp1\\hv_D.tup");
+		WriteTuple(Displacement, "C:\\Temp1\\hv_Displacement.tup");
+		WriteTuple((*hv_Dout), "C:\\Temp1\\hv_Dout.tup");
+		WriteTuple((hv_Wch), "C:\\Temp1\\hv_Wch.tup");
+
+		WriteObject(ho_Imr, "C:\\Temp1\\ho_Imr");
+		WriteObject(ho_Rectangle5, "C:\\Temp1\\ho_Rectangle5");
+
+		//WriteObject(ho_BorderEPs, "C:\\Temp1\\ho_BorderEPs");
+	}
+	/*HTuple ThrMB, ThrSP, DefSP, DefMB, Def, DefA, RowD, ColD, nD, Rd;
+		HObject CircleD, CircleDu;
+
+		TupleGenConst((HTuple)nI, -hw_absmb, &ThrMB);
+		TupleGenConst((HTuple)nI, hw_abssp, &ThrSP);
+		TupleGreaterEqualElem((*hv_Dout), ThrSP, &DefSP);
+		TupleLessEqualElem((*hv_Dout), ThrMB, &DefMB);
+		Def = DefSP - DefMB;
+		TupleAbs(Def, &DefA);*/
+		/*TupleSelectMask(hv_RowI, DefA, &RowD);
+		TupleSelectMask(hv_ColI, DefA, &ColD);
+		TupleLength(RowD, &nD);*/
+	if (nD > 1)
+	{
+		HObject RGEP, RBE, CircleDc, ho_RegionIntersection1;
+		HTuple RowG, ColG, nDc, hv_k, hv_a, hv_Row, hv_Column;
+		GetContourXld(ho_CG, &RowG, &ColG);
+		GenRegionLine(&RGEP, HTuple(RowG[0]), HTuple(ColG[0]), HTuple(RowG[nG - 2]),
+			HTuple(ColG[nG - 2]));
+		TupleGenConst(nD, 4.5, &Rd);
+		GenCircle(&CirclesD, RowD, ColD, Rd);
+		Union1(CirclesD, &CircleD);
+		Connection(CircleD, &CircleDc);
+		CountObj(CircleDc, &nDc);
+		GenEmptyObj(&CircleD);
+		if (nopad == 0)
+		{
+			//HTuple end_val17 = nDc;
+			//HTuple step_val17 = 1;
+			for (hv_k = 1; hv_k <= nDc; hv_k += 1)
+			{
+				SelectObj(CircleDc, &ho_ObjectD, hv_k);
+
+				if (save)
+				{
+					WriteObject(RGEP, "C:\\Temp1\\RGEP.hobj");
+					WriteObject(*ho_RBEp, "C:\\Temp1\\ho_RBEp.hobj");
+					WriteObject(ho_ObjectD, "C:\\Temp1\\ho_ObjectD.hobj");
+				}
+				Union2(*ho_RBEp, RGEP, &RBE);
+				//intersection (ObjectD, RBEp3, RegionIntersection1)
+				Intersection(ho_ObjectD, RBE, &ho_RegionIntersection1);
+				//union2 (RBEp3, RGEP, RBE)
+				AreaCenter(ho_RegionIntersection1, &hv_a, &hv_Row, &hv_Column);
+				if (0 != (hv_a == 0) || nopad == 1)
+				{
+					if (save)
+					{
+						WriteObject(ho_ContourGm, "C:\\Temp1\\ho_ContourGm.hobj");
+						WriteObject(RBI, "C:\\Temp1\\ho_RBI.hobj");
+						WriteObject(ho_CG, "C:\\Temp1\\ho_CG.hobj");
+						WriteObject(ho_ObjectD, "C:\\Temp1\\ho_ObjectD.hobj");
+						WriteObject(RBE, "C:\\Temp1\\RBE.hobj");
+					}
+					ConcatObj(CircleD, ho_ObjectD, &CircleD);
+				}
+			}
+		}
+		//CountObj(CircleD, &hv_nDef);
+
+			//GenRegionLine(&RGEP, RowG[0], ColG[0], RowG[nG - 2], ColG[nG - 2]);
+			//TupleGenConst(nD, 2.5, &Rd);
+			//GenCircle(&CirclesD, RowD, ColD, Rd);
+			//Union1(CirclesD, &CircleD);
+			//HObject RInt;
+			//Intersection(CircleDu, ho_BorderEPs, &RInt);
+			//// ecp 251031 11:06
+			//AreaCenter(RInt, &ha, &hr, &hc);
+			//if (ha > 0)
+			//	GenEmptyObj(&CircleDu);
+	}
+	else if (nD == -1)
+		//GenCircle(&CircleD, hv_rowGc, hv_colGc, 10);
+		CircleD = ho_Rectangle5;
+
+	else
+		GenEmptyObj(&CircleD);
+	if (nopad == 1)
+		CircleD = ho_Rectangle5;
+	CountSeconds(&ht6);
+	//(*ho_ContourOut) = ho_ContourH;
+	//CopyObj(CircleDu, ho_MeanderDefects, 0, 1);
+	(*ho_PadDefects) = CircleD;
+	*ho_ContourGmv = ho_ContourGm;
+	*ho_ContourI = ho_ContourOut;
+
+}
+
+
 // Procedures 
 void CCBM::DistPointToLineSegmH(HTuple hv_y, HTuple hv_x, HTuple hv_y1, HTuple hv_x1, HTuple hv_y2,
 	HTuple hv_x2, HTuple *hv_distance, HTuple *hv_ym, HTuple *hv_xm, HTuple *hv_t)
@@ -362,7 +715,7 @@ void CCBM::DistanceContours2(float *pRowI, float *pColI, int nI, float *pRowG, f
 	int *pK;
 
 	float digs, digc, digr, digsmin;
-	int kmin;
+	int kmin = 0;
 	int iz = isz;
 
 
@@ -854,6 +1207,149 @@ int CCBM::Region_Threshold_SubPix(HObject ho_Im, HObject ho_RegSel, int thr, flo
 	return pos_sub;
 }
 
+int CCBM::Region_Threshold_SubPixGap(HObject ho_Im, HObject ho_RegSel, int thr, float *rows_sub, float *cols_sub, int *ngap)
+{
+	HTuple tl, h, w, t, hiptr;
+	GetImagePointer1(ho_Im, &hiptr, &t, &w, &h);
+	UINT8 *pIm = (UINT8 *)(Hlong *)hiptr.L();
+	int im_w = (int)w.L();
+	int im_h = (int)h.L();
+
+
+	HTuple hv_Rows, hv_Cols, hv_Cont_Len;
+	UINT8 gray0, gray1, gray2;
+	int x0 = 0, x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+	double xR1, yR1, xR2, yR2;
+	int pos_sub = 0;
+
+	GetRegionContour(ho_RegSel, &hv_Rows, &hv_Cols);
+	UINT64* rows = (UINT64*)hv_Rows.LArr();
+	UINT64* cols = (UINT64*)hv_Cols.LArr();
+
+	TupleLength(hv_Rows, &hv_Cont_Len);
+	int count_len = (int)hv_Cont_Len.LArr()[0];
+
+	// ¬´¬Ö¬ã¬ä ¬ß¬Ñ ¬Õ¬í¬â¬Ü¬å
+	bool reg_hole = Test_Hole(pIm, im_w, im_h, rows, cols, count_len, thr);
+
+	int pos, j, jp;
+	double d = -1.;
+	*ngap = -1;
+	for (pos = 0; pos < count_len; pos++)
+	{
+		// * ¬°¬Ü¬â¬å¬Ø¬Ö¬ß¬Ú¬Ö ¬Ú¬ã¬ã¬Ý¬Ö¬Õ¬å¬Ö¬Þ¬à¬Ô¬à ¬á¬Ú¬Ü¬ã¬Ö¬Ý¬ñ
+		int pos_next = pos + 1;
+		if (pos_next > (count_len - 1))
+		{
+			pos_next = 0;
+		}
+		int pos_prev = pos - 1;
+		if (pos_prev < 0)
+		{
+			pos_prev = count_len - 1;
+		}
+		int row_prev = (int)rows[pos_prev];
+		int col_prev = (int)cols[pos_prev];
+		int row_next = (int)rows[pos_next];
+		int col_next = (int)cols[pos_next];
+		int row_curr = (int)rows[pos];
+		int col_curr = (int)cols[pos];
+
+		// ¬©¬Ñ ¬á¬â¬Ö¬Õ¬Ö¬Ý¬Ñ¬Þ¬Ú ¬Ú¬Ù¬à¬Ò¬â¬Ñ¬Ø¬Ö¬ß¬Ú¬ñ
+		if (row_curr >= im_h - 1 || col_curr >= im_w - 1 || row_curr == 0 || col_curr == 0)
+		{
+			continue;
+		}
+
+		// * ¬¯¬Ñ¬á¬â¬Ñ¬Ó¬Ý¬Ö¬ß¬Ú¬Ö
+		bool f_Down, f_Left;
+		f_Down = row_curr > row_prev || row_curr < row_next;
+		f_Left = col_curr < col_prev || col_curr > col_next;
+
+		gray0 = Get_Gray_Val(pIm, im_w, im_h, (int)rows[pos], (int)cols[pos]);
+
+		// *-- Cols ----------------------------------------------------------------------
+		gray1 = Get_Gray_Val(pIm, im_w, im_h, row_curr, col_curr + 1);
+		gray2 = Get_Gray_Val(pIm, im_w, im_h, row_curr, col_curr - 1);
+		bool f_Cols_Available = Interpolation_Sub(reg_hole, f_Down, gray0, gray1, gray2, col_curr, row_curr, thr, xR1, yR1);
+
+		// *--- Rows ----------------------------------------------------------------------
+		gray1 = Get_Gray_Val(pIm, im_w, im_h, row_curr + 1, col_curr);
+		gray2 = Get_Gray_Val(pIm, im_w, im_h, row_curr - 1, col_curr);
+		bool f_Rows_Available = Interpolation_Sub(reg_hole, f_Left, gray0, gray1, gray2, row_curr, col_curr, thr, yR2, xR2);
+
+		// *--- ¬³¬à¬Ò¬Ú¬â¬Ñ¬Ö¬Þ ¬â¬Ö¬Ù¬å¬Ý¬î¬ä¬Ñ¬ä ------------------------------------------------------
+		if (f_Cols_Available && f_Rows_Available)
+		{
+			if ((xR1 > xR2 && yR1 > yR2) || (xR1 <= xR2 && yR1 < yR2))
+			{
+				rows_sub[pos_sub] = yR2;
+				cols_sub[pos_sub] = xR2;
+				pos_sub += 1;
+				if (pos_sub >= 2)
+				{
+					j = pos_sub - 1;
+					jp = pos_sub - 2;
+					d = abs(rows_sub[j] - rows_sub[jp]) + abs(cols_sub[j] - cols_sub[jp]);
+					if (d > 2.)
+						*ngap = pos_sub - 1;
+				}
+
+				rows_sub[pos_sub] = yR1;
+				cols_sub[pos_sub] = xR1;
+				pos_sub += 1;
+			}
+			else
+			{
+				rows_sub[pos_sub] = yR1;
+				cols_sub[pos_sub] = xR1;
+				pos_sub += 1;
+				if (pos_sub >= 2)
+				{
+					j = pos_sub - 1;
+					jp = pos_sub - 2;
+					d = abs(rows_sub[j] - rows_sub[jp]) + abs(cols_sub[j] - cols_sub[jp]);
+					if (d > 2.)
+						*ngap = pos_sub - 1;
+				}
+				rows_sub[pos_sub] = yR2;
+				cols_sub[pos_sub] = xR2;
+				pos_sub += 1;
+			}
+		}
+		else if (f_Cols_Available)
+		{
+			rows_sub[pos_sub] = yR1;
+			cols_sub[pos_sub] = xR1;
+			pos_sub += 1;
+		}
+		else if (f_Rows_Available)
+		{
+			rows_sub[pos_sub] = yR2;
+			cols_sub[pos_sub] = xR2;
+			pos_sub += 1;
+		}
+		if (pos_sub >= 2)
+		{
+			j = pos_sub - 1;
+			jp = pos_sub - 2;
+			d = abs(rows_sub[j] - rows_sub[jp]) + abs(cols_sub[j] - cols_sub[jp]);
+			if (d > 2.)
+				*ngap = pos_sub - 1;
+		}
+
+	}
+	if (*ngap == -1)
+	{
+		j = 0;
+		jp = pos_sub - 1;
+		d = abs(rows_sub[j] - rows_sub[jp]) + abs(cols_sub[j] - cols_sub[jp]);
+		if (d > 2.)
+			*ngap = pos_sub - 1;
+	}
+
+	return pos_sub;
+}
 
 void CCBM::MoveContourH(HObject ho_Contour, HObject *ho_ContourOut, HTuple hv_mr, HTuple hv_mc)
 {
@@ -1161,13 +1657,14 @@ void CCBM::MeasureDisplacementH(HObject ho_Im, HObject ho_RegionInoD, HObject ho
 
 	Region_Threshold_SubPixH(ho_RegionIR, ho_Im, hv_thr, &hv_RowsSubI, &hv_ColsSubI);
 	GenContourPolygonXld(&ho_ContourIK, hv_RowsSubI, hv_ColsSubI);
-	AreaCenterXld(ho_ContourIK, &hv_AreaIK, &hv_RowIK, &hv_ColIK, &hv_PointOrderIK);
-	if (0 != (hv_PointOrderIK == HTuple("negative")))
-	{
-		ReverseContourH(ho_ContourIK, &ho_ContourIK);
-		//area_center_xld (ContourIK, Area, RowBcl, ColBcl, PointOrderB1)
-		//nrev := nrev+1
-	}
+	// 251106 removed
+	//AreaCenterXld(ho_ContourIK, &hv_AreaIK, &hv_RowIK, &hv_ColIK, &hv_PointOrderIK);
+	//if (0 != (hv_PointOrderIK == HTuple("negative")))
+	//{
+	//	ReverseContourH(ho_ContourIK, &ho_ContourIK);
+	//	//area_center_xld (ContourIK, Area, RowBcl, ColBcl, PointOrderB1)
+	//	//nrev := nrev+1
+	//}
 
 	//RowGsm := RowGsm[meander-1]
 	//ColGsm := ColGsm[meander-1]
@@ -1230,12 +1727,12 @@ void CCBM::MeasureDisplacement(HObject Im, HObject ho_RegionInoD, HObject ho_Mea
 
 	GenContourPolygonXld(&ho_ContourIK, hv_RowsSubI, hv_ColsSubI);
 	AreaCenterXld(ho_ContourIK, &hv_AreaIK, &hv_RowIK, &hv_ColIK, &hv_PointOrderIK);
-	if (0 != (hv_PointOrderIK == HTuple("negative")))
-	{
-		ReverseContourH(ho_ContourIK, &ho_ContourIK);
-		//area_center_xld (ContourIK, Area, RowBcl, ColBcl, PointOrderB1)
-		//nrev := nrev+1
-	}
+	//if (0 != (hv_PointOrderIK == HTuple("negative")))
+	//{
+	//	ReverseContourH(ho_ContourIK, &ho_ContourIK);
+	//	//area_center_xld (ContourIK, Area, RowBcl, ColBcl, PointOrderB1)
+	//	//nrev := nrev+1
+	//}
 
 	//RowGsm := RowGsm[meander-1]
 	//ColGsm := ColGsm[meander-1]
@@ -1281,6 +1778,7 @@ void CCBM::BuildBorderContour(HObject ho_Bordersi, HObject *ho_Bordercl, HObject
 	LengthXld(ho_Bordersi, &hv_LengthBI);
 	TupleSortIndex(hv_LengthBI, &hv_Indices);
 	TupleInverse(hv_Indices, &hv_Inverted);
+	/////// exc 10.31-9:50
 	hv_imax1 = HTuple(hv_Inverted[0]) + 1;
 	if (0 != (hv_nB > 1))
 	{
@@ -1369,6 +1867,150 @@ void CCBM::BuildRealContour(HObject ho_Im, HObject ho_Rectangle5,
 
 		//Region_Threshold_SubPix((*ho_RegionIR), ho_Im, hv_thr, &hv_RowsSubI, &hv_ColsSubI);
 		//GenContourPolygonXld(&ho_ContourIK, hv_RowsSubI, hv_ColsSubI);
+		(*ho_ContourOut) = ho_ContourIK;
+		//* IK end
+		free(pRowsSubI);
+		free(pColsSubI);
+	}
+	return;
+}
+
+void CCBM::BuildRealContourI(HObject ho_Im, HObject ho_Rectangle5, HObject ho_RegionI, HObject ho_RegionGPad,
+	HObject *ho_ContourOut, HObject *ho_BorderEPs, HObject *ho_RegionIR, HObject *ho_RBEp,
+	HTuple hv_ctype, HTuple hv_thr, HTuple hv_pdil)
+{
+
+	float *pRowsSubI, *pColsSubI;
+	// Local iconic variables
+	HObject  ho_Bordersi, ho_Regionsi, ho_RegionsIntersection, ho_RegionDilation, ho_RegionIntersection;
+	HObject  ho_Bordersii, ho_Bi, ho_RBi, ho_ContourH, ho_RegionIr, ho_RegionsIR;
+	HObject  ho_ContourIK, ho_RP, ho_RPd, ho_RPdI, ho_ImageReduced;
+
+	// Local control variables
+	HTuple  hv_Areai, hv_Row1, hv_Column1, hv_AreaI;
+	HTuple  hv_KA, hv_n, hv_j, hv_RowsSubI, hv_ColsSubI, hv_RowIK;
+	HTuple  hv_ColIK, hv_PointOrderG, hv_AreaIR, hv_Column;
+	HTuple  hv_Indices, hv_Inverted;
+	HTuple  hv_ni, hv_amax, hv_jmax, hv_Row, hv_Col, hv_a, hv_Row2, hv_Column2;
+	int ng; //gap position
+	//** BuildRealContour 20.10.2025
+	if (0 != (hv_ctype == 1))
+	{
+		//* H
+		//* H
+//fill_up (Rectangle5, Rectangle5fu)
+		Intersection(ho_Rectangle5, ho_RegionGPad, &ho_RP);
+		DilationCircle(ho_RP, &ho_RPd, hv_pdil);
+		//pdil := 10
+		Intersection(ho_RPd, ho_RegionI, &ho_RPdI);
+		//reduce_domain (Im, Rectangle5, ImageReduced)
+		ReduceDomain(ho_Im, ho_Rectangle5, &ho_ImageReduced);
+		ThresholdSubPix(ho_ImageReduced, &ho_Bordersi, hv_thr);
+		CountObj(ho_Bordersi, &hv_ni);
+		hv_amax = 0;
+		hv_jmax = -1;
+		GenEmptyObj(&ho_Bordersii);
+		{
+			HTuple end_val15 = hv_ni;
+			HTuple step_val15 = 1;
+			for (hv_j = 1; hv_j.Continue(end_val15, step_val15); hv_j += step_val15)
+			{
+				SelectObj(ho_Bordersi, &ho_Bi, hv_j);
+				GetContourXld(ho_Bi, &hv_Row, &hv_Col);
+				TupleLength(hv_Row, &hv_n);
+				if (0 != (hv_n < 50))
+				{
+					continue;
+				}
+				GenRegionPoints(&ho_RBi, hv_Row, hv_Col);
+				DilationCircle(ho_RBi, &ho_RegionDilation, 3.5);
+				Intersection(ho_RegionDilation, ho_RP, &ho_RegionIntersection);
+				AreaCenter(ho_RegionIntersection, &hv_a, &hv_Row2, &hv_Column2);
+				if (0 != (hv_a < 50))
+				{
+					continue;
+				}
+				else
+				{
+					if (0 != (hv_a > hv_amax))
+					{
+						ho_Bordersii = ho_Bi;
+						hv_amax = hv_a;
+					}
+				}
+			}
+		}
+		CountObj(ho_Bordersii, &hv_n);
+		if (0 != (hv_n == 0))
+		{
+			SelectObj(ho_Bordersi, &(*ho_ContourOut), 1);
+			return;
+			//ContourOut := ContourH
+		}
+
+		BuildBorderContour(ho_Bordersii, &ho_ContourH, &(*ho_RBEp));
+		GetContourXld(ho_ContourH, &hv_RowsSubI, &hv_ColsSubI);
+		AreaCenterXld(ho_ContourH, &hv_AreaI, &hv_RowIK, &hv_ColIK, &hv_PointOrderG);
+		GenRegionContourXld(ho_ContourH, &(*ho_RegionIR), "filled");
+		(*ho_ContourOut) = ho_ContourH;
+		//H end
+	}
+	else
+	{
+		pRowsSubI = (float *)malloc(5000 * sizeof(float));
+		pColsSubI = (float *)malloc(5000 * sizeof(float));
+		//* IK
+		Threshold(ho_Im, &ho_RegionIr, hv_thr, 255);
+		Intersection(ho_RegionIr, ho_Rectangle5, &(*ho_RegionIR));
+		Connection((*ho_RegionIR), &ho_RegionsIR);
+		AreaCenter(ho_RegionsIR, &hv_AreaIR, &hv_Row, &hv_Column);
+		TupleSortIndex(hv_AreaIR, &hv_Indices);
+		TupleInverse(hv_Indices, &hv_Inverted);
+		SelectObj(ho_RegionsIR, &(*ho_RegionIR), HTuple(hv_Inverted[0]) + 1);
+		int n = 0;
+		HTuple Epc, Epr;
+		Epr.Clear();
+		Epc.Clear();
+		if (hv_AreaIR > 0)
+		{
+			int n = Region_Threshold_SubPixGap(ho_Im, *ho_RegionIR, hv_thr, pRowsSubI, pColsSubI, &ng);
+			hv_RowsSubI = HTuple(pRowsSubI, n);
+			hv_ColsSubI = HTuple(pColsSubI, n);
+			GenContourPolygonXld(&ho_ContourIK, hv_RowsSubI, hv_ColsSubI);
+			if (ng > 0 && ng < n - 1)
+			{
+				Epc[0] = hv_ColsSubI[ng];
+				Epr[0] = hv_RowsSubI[ng];
+				Epc[1] = hv_ColsSubI[ng - 1];
+				Epr[1] = hv_RowsSubI[ng - 1];
+				if (ng > 1)
+				{
+					Epc[1] = hv_ColsSubI[ng - 2];
+					Epr[1] = hv_RowsSubI[ng - 2];
+				}
+
+				GenRegionPoints(ho_RBEp, Epr, Epc);
+			}
+			else if (ng == n - 1)
+			{
+				Epc[0] = hv_ColsSubI[ng];
+				Epc[1] = hv_ColsSubI[0];
+				Epr[0] = hv_RowsSubI[ng];
+				Epr[1] = hv_RowsSubI[0];
+				GenRegionPoints(ho_RBEp, Epr, Epc);
+			}
+			else
+				GenEmptyObj(ho_RBEp);
+
+		}
+
+		else
+		{
+			GenEmptyObj(&ho_ContourIK);
+			GenEmptyObj(ho_RBEp);
+		}
+		/*Region_Threshold_SubPix((*ho_RegionIR), ho_Im, hv_thr, &hv_RowsSubI, &hv_ColsSubI);
+		GenContourPolygonXld(&ho_ContourIK, hv_RowsSubI, hv_ColsSubI);*/
 		(*ho_ContourOut) = ho_ContourIK;
 		//* IK end
 		free(pRowsSubI);

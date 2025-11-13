@@ -1669,7 +1669,7 @@ namespace inspect_call
 
 			GenEmptyObj(&ho_MeanderDefect);
 
-			m_pCBM->ProcessMeander(m_local_Im, m_ho_ContoursGrsm, m_ho_MeanderRects, /*m_ho_Gi*/m_ho_Gi_CbmTest,
+			m_pCBM->ProcessMeander(m_local_Im, m_ho_ContoursGrsm, m_ho_MeanderRects, m_ho_Gi,
 				&ho_MeanderDefect, &ho_Rect, &m_ho_CG, &m_ho_CI,
 				m_hv_thr, m_hv_meander, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz,
 				&hv_DOut);
@@ -1707,14 +1707,14 @@ namespace inspect_call
 
 		DWORD time_start = GetTickCount();
 
-		HObject ho_PadIDefect, ho_PadIDefects, ho_Rect;
+		HObject ho_PadIDefect, ho_PadIDefects, ho_Rect, ho_RegionIR, ho_RBEp;
 		HTuple hv_DOut, hv_nObj;
-		HTuple ht1, ht3, ht2, ht;
+		HTuple ht1, ht3, ht2, ht, hv_pdil = 5;
 
-		CountObj(m_ho_ContoursGrsmPi, &hv_nObj);
+		CountObj(m_ho_ContoursGPadsIsol, &hv_nObj);
 		int nObj = hv_nObj.I();
 
-		HTuple m_hv_meander;
+		HTuple m_hv_pad;
 		HObject m_ho_CG, m_ho_CI;
 		HTuple m_hv_thr, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz;
 
@@ -1723,20 +1723,23 @@ namespace inspect_call
 		m_hv_thr = HTuple(m_Inspection_Params.threashold);
 		m_hw_absmb = HTuple(m_Inspection_Params.fCBM_AbsMB_Pad);
 		m_hw_abssp = HTuple(m_Inspection_Params.fCBM_AbsSP_Pad);
-		m_hv_ctype = HTuple(true);
+		m_hv_ctype = HTuple(0);
 		m_fsz = HTuple(m_Inspection_Params.iCBM_Rmsize_Pad);
+
+		HObject m_ho_RegionI;
+		Threshold(m_local_Im, &m_ho_RegionI, m_hv_thr, 255);
 
 		GenEmptyObj(&ho_PadIDefects);
 
 		for (int i = 1; i <= nObj; i++)
 		{
-			m_hv_meander = (HTuple)i;
+			m_hv_pad = (HTuple)i;
 
 			GenEmptyObj(&ho_PadIDefect);
-
-			m_pCBM->ProcessMeander(m_local_Im, m_ho_ContoursGrsmPi, m_ho_RectanglesPadsIsol, /*m_ho_Gi*/m_ho_Gi_CbmTest,
-				&ho_PadIDefect, &ho_Rect, &m_ho_CG, &m_ho_CI,
-				m_hv_thr, m_hv_meander, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz,
+			
+			m_pCBM->ProcessPads(m_local_Im, m_ho_ContoursGPadsIsol, m_ho_RegionsGPadsIsol, m_ho_Gi, m_ho_RegionI, m_ho_RegionGPad,
+				&ho_PadIDefect, &ho_Rect, &m_ho_CG, &m_ho_CI, &ho_RegionIR, &ho_RBEp,
+				m_hv_thr, m_hv_pad, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz, hv_pdil,
 				&hv_DOut);
 
 			HCnt = 0;
@@ -1772,14 +1775,14 @@ namespace inspect_call
 
 		DWORD time_start = GetTickCount();
 
-		HObject ho_PadCDefect, ho_PadCDefects, ho_Rect;
+		HObject ho_PadCDefect, ho_PadCDefects, ho_Rect, ho_RegionIR, ho_RBEp;
 		HTuple hv_DOut, hv_nObj;
-		HTuple ht1, ht3, ht2, ht;
+		HTuple ht1, ht3, ht2, ht, hv_pdil = 3;
 
-		CountObj(m_ho_ContoursGrsmPc, &hv_nObj);
+		CountObj(m_ho_ContoursGPadsCon, &hv_nObj);
 		int nObj = hv_nObj.I();
 
-		HTuple m_hv_meander;
+		HTuple m_hv_pad;
 		HObject m_ho_CG, m_ho_CI;
 		HTuple m_hv_thr, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz;
 
@@ -1788,20 +1791,23 @@ namespace inspect_call
 		m_hv_thr = HTuple(m_Inspection_Params.threashold);
 		m_hw_absmb = HTuple(m_Inspection_Params.fCBM_AbsMB_ConnPad);
 		m_hw_abssp = HTuple(m_Inspection_Params.fCBM_AbsSP_ConnPad);
-		m_hv_ctype = HTuple(true);
+		m_hv_ctype = HTuple(0);
 		m_fsz = HTuple(m_Inspection_Params.iCBM_Rmsize_ConnPad);
+
+		HObject m_ho_RegionI;
+		Threshold(m_local_Im, &m_ho_RegionI, m_hv_thr, 255);
 
 		GenEmptyObj(&ho_PadCDefects);
 
 		for (int i = 1; i <= nObj; i++)
 		{
-			m_hv_meander = (HTuple)i;
+			m_hv_pad = (HTuple)i;
 
 			GenEmptyObj(&ho_PadCDefect);
 
-			m_pCBM->ProcessMeander(m_local_Im, m_ho_ContoursGrsmPc, m_ho_RectanglesPadsCon, /*m_ho_Gi*/m_ho_Gi_CbmTest,
-				&ho_PadCDefect, &ho_Rect, &m_ho_CG, &m_ho_CI,
-				m_hv_thr, m_hv_meander, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz,
+			m_pCBM->ProcessPads(m_local_Im, m_ho_ContoursGPadsCon, m_ho_RegionsGPadsCon, m_ho_Gi, m_ho_RegionI, m_ho_RegionGPad,
+				&ho_PadCDefect, &ho_Rect, &m_ho_CG, &m_ho_CI, &ho_RegionIR, &ho_RBEp,
+				m_hv_thr, m_hv_pad, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz, hv_pdil,
 				&hv_DOut);
 
 			HCnt = 0;
@@ -1864,7 +1870,7 @@ namespace inspect_call
 
 			GenEmptyObj(&ho_WADefect);
 
-			m_pCBM->ProcessMeander(m_local_Im, m_ho_ContoursWireAngles, m_ho_RectanglesWireAngles, /*m_ho_Gi*/m_ho_Gi_CbmTest,
+			m_pCBM->ProcessMeander(m_local_Im, m_ho_ContoursWireAngles, m_ho_RectanglesWireAngles, m_ho_Gi,
 				&ho_WADefect, &ho_Rect, &m_ho_CG, &m_ho_CI,
 				m_hv_thr, m_hv_meander, m_hw_absmb, m_hw_abssp, m_hv_ctype, m_fsz,
 				&hv_DOut);
@@ -2124,11 +2130,11 @@ namespace inspect_call
 	HTuple m_ho_FWMpar;
 
 	/// for CBM ***
-	HObject m_ho_Gi_CbmTest;
 	HObject m_ho_ContoursGrsm, m_ho_MeanderRects;
-	HObject m_ho_ContoursGrsmPi, m_ho_RectanglesPadsIsol;
-	HObject m_ho_ContoursGrsmPc, m_ho_RectanglesPadsCon;	
+	HObject m_ho_ContoursGPadsIsol, m_ho_RegionsGPadsIsol;
+	HObject m_ho_ContoursGPadsCon, m_ho_RegionsGPadsCon;
 	HObject m_ho_ContoursWireAngles, m_ho_RectanglesWireAngles;
+	HObject m_ho_RegionGPad;
 
 	/// for Dynthres Test ***
 	HObject m_ho_CadSpaceRegion_DynThresTest;
@@ -2311,6 +2317,9 @@ namespace inspect_call
 			GetDomain(m_ho_Gi, &m_ho_GiDomain);
 			SmallestRectangle1(m_ho_GiDomain, &alig2::hv_Crop_Row1, &alig2::hv_Crop_Col1, &alig2::hv_Crop_Row2, &alig2::hv_Crop_Col2);
 
+			Threshold(m_ho_Gi, &m_ho_CadSpaceRegion_DynThresTest, 0, 0);
+			Threshold(m_ho_Gi, &m_ho_CadPatternRegion_DynThresTest, 1, 255);
+
 			bool ret = alig2::Alig2_Read(path_model);
 			if (!ret)
 			{
@@ -2400,6 +2409,16 @@ namespace inspect_call
 
 			GetFWMStandardWidth(m_ho_SkeletonsFWM, m_ho_WidthImageP, &m_ho_FWMpar);
 			//ReadTuple(HTuple(path_teach) + "FWMpar.tup", &m_ho_FWMpar);
+
+			//HCall(ret, Read_HObject(&m_ho_ContoursGrsm, HTuple(path_teach) + "ContoursGrsmc"));
+			//HCall(ret, Read_HObject(&m_ho_MeanderRects, HTuple(path_teach) + "MeanderRects"));
+			HCall(ret, Read_HObject(&m_ho_ContoursGPadsIsol, HTuple(path_teach) + "ContoursGPadsIsol"));
+			HCall(ret, Read_HObject(&m_ho_RegionsGPadsIsol, HTuple(path_teach) + "RegionsGPadsIsol"));
+			HCall(ret, Read_HObject(&m_ho_ContoursGPadsCon, HTuple(path_teach) + "ContoursGPadsCon"));
+			HCall(ret, Read_HObject(&m_ho_RegionsGPadsCon, HTuple(path_teach) + "RegionsGPadsCon"));
+			//HCall(ret, Read_HObject(&m_ho_ContoursWireAngles, HTuple(path_teach) + "ContoursWireAngles"));
+			//HCall(ret, Read_HObject(&m_ho_RectanglesWireAngles, HTuple(path_teach) + "RectanglesWireAngles"));
+			HCall(ret, Read_HObject(&m_ho_RegionGPad, HTuple(path_teach) + "RegionGPad"));
 
 			// --- Read BIN files ---------------------------------------------
 			CString path_bin;
@@ -2494,111 +2513,6 @@ namespace inspect_call
 		catch (...)
 		{
 			Queue_Add(&m_main_queue_log, NULL, "***Exception*** Load_Teach_FWM %s", path_model);
-			return false;
-		}
-		return ret;
-	}
-
-	bool Load_Teach3(CString path_model, int &iNoMeander, int &iNoPad, int &iNoConnPad, int &iNoWireAngle)
-	{
-		CString path_teach = path_model + "Teach3\\";
-
-		bool ret = true;
-
-		try
-		{
-			// --- Read HOBJ files ---------------------------------------------
-
-			HCall(ret, Read_HObject(&m_ho_Gi_CbmTest, HTuple(path_teach) + "Gi"));
-
-			HCall(ret, Read_HObject(&m_ho_ContoursGrsm, HTuple(path_teach) + "ContoursGrsmc"));
-			HCall(ret, Read_HObject(&m_ho_MeanderRects, HTuple(path_teach) + "MeanderRects"));
-
-			HCall(ret, Read_HObject(&m_ho_ContoursGrsmPi, HTuple(path_teach) + "ContoursGrsmPi"));
-			HCall(ret, Read_HObject(&m_ho_RectanglesPadsIsol, HTuple(path_teach) + "RectanglesPadsIsol"));
-
-			HCall(ret, Read_HObject(&m_ho_ContoursGrsmPc, HTuple(path_teach) + "ContoursGrsmPc"));
-			HCall(ret, Read_HObject(&m_ho_RectanglesPadsCon, HTuple(path_teach) + "RectanglesPadsCon"));
-
-			HCall(ret, Read_HObject(&m_ho_ContoursWireAngles, HTuple(path_teach) + "ContoursWireAngles"));
-			HCall(ret, Read_HObject(&m_ho_RectanglesWireAngles, HTuple(path_teach) + "RectanglesWireAngles"));
-
-			HTuple tnum;
-
-			CountObj(m_ho_MeanderRects, &tnum);
-			iNoMeander = tnum.I();
-
-			CountObj(m_ho_RectanglesPadsIsol, &tnum);
-			iNoPad = tnum.I();
-
-			CountObj(m_ho_RectanglesPadsCon, &tnum);
-			iNoConnPad = tnum.I();
-
-			CountObj(m_ho_ContoursWireAngles, &tnum);
-			iNoWireAngle = tnum.I();
-
-			m_num_teach += 1;
-			Queue_Add(&m_main_queue_log, NULL, "*-- Load_Teach3() - OK. %s", path_model);
-		}
-		catch (HException &except)
-		{
-			HTuple HExp;
-			HTuple HOperatorName, HErrMsg;
-			except.ToHTuple(&HExp);
-			except.GetExceptionData(HExp, "operator", &HOperatorName);
-			except.GetExceptionData(HExp, "error_message", &HErrMsg);
-
-			CString sOperatorName, sErrMsg;
-			sOperatorName = HOperatorName.S();
-			sErrMsg = HErrMsg.S();
-
-			Queue_Add(&m_main_queue_log, NULL, "***Halcon Exception*** Load_Teach3 <%s>, <%s>. %s", sOperatorName.GetBuffer(), sErrMsg.GetBuffer(), path_model);
-			return false;
-		}
-		catch (...)
-		{
-			Queue_Add(&m_main_queue_log, NULL, "***Exception*** Load_Teach3 %s", path_model);
-			return false;
-		}
-		return ret;
-	}
-
-	bool Load_Teach_DT(CString path_model)
-	{
-		CString path_teach = path_model + "LowGrayTeach\\";
-
-		bool ret = true;
-
-		try
-		{
-			// --- Read HOBJ files ---------------------------------------------
-
-			HObject HCadImage;
-			HCall(ret, Read_HImage(&HCadImage, HTuple(path_teach) + "Gi.tif"));
-
-			Threshold(HCadImage, &m_ho_CadSpaceRegion_DynThresTest, 0, 128);
-			Threshold(HCadImage, &m_ho_CadPatternRegion_DynThresTest, 128, 255);
-
-			Queue_Add(&m_main_queue_log, NULL, "*-- Load_Teach_DT() - OK. %s", path_model);
-		}
-		catch (HException &except)
-		{
-			HTuple HExp;
-			HTuple HOperatorName, HErrMsg;
-			except.ToHTuple(&HExp);
-			except.GetExceptionData(HExp, "operator", &HOperatorName);
-			except.GetExceptionData(HExp, "error_message", &HErrMsg);
-
-			CString sOperatorName, sErrMsg;
-			sOperatorName = HOperatorName.S();
-			sErrMsg = HErrMsg.S();
-
-			Queue_Add(&m_main_queue_log, NULL, "***Halcon Exception*** Load_Teach_DT <%s>, <%s>. %s", sOperatorName.GetBuffer(), sErrMsg.GetBuffer(), path_model);
-			return false;
-		}
-		catch (...)
-		{
-			Queue_Add(&m_main_queue_log, NULL, "***Exception*** Load_Teach_DT %s", path_model);
 			return false;
 		}
 		return ret;

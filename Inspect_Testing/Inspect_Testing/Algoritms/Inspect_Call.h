@@ -430,11 +430,12 @@ namespace inspect_call
 
 	extern int m_num_teach;
 
-	extern HObject m_ho_Gi_CbmTest;
 	extern HObject m_ho_ContoursGrsm, m_ho_MeanderRects;
-	extern HObject m_ho_ContoursGrsmPi, m_ho_RectanglesPadsIsol;
-	extern HObject m_ho_ContoursGrsmPc, m_ho_RectanglesPadsCon;
+	extern HObject m_ho_ContoursGPadsIsol, m_ho_RegionsGPadsIsol;
+	extern HObject m_ho_ContoursGPadsCon, m_ho_RegionsGPadsCon;
 	extern HObject m_ho_ContoursWireAngles, m_ho_RectanglesWireAngles;
+	extern HObject m_ho_RegionGPad;
+
 
 	/// for Dynthres Test ***
 	extern HObject m_ho_CadSpaceRegion_DynThresTest;
@@ -458,8 +459,6 @@ namespace inspect_call
 		HTuple hv_cutfrombeg, HTuple hv_cutfromend);
 
 	bool Load_Teach(CString path_model);
-	bool Load_Teach3(CString path_model, int &iNoMeander, int &iNoPad, int &iNoConnPad, int &iNoWireAngle);
-	bool Load_Teach_DT(CString path_model);
 	bool Load_Model(CString path_model);
 	bool Convert_To_Bin(CString path_teach, bool replace);
 	bool Load_Params(CString szModelPath, int iVersion, struct Inspection_Params *params, TSQueueSM<CString>* queue_log);

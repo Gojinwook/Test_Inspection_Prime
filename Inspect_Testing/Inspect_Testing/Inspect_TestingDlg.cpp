@@ -1140,22 +1140,33 @@ void CInspectTestingDlg::OnBnClickedButtonLoadTeach()
 		Load_Model(m_model_Path);
 		Load_Teach(m_model_Path);
 
-		//int iNoMeander, iNoPad, iNoConnPad, iNoWireAngle;
+		int iNoMeander, iNoPad, iNoConnPad, iNoWireAngle;
+		HTuple tnum;
 
-		//Load_Teach3(m_model_Path, iNoMeander, iNoPad, iNoConnPad, iNoWireAngle);
-		//CString cstr;
-		//cstr.Format(_T("%d"), iNoMeander);
-		//SetDlgItemText(IDC_EDIT_CBM_MEANDER, cstr);
-		//cstr.Format(_T("%d"), iNoPad);
-		//SetDlgItemText(IDC_EDIT_CBM_PAD, cstr);
-		//cstr.Format(_T("%d"), iNoConnPad);
-		//SetDlgItemText(IDC_EDIT_CBM_CONN_PAD, cstr);
-		//cstr.Format(_T("%d"), iNoWireAngle);
-		//SetDlgItemText(IDC_EDIT_CBM_WIRE_ANGLE, cstr);
+		//CountObj(m_ho_MeanderRects, &tnum);
+		//iNoMeander = tnum.I();
+		iNoMeander = 0;
 
-		// Temporarily load a CAD file for testing.
-		Load_Teach_DT(m_model_Path);
+		CountObj(m_ho_RegionsGPadsIsol, &tnum);
+		iNoPad = tnum.I();
 
+		CountObj(m_ho_RegionsGPadsCon, &tnum);
+		iNoConnPad = tnum.I();
+
+		//CountObj(m_ho_ContoursWireAngles, &tnum);
+		//iNoWireAngle = tnum.I();
+		iNoWireAngle = 0;
+		
+		CString cstr;
+		cstr.Format(_T("%d"), iNoMeander);
+		SetDlgItemText(IDC_EDIT_CBM_MEANDER, cstr);
+		cstr.Format(_T("%d"), iNoPad);
+		SetDlgItemText(IDC_EDIT_CBM_PAD, cstr);
+		cstr.Format(_T("%d"), iNoConnPad);
+		SetDlgItemText(IDC_EDIT_CBM_CONN_PAD, cstr);
+		cstr.Format(_T("%d"), iNoWireAngle);
+		SetDlgItemText(IDC_EDIT_CBM_WIRE_ANGLE, cstr);
+		
 		inspect_call::m_Path_Model = m_model_Path;
 		m_inspect->Init();
 		m_init = 1;
@@ -2617,6 +2628,9 @@ int CInspectTestingDlg::Disp_Defects()
 	{
 		HColor = "red";
 	}
+
+	DispObjImage(m_inspect->m_ho_RegionsPadMB, "red");
+	DispObjImage(m_inspect->m_ho_RegionsConnPadMB, "red");
 
 	DispObjImage(m_inspect->m_ho_RegionsDT_S, "red");
 	DispObjImage(m_inspect->m_ho_RegionsDT_P, "red");
@@ -4219,13 +4233,13 @@ void CInspectTestingDlg::OnBnClickedViewCbmMeander()
 void CInspectTestingDlg::OnBnClickedViewCbmPad()
 {
 	m_Window.SetColor("cyan");
-	m_Window.DispObj(m_ho_ContoursGrsmPi);
+	m_Window.DispObj(m_ho_ContoursGPadsIsol);
 }
 
 void CInspectTestingDlg::OnBnClickedViewCbmConnPad()
 {
 	m_Window.SetColor("magenta");
-	m_Window.DispObj(m_ho_ContoursGrsmPc);
+	m_Window.DispObj(m_ho_ContoursGPadsCon);
 }
 
 void CInspectTestingDlg::OnBnClickedViewCbmWireAngle()
@@ -4279,6 +4293,8 @@ void CInspectTestingDlg::OnBnClickedWpseti()
 
 void CInspectTestingDlg::OnBnClickedButtonProcCbmMeander()
 {
+	OnBnClickedButtonInspectionInit();
+
 	m_inspect->Proc_CBM_Meander();
 
 	m_Window.DispObj(m_inspect->m_local_Im);
@@ -4289,6 +4305,12 @@ void CInspectTestingDlg::OnBnClickedButtonProcCbmMeander()
 
 void CInspectTestingDlg::OnBnClickedButtonProcCbmPad()
 {
+	OnBnClickedButtonInspectionInit();
+
+	m_Window.DispObj(m_inspect->m_local_Im);
+	m_Disp_Image = m_inspect->m_local_Im;
+
+	GenEmptyObj(&m_inspect->m_ho_RegionsPadMB);
 	m_inspect->Proc_CBM_Pad();
 
 	m_Window.DispObj(m_inspect->m_local_Im);
@@ -4299,6 +4321,12 @@ void CInspectTestingDlg::OnBnClickedButtonProcCbmPad()
 
 void CInspectTestingDlg::OnBnClickedButtonProcCbmConnPad()
 {
+	OnBnClickedButtonInspectionInit();
+
+	m_Window.DispObj(m_inspect->m_local_Im);
+	m_Disp_Image = m_inspect->m_local_Im;
+
+	GenEmptyObj(&m_inspect->m_ho_RegionsConnPadMB);
 	m_inspect->Proc_CBM_ConnPad();
 
 	m_Window.DispObj(m_inspect->m_local_Im);
@@ -4309,6 +4337,8 @@ void CInspectTestingDlg::OnBnClickedButtonProcCbmConnPad()
 
 void CInspectTestingDlg::OnBnClickedButtonProcCbmWireAngle()
 {
+	OnBnClickedButtonInspectionInit();
+
 	m_inspect->Proc_CBM_WireAngle();
 
 	m_Window.DispObj(m_inspect->m_local_Im);

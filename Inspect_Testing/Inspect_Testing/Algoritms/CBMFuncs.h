@@ -28,6 +28,11 @@ public:
 		HTuple hv_thr, HTuple hv_meander, HTuple hw_absmb, HTuple hw_abssp, HTuple hv_ctype, int fsz,
 		HTuple *hv_Dout); // Filtered displacement
 
+	void ProcessPads(HObject ho_Im, HObject ho_ContoursGrsm, HObject ho_PadRects, HObject ho_Gi, HObject ho_RegionI, HObject ho_RegionGPad,
+		HObject *ho_PadDefects, HObject *ho_Rectangle, HObject *ho_ContourGmv, HObject *ho_ContourI, HObject *ho_RegionIR, HObject *ho_RBEp, // defects found as regions
+		HTuple hv_thr, HTuple hv_pad, HTuple hw_absmb, HTuple hw_abssp, HTuple hv_ctype, int fsz, HTuple hv_pdil,
+		HTuple *hv_Dout);
+
 protected:
 	void DistPointToLineSegmH(HTuple hv_y, HTuple hv_x, HTuple hv_y1, HTuple hv_x1, HTuple hv_y2,
 		HTuple hv_x2, HTuple *hv_distance, HTuple *hv_ym, HTuple *hv_xm, HTuple *hv_t);
@@ -55,6 +60,8 @@ protected:
 
 	int Region_Threshold_SubPix(HObject ho_Im, HObject ho_RegSel, int thr, float *rows_sub, float *cols_sub);
 
+	int Region_Threshold_SubPixGap(HObject ho_Im, HObject ho_RegSel, int thr, float *rows_sub, float *cols_sub, int *ngap);
+
 	void MoveContourH(HObject ho_Contour, HObject *ho_ContourOut, HTuple hv_mr, HTuple hv_mc);
 
 	void Region_Threshold_SubPixH(HObject ho_RegSel, HObject ho_Im, HTuple hv_Thr, HTuple *hv_RowsSub, HTuple *hv_ColsSub);
@@ -71,7 +78,10 @@ protected:
 
 	void BuildBorderContour(HObject ho_Bordersi, HObject *ho_Bordercl, HObject *ho_BorderEPs);
 
-	void CCBM::BuildRealContour(HObject ho_Im, HObject ho_Rectangle5,
+	void BuildRealContourI(HObject ho_Im, HObject ho_Rectangle5, HObject ho_RegionI, HObject ho_RegionGPad, HObject *ho_ContourOut, HObject *ho_BorderEPs,
+		HObject *ho_RegionIR, HObject *ho_RBEp, HTuple hv_ctype, HTuple hv_thr, HTuple hv_pdil);
+
+	void BuildRealContour(HObject ho_Im, HObject ho_Rectangle5,
 		HObject *ho_ContourOut, HObject *ho_BorderEPs, HObject *ho_RegionIR,
 		HTuple hv_ctype, HTuple hv_thr);
 
