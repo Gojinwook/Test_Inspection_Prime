@@ -1799,6 +1799,13 @@ namespace inspect_call
 
 		GenEmptyObj(&ho_PadCDefects);
 
+		//WriteObject(m_local_Im, (LPCTSTR)("c:\\DualTest\\Igor_ho_Local_Im_R"));
+		//WriteObject(m_ho_ContoursGPadsCon, (LPCTSTR)("c:\\DualTest\\Igor_m_ho_ContoursGPadsCon"));
+		//WriteObject(m_ho_RegionsGPadsCon, (LPCTSTR)("c:\\DualTest\\Igor_m_ho_RegionsGPadsCon"));
+		//WriteObject(m_ho_Gi, (LPCTSTR)("c:\\DualTest\\Igor_m_ho_Gi"));
+		//WriteObject(m_ho_RegionI, (LPCTSTR)("c:\\DualTest\\Igor_HPatternRgn"));
+		//WriteObject(m_ho_RegionGPad, (LPCTSTR)("c:\\DualTest\\Igor_m_ho_RegionGPad"));
+
 		for (int i = 1; i <= nObj; i++)
 		{
 			m_hv_pad = (HTuple)i;
@@ -2317,8 +2324,8 @@ namespace inspect_call
 			GetDomain(m_ho_Gi, &m_ho_GiDomain);
 			SmallestRectangle1(m_ho_GiDomain, &alig2::hv_Crop_Row1, &alig2::hv_Crop_Col1, &alig2::hv_Crop_Row2, &alig2::hv_Crop_Col2);
 
-			Threshold(m_ho_Gi, &m_ho_CadSpaceRegion_DynThresTest, 0, 0);
-			Threshold(m_ho_Gi, &m_ho_CadPatternRegion_DynThresTest, 1, 255);
+			Threshold(m_ho_Gi, &m_ho_CadSpaceRegion_DynThresTest, 0, 127);
+			Threshold(m_ho_Gi, &m_ho_CadPatternRegion_DynThresTest, 128, 255);
 
 			bool ret = alig2::Alig2_Read(path_model);
 			if (!ret)
